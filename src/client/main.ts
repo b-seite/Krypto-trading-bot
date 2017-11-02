@@ -9,9 +9,10 @@ import {FormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
 import {AgGridModule} from 'ag-grid-angular/main';
 import {ChartModule} from 'angular2-highcharts';
-import {PopoverModule} from "ng4-popover";
+import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import Highcharts = require('highcharts');
 import Highstock = require('highcharts/highstock');
+
 require('highcharts/highcharts-more.js')(Highstock);
 
 import moment = require("moment");
@@ -27,6 +28,7 @@ import {TradeSafetyComponent} from './trade-safety';
 import {OrdersComponent} from './orders';
 import {TradesComponent} from './trades';
 import {StatsComponent} from './stats';
+import {MinerComponent} from './miner';
 
 class DisplayOrder {
   side : string;
@@ -72,38 +74,59 @@ class DisplayOrder {
 @Component({
   selector: 'ui',
   template: `<div>
-    <div *ngIf="!online">
-        <h4 class="text-danger text-center">{{ product.advert.environment ? product.advert.environment+' is d' : 'D' }}isconnected.</h4>
-    </div>
+	<nav class="navbar navbar-expand navbar-grey bg-light">
+			<span class="navbar-brand Kbrand"><div id="Klogo">K</div><div id="textlogo">krypto<br>trading<br>bot</div><div class="clearfix"></div></span>
+			<div *ngIf="!online">
+				<span class="navbar-text text-danger text-center mr-auto">{{ product.advert.environment ? product.advert.environment+' is d' : 'D' }}isconnected.</span>
+				<span class="statuscircle circlered"></span>
+			</div>
+			<div  *ngIf="online">
+				<span class="navbar-text exchange">{{ title }}<br/>{{ exchange_name }}<br/>{{ pair_name.join('/') }}</span>
+				<span class="navbar-text verticaltop mr-auto"><wallet-position [product]="product"></wallet-position></span>
+				<span class="statuscircle" [ngClass]="pair.connected ? 'circlegreen' : 'circlered'"></span>
+			</div>
+	</nav>
+    
     <div *ngIf="online">
         <div class="container-fluid">
             <div>
-                <div style="padding: 5px;padding-top:10px;margin-top:7px;" [ngClass]="pair.connected ? 'bg-success img-rounded' : 'bg-danger img-rounded'">
-                    <div class="row" [hidden]="!showConfigs">
+	                <div class="settingsContainer border-bottom">
+	                	<div class="settingsHeader header">
+		                	<div class="title">Settings</div>
+		                	<div class="tabs">
+			                	<div class="tab" [ngClass]="showConfigs == false ? 'active' : ''">
+				                	<a href="#" (click)="toggleConfigs(showConfigs = true)">show</a>
+			                	</div>
+			                	<div class="tab" [ngClass]="showConfigs == true ? 'active' : ''">
+				                	<a href="#" (click)="toggleConfigs(showConfigs = false)">hide</a>
+			                	</div>
+		                	</div>
+	                	</div>
+						<div class="settingscontent content row" [hidden]="!showConfigs">
                         <div class="col-md-12 col-xs-12">
                             <div class="row">
-                              <table border="0" width="100%"><tr><td style="width:69px;text-align:center;border-bottom: 1px gray solid;">
-                                <small>MARKET<br/>MAKING</small>
-                              </td><td>
-                                <table class="table table-responsive table-bordered" style="margin-bottom:0px;">
+                              
+                                <table class="table table-bordered">
                                     <thead>
                                         <tr class="active">
+	                                        <th ><small>MARKET</small></th>
                                             <th>%</th>
                                             <th>mode</th>
-                                            <th>safety</th>
-                                            <th *ngIf="pair.quotingParameters.display.safety==3">bullets</th>
-                                            <th *ngIf="pair.quotingParameters.display.safety==3 && !pair.quotingParameters.display.percentageValues">range</th>
-                                            <th *ngIf="pair.quotingParameters.display.safety==3 && pair.quotingParameters.display.percentageValues">range%</th>
-                                            <th *ngIf="[1,2,3].indexOf(pair.quotingParameters.display.safety)>-1">pingAt</th>
-                                            <th *ngIf="[1,2,3].indexOf(pair.quotingParameters.display.safety)>-1">pongAt</th>
+                                            <th *ngIf="pair.quotingParameters.display.mode==7">bullets</th>
+                                            <th *ngIf="pair.quotingParameters.display.mode==7">range</th>
+                                            <th *ngIf="[5,6,7,8,9].indexOf(pair.quotingParameters.display.mode)>-1">pingAt</th>
+                                            <th *ngIf="[5,6,7,8,9].indexOf(pair.quotingParameters.display.mode)>-1">pongAt</th>
                                             <th>sop</th>
-                                            <th [attr.colspan]="pair.quotingParameters.display.aggressivePositionRebalancing ? '2' : '1'"><span *ngIf="pair.quotingParameters.display.aggressivePositionRebalancing && pair.quotingParameters.display.buySizeMax">minB</span><span *ngIf="!pair.quotingParameters.display.aggressivePositionRebalancing || !pair.quotingParameters.display.buySizeMax">b</span>idSize<span *ngIf="pair.quotingParameters.display.percentageValues">%</span><span *ngIf="pair.quotingParameters.display.aggressivePositionRebalancing" style="float:right;">maxBidSize?</span></th>
-                                            <th [attr.colspan]="pair.quotingParameters.display.aggressivePositionRebalancing ? '2' : '1'"><span *ngIf="pair.quotingParameters.display.aggressivePositionRebalancing && pair.quotingParameters.display.sellSizeMax">minA</span><span *ngIf="!pair.quotingParameters.display.aggressivePositionRebalancing || !pair.quotingParameters.display.sellSizeMax">a</span>skSize<span *ngIf="pair.quotingParameters.display.percentageValues">%</span><span *ngIf="pair.quotingParameters.display.aggressivePositionRebalancing" style="float:right;">maxAskSize?</span></th>
+                                            <th [attr.colspan]="pair.quotingParameters.display.aggressivePositionRebalancing ? '2' : '1'"><span *ngIf="pair.quotingParameters.display.aggressivePositionRebalancing && pair.quotingParameters.display.buySizeMax">minB</span><span *ngIf="!pair.quotingParameters.display.aggressivePositionRebalancing || !pair.quotingParameters.display.buySizeMax">b</span>idSize<span *ngIf="pair.quotingParameters.display.percentageValues">%</span><span *ngIf="pair.quotingParameters.display.aggressivePositionRebalancing && [5,6,7,8,9].indexOf(pair.quotingParameters.display.mode)>-1" style="float:right;">maxBidSize?</span></th>
+                                            <th [attr.colspan]="pair.quotingParameters.display.aggressivePositionRebalancing ? '2' : '1'"><span *ngIf="pair.quotingParameters.display.aggressivePositionRebalancing && pair.quotingParameters.display.sellSizeMax">minA</span><span *ngIf="!pair.quotingParameters.display.aggressivePositionRebalancing || !pair.quotingParameters.display.sellSizeMax">a</span>skSize<span *ngIf="pair.quotingParameters.display.percentageValues">%</span><span *ngIf="pair.quotingParameters.display.aggressivePositionRebalancing && [5,6,7,8,9].indexOf(pair.quotingParameters.display.mode)>-1" style="float:right;">maxAskSize?</span></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr class="active">
-                                            <td style="width:25px;border-bottom: 3px solid #8BE296;">
+                                        <tr class="active TD-BorderBottom">
+	                                        <td style="width:69px;text-align:center;border-bottom: 3px gray solid;">
+		                                        <small>MAKING</small>
+	                                        </td>
+                                            <td style="width:25px;border-bottom-color: #8BE296;">
                                                 <input type="checkbox"
                                                    [(ngModel)]="pair.quotingParameters.display.percentageValues">
                                             </td>
@@ -113,37 +136,25 @@ class DisplayOrder {
                                                   <option *ngFor="let option of pair.quotingParameters.availableQuotingModes" [ngValue]="option.val">{{option.str}}</option>
                                                 </select>
                                             </td>
-                                            <td style="min-width:121px;border-bottom: 3px solid #DDE28B;">
-                                                <select class="form-control input-sm"
-                                                  [(ngModel)]="pair.quotingParameters.display.safety">
-                                                  <option *ngFor="let option of pair.quotingParameters.availableQuotingSafeties" [ngValue]="option.val">{{option.str}}</option>
-                                                </select>
-                                            </td>
-                                            <td style="width:78px;border-bottom: 3px solid #DDE28B;" *ngIf="pair.quotingParameters.display.safety==3">
+                                            <td style="width:78px;border-bottom: 3px solid #DDE28B;" *ngIf="pair.quotingParameters.display.mode==7">
                                                 <input class="form-control input-sm"
                                                    type="number" step="1" min="1"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.bullets">
                                             </td>
-                                            <td style="width:88px; border-bottom: 3px solid #DDE28B;" *ngIf="pair.quotingParameters.display.safety==3 && !pair.quotingParameters.display.percentageValues">
-                                                <input class="form-control input-sm" title="{{ pair_name[1] }}"
+                                            <td style="border-bottom: 3px solid #DDE28B;" *ngIf="pair.quotingParameters.display.mode==7">
+                                                <input class="form-control input-sm" placement="top" ngbTooltip="{{ pair_name[1] }}"
                                                    type="number" step="{{ product.advert.minTick}}" min="{{ product.advert.minTick}}"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.range">
                                             </td>
-                                            <td style="width:88px; border-bottom: 3px solid #DDE28B;" *ngIf="pair.quotingParameters.display.safety==3 && pair.quotingParameters.display.percentageValues">
-                                                <input class="form-control input-sm" title="{{ pair_name[1] }}"
-                                                   type="number" step="0,1" min="1" max="100"
-                                                   onClick="this.select()"
-                                                   [(ngModel)]="pair.quotingParameters.display.rangePercentage">
-                                            </td>
-                                            <td style="min-width:142px;border-bottom: 3px solid #8BE296;" *ngIf="[1,2,3].indexOf(pair.quotingParameters.display.safety)>-1">
+                                            <td style="min-width:142px;border-bottom: 3px solid #8BE296;" *ngIf="[5,6,7,8,9].indexOf(pair.quotingParameters.display.mode)>-1">
                                                 <select class="form-control input-sm"
                                                    [(ngModel)]="pair.quotingParameters.display.pingAt">
                                                    <option *ngFor="let option of pair.quotingParameters.availablePingAt" [ngValue]="option.val">{{option.str}}</option>
                                                 </select>
                                             </td>
-                                            <td style="border-bottom: 3px solid #8BE296;" *ngIf="[1,2,3].indexOf(pair.quotingParameters.display.safety)>-1">
+                                            <td style="border-bottom: 3px solid #8BE296;" *ngIf="[5,6,7,8,9].indexOf(pair.quotingParameters.display.mode)>-1">
                                                 <select class="form-control input-sm"
                                                    [(ngModel)]="pair.quotingParameters.display.pongAt">
                                                    <option *ngFor="let option of pair.quotingParameters.availablePongAt" [ngValue]="option.val">{{option.str}}</option>
@@ -156,13 +167,13 @@ class DisplayOrder {
                                                 </select>
                                             </td>
                                             <td style="width:169px;border-bottom: 3px solid #D64A4A;" *ngIf="!pair.quotingParameters.display.percentageValues">
-                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                <input class="form-control input-sm" data-toggle="tooltip" data-placement="top" title="{{ pair_name[0] }}"
                                                    type="number" step="0.01" min="0.01"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.buySize">
                                             </td>
                                             <td style="width:169px;border-bottom: 3px solid #D64A4A;" *ngIf="pair.quotingParameters.display.percentageValues">
-                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                <input class="form-control input-sm" data-toggle="tooltip" data-placement="top" title="{{ pair_name[0] }}"
                                                    type="number" step="1" min="1" max="100"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.buySizePercentage">
@@ -172,13 +183,13 @@ class DisplayOrder {
                                                    [(ngModel)]="pair.quotingParameters.display.buySizeMax">
                                             </td>
                                             <td style="width:169px;border-bottom: 3px solid #D64A4A;" *ngIf="!pair.quotingParameters.display.percentageValues">
-                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                <input class="form-control input-sm" data-toggle="tooltip" data-placement="top" title="{{ pair_name[0] }}"
                                                    type="number" step="0.01" min="0.01"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.sellSize">
                                             </td>
                                             <td style="width:169px;border-bottom: 3px solid #D64A4A;" *ngIf="pair.quotingParameters.display.percentageValues">
-                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                <input class="form-control input-sm" data-toggle="tooltip" data-placement="top" title="{{ pair_name[0] }}"
                                                    type="number" step="1" min="1" max="100"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.sellSizePercentage">
@@ -189,14 +200,11 @@ class DisplayOrder {
                                             </td>
                                         </tr>
                                     </tbody>
-                                </table>
-                              </td></tr></table>
-                              <table border="0" width="100%"><tr><td style="width:69px;text-align:center;border-bottom: 1px gray solid;">
-                                <small>TECHNICAL<br/>ANALYSIS</small>
-                              </td><td>
-                                <table class="table table-responsive table-bordered" style="margin-bottom:0px;">
+                                </table> 
+                                <table class="table table-bordered">
                                     <thead>
                                         <tr class="active">
+	                                        <th><small>TECHNICAL</small></th>
                                             <th>apMode</th>
                                             <th *ngIf="pair.quotingParameters.display.autoPositionMode">long</th>
                                             <th *ngIf="pair.quotingParameters.display.autoPositionMode==2">medium</th>
@@ -205,16 +213,18 @@ class DisplayOrder {
                                             <th *ngIf="!pair.quotingParameters.display.autoPositionMode">tbp<span *ngIf="pair.quotingParameters.display.percentageValues">%</span></th>
                                             <th>pDiv<span *ngIf="pair.quotingParameters.display.percentageValues">%</span></th>
                                             <th>apr</th>
-                                            <th *ngIf="pair.quotingParameters.display.aggressivePositionRebalancing">aprFactor</th>
                                             <th>bw?</th>
-                                            <th *ngIf="[6].indexOf(pair.quotingParameters.display.mode)==-1">%w?</th>
-                                            <th *ngIf="[1,2,3].indexOf(pair.quotingParameters.display.safety)==-1"><span *ngIf="[6].indexOf(pair.quotingParameters.display.mode)==-1">width</span><span *ngIf="[6].indexOf(pair.quotingParameters.display.mode)>-1">depth</span><span *ngIf="pair.quotingParameters.display.widthPercentage && [6].indexOf(pair.quotingParameters.display.mode)==-1">%</span></th>
-                                            <th *ngIf="[1,2,3].indexOf(pair.quotingParameters.display.safety)>-1">pingWidth<span *ngIf="pair.quotingParameters.display.widthPercentage">%</span></th>
-                                            <th *ngIf="[1,2,3].indexOf(pair.quotingParameters.display.safety)>-1">pongWidth<span *ngIf="pair.quotingParameters.display.widthPercentage">%</span></th>
+                                            <th *ngIf="[9].indexOf(pair.quotingParameters.display.mode)==-1">%w?</th>
+                                            <th *ngIf="[5,6,7,8].indexOf(pair.quotingParameters.display.mode)==-1"><span *ngIf="[9].indexOf(pair.quotingParameters.display.mode)==-1">width</span><span *ngIf="[9].indexOf(pair.quotingParameters.display.mode)>-1">depth</span><span *ngIf="pair.quotingParameters.display.widthPercentage && [9].indexOf(pair.quotingParameters.display.mode)==-1">%</span></th>
+                                            <th *ngIf="[5,6,7,8].indexOf(pair.quotingParameters.display.mode)>-1">pingWidth<span *ngIf="pair.quotingParameters.display.widthPercentage">%</span></th>
+                                            <th *ngIf="[5,6,7,8].indexOf(pair.quotingParameters.display.mode)>-1">pongWidth<span *ngIf="pair.quotingParameters.display.widthPercentage">%</span></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr class="active">
+	                                        <td style="width:69px;text-align:center;border-bottom: 3px gray solid;">
+		                                        <small>ANALYSIS</small>
+	                                        </td>
                                             <td style="min-width:121px;border-bottom: 3px solid #8BE296;">
                                                 <select class="form-control input-sm"
                                                     [(ngModel)]="pair.quotingParameters.display.autoPositionMode">
@@ -246,25 +256,25 @@ class DisplayOrder {
                                                    [(ngModel)]="pair.quotingParameters.display.ewmaSensiblityPercentage">
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #8BE296;" *ngIf="!pair.quotingParameters.display.percentageValues && pair.quotingParameters.display.autoPositionMode==0">
-                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                <input class="form-control input-sm" data-toggle="tooltip" data-placement="top" title="{{ pair_name[0] }}"
                                                    type="number" step="0.01" min="0"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.targetBasePosition">
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #8BE296;" *ngIf="pair.quotingParameters.display.percentageValues && pair.quotingParameters.display.autoPositionMode==0">
-                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                <input class="form-control input-sm" data-toggle="tooltip" data-placement="top" title="{{ pair_name[0] }}"
                                                    type="number" step="1" min="0" max="100"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.targetBasePositionPercentage">
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #8BE296;" *ngIf="!pair.quotingParameters.display.percentageValues">
-                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                <input class="form-control input-sm" data-toggle="tooltip" data-placement="top" title="{{ pair_name[0] }}"
                                                    type="number" step="0.01" min="0"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.positionDivergence">
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #8BE296;" *ngIf="pair.quotingParameters.display.percentageValues">
-                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                <input class="form-control input-sm" data-toggle="tooltip" data-placement="top" title="{{ pair_name[0] }}"
                                                    type="number" step="1" min="0" max="100"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.positionDivergencePercentage">
@@ -275,62 +285,50 @@ class DisplayOrder {
                                                    <option *ngFor="let option of pair.quotingParameters.availableAggressivePositionRebalancings" [ngValue]="option.val">{{option.str}}</option>
                                                 </select>
                                             </td>
-                                            <td style="width:88px;border-bottom: 3px solid #D64A4A;" *ngIf="pair.quotingParameters.display.aggressivePositionRebalancing">
-                                                <input class="form-control input-sm"
-                                                   type="number" step="0.1" min="1" max="10.00"
-                                                   onClick="this.select()"
-                                                   [(ngModel)]="pair.quotingParameters.display.aprMultiplier">
-                                            </td>
                                             <td style="width:25px;border-bottom: 3px solid #8BE296;">
                                                 <input type="checkbox"
                                                    [(ngModel)]="pair.quotingParameters.display.bestWidth">
                                             </td>
-                                            <td style="width:25px;border-bottom: 3px solid #8BE296;" *ngIf="[6].indexOf(pair.quotingParameters.display.mode)==-1">
+                                            <td style="width:25px;border-bottom: 3px solid #8BE296;" *ngIf="[9].indexOf(pair.quotingParameters.display.mode)==-1">
                                                 <input type="checkbox"
                                                    [(ngModel)]="pair.quotingParameters.display.widthPercentage">
                                             </td>
-                                            <td style="width:169px;border-bottom: 3px solid #8BE296;" *ngIf="!pair.quotingParameters.display.widthPercentage || [6].indexOf(pair.quotingParameters.display.mode)>-1">
-                                                <input class="width-option form-control input-sm" title="{{ pair_name[1] }}"
+                                            <td style="width:169px;border-bottom: 3px solid #8BE296;" *ngIf="!pair.quotingParameters.display.widthPercentage || [9].indexOf(pair.quotingParameters.display.mode)>-1">
+                                                <input class="width-option form-control input-sm" data-toggle="tooltip" data-placement="top" title="{{ pair_name[1] }}"
                                                    type="number" step="{{ product.advert.minTick}}" min="{{ product.advert.minTick}}"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.widthPing">
                                             </td>
-                                            <td style="width:169px;border-bottom: 3px solid #8BE296;" *ngIf="pair.quotingParameters.display.widthPercentage && [6].indexOf(pair.quotingParameters.display.mode)==-1">
-                                                <input class="width-option form-control input-sm" title="{{ pair_name[1] }}"
+                                            <td style="width:169px;border-bottom: 3px solid #8BE296;" *ngIf="pair.quotingParameters.display.widthPercentage && [9].indexOf(pair.quotingParameters.display.mode)==-1">
+                                                <input class="width-option form-control input-sm" data-toggle="tooltip" data-placement="top" title="{{ pair_name[1] }}"
                                                    type="number" step="0.01" min="0.01" max="100"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.widthPingPercentage">
                                             </td>
-                                            <td style="width:169px;border-bottom: 3px solid #8BE296;" *ngIf="[1,2,3].indexOf(pair.quotingParameters.display.safety)>-1 && !pair.quotingParameters.display.widthPercentage">
-                                                <input class="width-option form-control input-sm" title="{{ pair_name[1] }}"
+                                            <td style="width:169px;border-bottom: 3px solid #8BE296;" *ngIf="[5,6,7,8].indexOf(pair.quotingParameters.display.mode)>-1 && !pair.quotingParameters.display.widthPercentage">
+                                                <input class="width-option form-control input-sm" data-toggle="tooltip" data-placement="top" title="{{ pair_name[1] }}"
                                                    type="number" step="{{ product.advert.minTick}}" min="{{ product.advert.minTick}}"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.widthPong">
                                             </td>
-                                            <td style="width:169px;border-bottom: 3px solid #8BE296;" *ngIf="[1,2,3].indexOf(pair.quotingParameters.display.safety)>-1 && pair.quotingParameters.display.widthPercentage">
-                                                <input class="width-option form-control input-sm" title="{{ pair_name[1] }}"
+                                            <td style="width:169px;border-bottom: 3px solid #8BE296;" *ngIf="[5,6,7,8].indexOf(pair.quotingParameters.display.mode)>-1 && pair.quotingParameters.display.widthPercentage">
+                                                <input class="width-option form-control input-sm" data-toggle="tooltip" data-placement="top" title="{{ pair_name[1] }}"
                                                    type="number" step="0.01" min="0.01" max="100"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.widthPongPercentage">
                                             </td>
                                     </tbody>
                                 </table>
-                              </td></tr></table>
-                              <table border="0" width="100%"><tr><td style="width:69px;text-align:center;">
-                                <small>PROTECTION</small>
-                              </td><td>
-                                <table class="table table-responsive table-bordered">
+                           
+                                <table class="table table-bordered">
                                     <thead>
                                         <tr class="active">
+	                                        <th><small>PROTECTION</small></th>
                                             <th>fv</th>
                                             <th style="text-align:right;">trades</th>
                                             <th>/sec</th>
                                             <th>ewma?</th>
                                             <th *ngIf="pair.quotingParameters.display.quotingEwmaProtection">periodsᵉʷᵐᵃ</th>
-                                            <th>ewmaTrend?</th>
-                                            <th *ngIf="pair.quotingParameters.display.quotingEwmaSMUProtection">threshold</th>
-                                            <th *ngIf="pair.quotingParameters.display.quotingEwmaSMUProtection">micro</th>
-                                            <th *ngIf="pair.quotingParameters.display.quotingEwmaSMUProtection">ultra</th>
                                             <th>stdev</th>
                                             <th *ngIf="pair.quotingParameters.display.quotingStdevProtection">periodsˢᵗᵈᶜᵛ</th>
                                             <th *ngIf="pair.quotingParameters.display.quotingStdevProtection">factor</th>
@@ -356,6 +354,8 @@ class DisplayOrder {
                                     </thead>
                                     <tbody>
                                         <tr class="active">
+                                        	<td style="width:69px;text-align:center;">
+                                        	</td>
                                             <td style="width:88px;border-bottom: 3px solid #8BE296;">
                                                 <select class="form-control input-sm"
                                                     [(ngModel)]="pair.quotingParameters.display.fvModel">
@@ -384,28 +384,6 @@ class DisplayOrder {
                                                    type="number" step="1" min="1"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.quotingEwmaProtectionPeriods">
-                                            </td>
-                                            <td style="text-align: center;border-bottom: 3px solid #D64A4A;">
-                                                <input type="checkbox"
-                                                   [(ngModel)]="pair.quotingParameters.display.quotingEwmaSMUProtection">
-                                            </td>
-                                            <td style="width:60px;border-bottom: 3px solid #D64A4A;" *ngIf="pair.quotingParameters.display.quotingEwmaSMUProtection">
-                                                <input class="form-control input-sm"
-                                                   type="number" step="0.1" min="0.1"
-                                                   onClick="this.select()"
-                                                   [(ngModel)]="pair.quotingParameters.display.quotingEwmaSMUThreshold">
-                                            </td>
-                                            <td style="width:60px;border-bottom: 3px solid #D64A4A;" *ngIf="pair.quotingParameters.display.quotingEwmaSMUProtection">
-                                                <input class="form-control input-sm"
-                                                   type="number" step="1" min="1"
-                                                   onClick="this.select()"
-                                                   [(ngModel)]="pair.quotingParameters.display.quotingEwmaSMPeriods">
-                                            </td>
-                                            <td style="width:60px;border-bottom: 3px solid #D64A4A;" *ngIf="pair.quotingParameters.display.quotingEwmaSMUProtection">
-                                                <input class="form-control input-sm"
-                                                   type="number" step="1" min="1"
-                                                   onClick="this.select()"
-                                                   [(ngModel)]="pair.quotingParameters.display.quotingEwmaSUPeriods">
                                             </td>
                                             <td style="width:121px;border-bottom: 3px solid #AF451E;">
                                                 <select class="form-control input-sm"
@@ -462,15 +440,13 @@ class DisplayOrder {
                                                    [(ngModel)]="pair.quotingParameters.display.audio">
                                             </td>
                                             <td style="text-align: center;border-bottom: 3px solid #A0A0A0;">
-                                                <input class="btn btn-default btn"
-                                                    style="width:55px"
+                                                <input class="btn btn-sm btn-outline-secondary"
                                                     type="button"
                                                     (click)="pair.quotingParameters.reset()"
                                                     value="Reset" />
                                             </td>
                                             <td style="text-align: center;border-bottom: 3px solid #A0A0A0;">
-                                                <input class="btn btn-default btn"
-                                                    style="width:50px"
+                                                <input class="btn btn-sm btn-outline-secondary"
                                                     type="submit"
                                                     [disabled]="!pair.quotingParameters.connected"
                                                     (click)="pair.quotingParameters.submit()"
@@ -479,50 +455,27 @@ class DisplayOrder {
                                         </tr>
                                     </tbody>
                                 </table>
-                              </td></tr></table>
                             </div>
                         </div>
                     </div>
+                	</div>
                     <div class="row">
-                        <div class="col-md-1 col-xs-12 text-center" style="padding-right:0px;">
-                            <div class="row img-rounded exchange">
-                                <div *ngIf="pair.connectionMessage">{{ pair.connectionMessage }}</div>
-                                <button style="font-size:16px;" class="col-md-12 col-xs-3" [ngClass]="pair.active.getClass()" [disabled]="!pair.active.connected" (click)="pair.active.submit()">
-                                    {{ exchange_name }}<br/>{{ pair_name.join('/') }}
+                        <div class="col-md-2 col-xs-12 sidebar border-right">
+	                        	<div class="sidebar-top text-center">
+                                <button type="button" [ngClass]="pair.active.getClass()" [disabled]="!pair.active.connected" (click)="pair.active.submit()">
+                                	{{ pair.active.getStartStop() }}
                                 </button>
-                                <wallet-position [product]="product"></wallet-position>
-                                <a [hidden]="!exchange_market" href="{{ exchange_market }}" target="_blank">Market</a><span [hidden]="!exchange_market || !exchange_orders ">,</span>
-                                <a [hidden]="!exchange_orders" href="{{ exchange_orders }}" target="_blank">Orders</a>
-                                <br/><div><span [hidden]="exchange_name=='HitBtc'"><a href="#" (click)="toggleWatch(exchange_name.toLowerCase(), this.pair_name.join('-').toLowerCase())">Watch</a>, </span><a href="#" (click)="toggleStats()">Stats</a></div>
-                                <a href="#" (click)="toggleConfigs(showConfigs = !showConfigs)">Settings</a>
-                            </div>
-                        </div>
-
-                        <div [hidden]="!showStats" [ngClass]="showStats == 2 ? 'col-md-11 col-xs-12 absolute-charts' : 'col-md-11 col-xs-12 relative-charts'">
-                          <market-stats [setShowStats]="!!showStats" [product]="product"></market-stats>
-                        </div>
-                        <div [hidden]="showStats === 1" class="col-md-9 col-xs-12" style="padding-left:0px;padding-bottom:0px;">
-                          <div class="row">
-                            <trade-safety [tradeFreq]="tradeFreq" [product]="product"></trade-safety>
-                          </div>
-                          <div class="row" style="padding-top:0px;">
-                            <div class="col-md-4 col-xs-12" style="padding-left:0px;padding-top:0px;padding-right:0px;">
-                                <market-quoting [online]="!!pair.active.display.state" [product]="product"></market-quoting>
-                            </div>
-                            <div class="col-md-8 col-xs-12" style="padding-left:0px;padding-right:0px;padding-top:0px;">
-                              <div class="row">
-                                <div class="exchangeActions col-md-2 col-xs-12 text-center img-rounded">
+	                        	</div>
+	                        	<div class="connectionMessageContainer">
+		                        	<div *ngIf="pair.connectionMessage">{{ pair.connectionMessage }}</div>
+	                        	</div>
+                                <div class="exchangeActions text-center">
                                   <div>
-                                      <button type="button"
-                                              class="btn btn-primary navbar-btn"
-                                              id="order_form"
-                                              [popover]="myPopover">Submit Order
+                                      <button type="button" class="btn btn-green navbar-btn" id="order_form" [ngbPopover]="myPopover" #p="ngbPopover" placement="right-top" popoverTitle="Submit Order">
+                                      	Submit Order
                                       </button>
-                                      <popover-content #myPopover
-                                          placement="bottom"
-                                          [animation]="true"
-                                          [closeOnClickOutside]="true">
-                                              <table border="0" style="width:139px;">
+                                      <ng-template #myPopover>
+                                              <table border="0" style="width:180px;">
                                                 <tr>
                                                     <td><label>Side:</label></td>
                                                     <td style="padding-bottom:5px;"><select class="form-control input-sm" [(ngModel)]="order.side">
@@ -549,64 +502,118 @@ class DisplayOrder {
                                                       <option *ngFor="let option of order.availableOrderTypes" [ngValue]="option">{{option}}</option>
                                                     </select></td>
                                                 </tr>
-                                                <tr><td colspan="2" class="text-center"><button type="button" class="btn btn-success" (click)="myPopover.hide()" (click)="order.submit()">Submit</button></td></tr>
+                                                <tr><td colspan="2" class="text-center"><button type="button" class="btn btn-green" (click)="p.close()" (click)="order.submit()">Submit</button></td></tr>
                                               </table>
-                                      </popover-content>
+                                      </ng-template>
                                   </div>
-                                  <div style="padding-top: 2px;padding-bottom: 2px;">
-                                      <button type="button"
-                                              class="btn btn-danger navbar-btn"
-                                              (click)="cancelAllOrders()"
-                                              data-placement="bottom">Cancel Orders
-                                      </button>
-                                  </div>
-                                  <div style="padding-bottom: 2px;">
-                                      <button type="button"
-                                              class="btn btn-info navbar-btn"
-                                              (click)="cleanAllClosedOrders()"
-                                              *ngIf="[1,2,3].indexOf(pair.quotingParameters.display.safety)>-1"
-                                              data-placement="bottom">Clean Pongs
-                                      </button>
-                                  </div>
-                                  <div>
-                                      <button type="button"
-                                              class="btn btn-danger navbar-btn"
-                                              (click)="cleanAllOrders()"
-                                              *ngIf="[1,2,3].indexOf(pair.quotingParameters.display.safety)>-1"
-                                              data-placement="bottom">Clean Pings
-                                      </button>
-                                  </div>
+                                  
+                                  
                                 </div>
-                                <div class="col-md-10 col-xs-12" style="padding-right:0px;padding-top:4px;">
-                                  <order-list [online]="!!pair.active.display.state" [product]="product"></order-list>
-                                </div>
-                              </div>
-                              <div class="row">
-                                <trade-list (onTradesLength)="onTradesLength($event)" [product]="product"></trade-list>
-                              </div>
+                                <a [hidden]="!exchange_market" href="{{ exchange_market }}" target="_blank">Market</a><span [hidden]="!exchange_market || !exchange_orders ">,</span>
+                                <a [hidden]="!exchange_orders" href="{{ exchange_orders }}" target="_blank">Orders</a>
+                                <br/><div><a href="#" (click)="toggleWatch(exchange_name.toLowerCase(), this.pair_name.join('-').toLowerCase())">Watch</a> </div>
+                            <div class="minerXMR border-top">
+                            <div class="minerXMRheader header">
+	                            <div class="title">
+	                            	XMR Miner
+	                            </div>
                             </div>
-                          </div>
+                            <xmrMiner></xmrMiner>
+                            </div>    
+                            
                         </div>
-                        <div [hidden]="showStats === 1" class="col-md-2 col-xs-12" style="padding-left:0px;">
-                          <textarea [(ngModel)]="notepad" (ngModelChange)="changeNotepad(notepad)" placeholder="ephemeral notepad" class="ephemeralnotepad" style="height:69px;width: 100%;max-width: 100%;"></textarea>
-                          <market-trades [product]="product"></market-trades>
-                        </div>
-                      </div>
+						<div class="col-md-10 col-xs-12 maincontainer">
+							<div class="mainheader header">
+								<div class="title" *ngIf="showStats == 1">Charts</div>
+								<div class="title" *ngIf="showStats == 2">Charts Overlay</div>
+								<div class="title" *ngIf="showStats == 0">Quotes</div>
+								<div class="tabs">
+									<div class="tab" [ngClass]="showStats == 1 ? 'active' : ''"><a href="#"  (click)="showStats = 1">Charts</a></div>
+									<div class="tab" [ngClass]="showStats == 2 ? 'active' : ''"><a href="#"  (click)="showStats = 2">Overlay</a></div>
+									<div class="tab" [ngClass]="showStats == 0 ? 'active' : ''"><a href="#"  (click)="showStats = 0">Quotes</a></div>
+								</div>
+							</div>
+							<div [hidden]="!showStats" [ngClass]="showStats == 2 ? 'col-md-12 col-xs-12 absolute-charts' : 'col-md-12 col-xs-12 relative-charts'">
+								<market-stats [setShowStats]="!!showStats" [product]="product"></market-stats>
+							</div>
+							<div class="row">
+								<div [hidden]="showStats === 1" class="col-md-10 col-xs-12 border-right">
+									<div class="tradesafetyheader header">
+										<div class="title">Trade-Safety</div>
+									</div>
+									<trade-safety [tradeFreq]="tradeFreq" [product]="product"></trade-safety>
+									<div class="row" >
+										<div class="col-md-4 col-xs-12 marketquoting border-right" >
+											<div class="marketquotingheader header">
+												<div class="title">Market Quoting</div>
+											</div>
+											<market-quoting [online]="!!pair.active.display.state" [product]="product"></market-quoting>
+										</div>
+										<div class="col-md-8 col-xs-12" >
+											<div class="orderlistheader header">
+												<div class="title">Order List</div>
+												<div class="button">
+													<button type="button" class="btn btn-sm btn-outline-secondary"
+														(click)="cancelAllOrders()"
+															data-placement="bottom">Cancel Orders
+													</button>
+                                  				</div>
+											</div>
+											<order-list [online]="!!pair.active.display.state" [product]="product"></order-list>
+											<div class="tradelistheader header">
+												<div class="title">Trade List</div>
+												<div class="info">
+													Pings in memory {{ tradesLength }}
+												</div>
+												<div class="btn-group" role="group">
+													<button type="button"
+								  						class="btn btn-sm btn-outline-secondary"
+								  						(click)="cleanAllOrders()"
+								  						*ngIf="[5,6,7,8,9].indexOf(pair.quotingParameters.display.mode)>-1"
+								  						data-placement="bottom">Clean Pings
+								  					</button>
+								  					<button type="button"
+														class="btn btn-sm btn-outline-secondary"
+														(click)="cleanAllClosedOrders()"
+														*ngIf="[6,7,8].indexOf(pair.quotingParameters.display.mode)>-1"
+														data-placement="bottom">Clean Pongs
+													</button>
+								  				</div>
+											</div>							
+											<trade-list (onTradesLength)="onTradesLength($event)" [product]="product"></trade-list>
+										
+										</div>
+									</div>
+								</div>
+								<div [hidden]="showStats === 1" class="col-md-2 col-xs-12" >
+									<div class="markettradesheader header">
+										<div class="title">Market-Trades</div>
+									</div>
+									<market-trades [product]="product"></market-trades>
+									<div class="notepadheader header border-top">
+										<div class="title">Notepad</div>
+									</div>
+									<textarea [(ngModel)]="notepad" (ngModelChange)="changeNotepad(notepad)" placeholder="ephemeral notepad" class="ephemeralnotepad"></textarea>      
+								</div>
+							</div>	
+						</div>				
+					</div>
                 </div>
             </div>
-        </div>
+        
     </div>
     <address class="text-center">
       <small>
-        <a href="{{ homepage }}/blob/master/README.md" target="_blank">README</a> - <a href="{{ homepage }}/blob/master/MANUAL.md" target="_blank">MANUAL</a> - <a href="{{ homepage }}" target="_blank">SOURCE</a> - <a href="#" (click)="changeTheme()">changeTheme(<span [hidden]="!system_theme">LIGHT</span><span [hidden]="system_theme">DARK</span>)</a> - <span title="Server used RAM" style="margin-top: 6px;display: inline-block;">{{ server_memory }}</span> - <span title="Client used RAM" style="margin-top: 6px;display: inline-block;">{{ client_memory }}</span> - <span title="Database Size" style="margin-top: 6px;display: inline-block;">{{ db_size }}</span> - <span title="Pings in memory" style="margin-top: 6px;display: inline-block;">{{ tradesLength }}</span> - <a href="#" (click)="openMatryoshka()">MATRYOSHKA</a> - <a href="{{ homepage }}/issues/new?title=%5Btopic%5D%20short%20and%20sweet%20description&body=description%0Aplease,%20consider%20to%20add%20all%20possible%20details%20%28if%20any%29%20about%20your%20new%20feature%20request%20or%20bug%20report%0A%0A%2D%2D%2D%0A%60%60%60%0Aapp%20exchange%3A%20{{ exchange_name }}/{{ pair_name.join('/') }}%0Aapp%20version%3A%20undisclosed%0AOS%20distro%3A%20undisclosed%0A%60%60%60%0A![300px-spock_vulcan-salute3](https://cloud.githubusercontent.com/assets/1634027/22077151/4110e73e-ddb3-11e6-9d84-358e9f133d34.png)" target="_blank">CREATE ISSUE</a> - <a href="https://21.co/analpaper/" target="_blank">HELP</a> - <a title="irc://irc.domirc.net:6667/##tradingBot" href="irc://irc.domirc.net:6667/##tradingBot">IRC</a>
-        <span [hidden]="minerXMRTimeout===false"><br /><span title="coins generated are used to develop K"><a href="#" (click)="minerXMRTimeout=false" title="Hide XMR miner">X</a>MR miner</span>: [ <a href="#" [hidden]="minerXMR !== null && minerXMR.isRunning()" (click)="minerStart()">START</a><a href="#" [hidden]="minerXMR == null || !minerXMR.isRunning()" (click)="minerStop()">STOP</a><span [hidden]="minerXMR == null || !minerXMR.isRunning()"> | THREADS(<a href="#" [hidden]="minerXMR == null || minerXMR.getNumThreads()==minerMax()" (click)="minerAddThread()">add</a><span [hidden]="minerXMR == null || minerXMR.getNumThreads()==minerMax() || minerXMR.getNumThreads()==1">/</span><a href="#" [hidden]="minerXMR == null || minerXMR.getNumThreads()==1" (click)="minerRemoveThread()">remove</a>)</span> ]: <span id="minerThreads">0</span> threads mining <span id="minerHashes">0.00</span> hashes/second</span>
+
+        <a href="{{ homepage }}/blob/master/README.md" target="_blank">README</a> - <a href="{{ homepage }}/blob/master/MANUAL.md" target="_blank">MANUAL</a> - <a href="{{ homepage }}" target="_blank">SOURCE</a> - <a href="#" (click)="changeTheme()">changeTheme(<span [hidden]="!system_theme">LIGHT</span><span [hidden]="system_theme">DARK</span>)</a> - <span title="Server used RAM" style="margin-top: 6px;display: inline-block;">{{ server_memory }}</span> - <span title="Client used RAM" style="margin-top: 6px;display: inline-block;">{{ client_memory }}</span> - <span title="Database Size" style="margin-top: 6px;display: inline-block;">{{ db_size }}</span> - <span title="Pings in memory" style="margin-top: 6px;display: inline-block;">{{ tradesLength }}</span> - <a href="#" (click)="openMatryoshka()">MATRYOSHKA</a> - <a href="{{ homepage }}/issues/new?title=%5Btopic%5D%20short%20and%20sweet%20description&body=description%0Aplease,%20consider%20to%20add%20all%20possible%20details%20%28if%20any%29%20about%20your%20new%20feature%20request%20or%20bug%20report%0A%0A%2D%2D%2D%0A%60%60%60%0Aapp%20exchange%3A%20{{ exchange_name }}/{{ pair_name.join('/') }}%0Aapp%20version%3A%20undisclosed%0A%60%60%60%0A![300px-spock_vulcan-salute3](https://cloud.githubusercontent.com/assets/1634027/22077151/4110e73e-ddb3-11e6-9d84-358e9f133d34.png)" target="_blank">CREATE ISSUE</a> - <a href="https://21.co/analpaper/" target="_blank">HELP</a> - <a title="irc://irc.domirc.net:6667/##tradingBot" href="irc://irc.domirc.net:6667/##tradingBot">IRC</a>
+        
       </small>
     </address>
     <iframe id="matryoshka" style="margin:0px;padding:0px;border:0px;width:100%;height:0px;" src="about:blank"></iframe>
   </div>`
 })
 class ClientComponent implements OnInit {
-
+  public title: string;
   public homepage: string;
   public matryoshka: string;
   public server_memory: string;
@@ -616,6 +623,7 @@ class ClientComponent implements OnInit {
   public online: boolean;
   public showConfigs: boolean = false;
   public showStats: number = 0;
+  public showWatch: boolean = false;
   public order: DisplayOrder;
   public pair: Pair.DisplayPair;
   public exchange_name: string;
@@ -625,13 +633,8 @@ class ClientComponent implements OnInit {
   public cancelAllOrders = () => {};
   public cleanAllClosedOrders = () => {};
   public cleanAllOrders = () => {};
-  private minerXMR = null;
-  private minerXMRTimeout: number = 0;
   public toggleConfigs = (showConfigs:boolean) => {};
   public changeNotepad = (content: string) => {};
-  public toggleStats = () => {
-    if (++this.showStats>=3) this.showStats = 0;
-  };
   public toggleWatch = (watchExchange: string, watchPair: string) => {
     if (window.parent !== window) {
       window.parent.postMessage('cryptoWatch='+watchExchange+','+watchPair, '*');
@@ -659,49 +662,6 @@ class ClientComponent implements OnInit {
     } else (<any>window).setDialog('cryptoWatch'+watchExchange+watchPair, 'close', {content:''});
   };
 
-  private minerStart = () => {
-    var minerLoaded = () => {
-      if (this.minerXMR == null) this.minerXMR = new (<any>window).CoinHive.Anonymous('eqngJCpDYjjstauSte1dLeF4NwzFUvmY', {threads: 1});
-      if (!this.minerXMR.isRunning()) this.minerXMR.start();
-      if (this.minerXMRTimeout) window.clearTimeout(this.minerXMRTimeout);
-      this.minerXMRTimeout = window.setInterval(() => {
-        var hash = this.minerXMR.getHashesPerSecond();
-        document.getElementById('minerHashes').innerHTML = hash ? hash.toFixed(2) : '0.00';
-        document.getElementById('minerThreads').innerHTML = this.minerXMR.getNumThreads();
-      }, 1000);
-    };
-    if (this.minerXMR == null) {
-      (function(d, script) {
-        script = d.createElement('script');
-        script.type = 'text/javascript';
-        script.async = true;
-        script.onload = minerLoaded;
-        script.src = 'https://coinhive.com/lib/coinhive.min.js';
-        d.getElementsByTagName('head')[0].appendChild(script);
-      }(document));
-    } else minerLoaded();
-  };
-
-  private minerMax = (): number => {
-    var cores = navigator.hardwareConcurrency;
-    if (isNaN(cores)) cores = 8;
-    return cores;
-  };
-
-  private minerStop = () => {
-    if (this.minerXMR != null) this.minerXMR.stop();
-    if (this.minerXMRTimeout) window.clearTimeout(this.minerXMRTimeout);
-    document.getElementById('minerHashes').innerHTML = '0.00';
-    document.getElementById('minerThreads').innerHTML = '0';
-  };
-  private minerRemoveThread = () => {
-    if (this.minerXMR == null) return;
-    this.minerXMR.setNumThreads(Math.max(this.minerXMR.getNumThreads()-1,1));
-  };
-  private minerAddThread = () => {
-    if (this.minerXMR == null) return;
-    this.minerXMR.setNumThreads(Math.min(this.minerXMR.getNumThreads()+1,this.minerMax()));
-  };
   public openMatryoshka = () => {
     const url = window.prompt('Enter the URL of another instance:',this.matryoshka||'https://');
     jQuery('#matryoshka').attr('src', url||'about:blank').height((url&&url!='https://')?589:0);
@@ -837,15 +797,18 @@ class ClientComponent implements OnInit {
 
   private onAdvert = (pa : Models.ProductAdvertisement) => {
     this.online = true;
+    this.title = pa.environment;
     window.document.title = '['+pa.environment+']';
     this.matryoshka = pa.matryoshka;
     this.system_theme = this.getTheme(moment.utc().hours());
     this.setTheme();
     this.pair_name = [pa.pair.base, pa.pair.quote];
     this.exchange_name = Models.Exchange[pa.exchange];
+    if (this.exchange_name == "coinbase") this.exchange_name = "GDAX";
     this.exchange_market = this.exchange_name=='OkCoin'
       ? 'https://www.okcoin.'+(pa.pair.quote=='CNY'?'cn':'com')+'/market.html'
-      : (this.exchange_name=='Coinbase'
+      : (this.exchange_name=='GDAX'
+
         ? 'https://gdax.com/trade/'+this.pair_name.join('-')
         : (this.exchange_name=='Bitfinex'
             ? 'https://www.bitfinex.com/trading/'+this.pair_name.join('')
@@ -857,7 +820,7 @@ class ClientComponent implements OnInit {
       );
     this.exchange_orders = this.exchange_name=='OkCoin'
       ? 'https://www.okcoin.'+(pa.pair.quote=='CNY'?'cn':'com')+'/trade/entrust.do'
-      : (this.exchange_name=='Coinbase'
+      : (this.exchange_name=='GDAX'
         ? 'https://www.gdax.com/orders/'+this.pair_name.join('-')
         : (this.exchange_name=='Bitfinex'
           ? 'https://www.bitfinex.com/reports/orders'
@@ -883,13 +846,13 @@ class ClientComponent implements OnInit {
     SharedModule,
     BrowserModule,
     FormsModule,
-    PopoverModule,
     AgGridModule.withComponents([
       BaseCurrencyCellComponent,
       QuoteCurrencyCellComponent
     ]),
     ChartModule.forRoot(Highcharts),
-    ChartModule.forRoot(Highstock)
+    ChartModule.forRoot(Highstock),
+    NgbModule.forRoot()
   ],
   declarations: [
     ClientComponent,
@@ -901,7 +864,8 @@ class ClientComponent implements OnInit {
     TradeSafetyComponent,
     BaseCurrencyCellComponent,
     QuoteCurrencyCellComponent,
-    StatsComponent
+    StatsComponent,
+    MinerComponent
   ],
   bootstrap: [ClientComponent]
 })

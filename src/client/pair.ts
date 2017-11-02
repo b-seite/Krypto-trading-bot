@@ -49,16 +49,22 @@ class QuotingButtonViewModel extends FormViewModel<any> {
     super({state:0}, sub, fire, d => {return {state:Math.abs(d.state-1)};});
   }
 
-  public getClass = () => {
-    if (this.pending) return "btn btn-warning";
-    if (this.display.state) return "btn btn-success";
-    return "btn btn-danger";
+   public getClass = () => {
+	let btnclass = "btn btn-lg btn-block btn-";
+    if (this.pending) return btnclass + "warning";
+    if (this.display.state) return btnclass + "green";
+    return btnclass + "red";
   }
+  
+  public getStartStop = () => {
+    if (this.display.state) return "Stop?";
+    return "Trade?";
+  }
+
 }
 
 class DisplayQuotingParameters extends FormViewModel<Models.QuotingParameters> {
   availableQuotingModes = [];
-  availableQuotingSafeties = [];
   availableFvModels = [];
   availableAutoPositionModes = [];
   availableAggressivePositionRebalancings = [];
@@ -72,7 +78,6 @@ class DisplayQuotingParameters extends FormViewModel<Models.QuotingParameters> {
     super(<Models.QuotingParameters>{}, sub, fire);
 
     this.availableQuotingModes = DisplayQuotingParameters.getMapping(Models.QuotingMode);
-    this.availableQuotingSafeties = DisplayQuotingParameters.getMapping(Models.QuotingSafety);
     this.availableFvModels = DisplayQuotingParameters.getMapping(Models.FairValueModel);
     this.availableAutoPositionModes = DisplayQuotingParameters.getMapping(Models.AutoPositionMode);
     this.availableAggressivePositionRebalancings = DisplayQuotingParameters.getMapping(Models.APR);

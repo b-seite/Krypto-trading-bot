@@ -8,7 +8,7 @@ import {SubscriberFactory, FireFactory, BaseCurrencyCellComponent, QuoteCurrency
 
 @Component({
   selector: 'order-list',
-  template: `<ag-grid-angular #orderList class="ag-fresh ag-dark" style="height: 135px;width: 99.99%;" rowHeight="21" [gridOptions]="gridOptions" (cellClicked)="onCellClicked($event)"></ag-grid-angular>`
+  template: `<ag-grid-angular #orderList class="ag-K" rowHeight="21" [gridOptions]="gridOptions" (cellClicked)="onCellClicked($event)"></ag-grid-angular>`
 })
 export class OrdersComponent implements OnInit {
 
@@ -22,7 +22,7 @@ export class OrdersComponent implements OnInit {
     if (online) return;
     if (!this.gridOptions.api) return;
     this.gridOptions.api.setRowData([]);
-    setTimeout(()=>this.gridOptions.api.refreshView(),0);
+    setTimeout(()=>this.gridOptions.api.redrawRows(),0);
   }
 
   constructor(
@@ -56,7 +56,7 @@ export class OrdersComponent implements OnInit {
   private createColumnDefs = (): ColDef[] => {
     return [
       { width: 30, suppressSizeToFit: true, field: "cancel", headerName: 'cxl', cellRenderer: (params) => {
-        return '<button type="button" class="btn btn-danger btn-xs"><span data-action-type="remove" style="font-size: 16px;font-weight: bold;padding: 0px;line-height: 12px;">&times;</span></button>';
+        return '<button type="button" data-action-type="remove" class="btn btn-outline-secondary btn-xs">&times;</button>';
       } },
       { width: 82, suppressSizeToFit: true, field: 'time', headerName: 'time', cellRenderer:(params) => {
         return (params.value) ? params.value.format('HH:mm:ss,SSS') : '';
@@ -122,7 +122,7 @@ export class OrdersComponent implements OnInit {
         }
       }
     });
-    setTimeout(()=>this.gridOptions.api.refreshView(),0);
+    setTimeout(()=>this.gridOptions.api.redrawRows(),0);
     if (!exists && !isClosed)
       this.gridOptions.api.updateRowData({add:[{
         orderId: o.orderId,
