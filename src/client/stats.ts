@@ -385,6 +385,27 @@ export class StatsComponent implements OnInit {
     this.showStats = showStats;
   }
 
+  private forEach = (array, callback) => {
+    for (var i = 0; i < array.length; i++)
+      callback.call(window, array[i]);
+  }
+
+  private extend = (out) => {
+    out = out || {};
+
+    for (var i = 1; i < arguments.length; i++) {
+      if (!arguments[i])
+        continue;
+
+      for (var key in arguments[i]) {
+        if (arguments[i].hasOwnProperty(key))
+          out[key] = arguments[i][key];
+      }
+    }
+
+    return out;
+  }
+
   constructor(
     @Inject(NgZone) private zone: NgZone,
     @Inject(SubscriberFactory) private subscriberFactory: SubscriberFactory

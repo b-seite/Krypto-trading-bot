@@ -173,7 +173,13 @@ In the web UI, there are three rows of panels with cryptic looking names and edi
 
 * `aprFactor` - Defines the value with which the `size` is multiplicated when `apr` is in functional state.
 
-* `sop` - Super opportunities, if enabled and if the market width is x3 times bigger than the `width` set, it multiplies (x2 or x3) the `trades` and/or the `size`, in both sides at the same time.
+* `sop` - Super opportunities, if enabled and if the market width is `sopWidth` times bigger than the `width` set, it multiplies `sopTrades` to `trades` and/or `sopSize` to `size`, in both sides at the same time.
+ 
+* `sopWidth` - Is the value with the market width is multiplicated to define the activation point for Super opportunities.
+  
+* `sopTrades` - Multiplicates `trades` to rise the possible Trades per Minute if `sop` is in `Trades` or `tradesSize` state.
+
+* `sopSize` - Multiplicates `width` if `sop` is in `Size` or `tradesSize` state.  
 
 * `trades` - Often, only buying or selling many times in a short timeframe indicates that there is going to be a price swing. `trades` and `/sec` are highly related: If you successfully complete more orders than `trades` in `/sec` seconds, K.js will stop sending more buy orders until either `/sec` seconds has passed, or you have sold enough at a higher cost to make all those buy orders profitable. The number of trades is reported by side in the UI; "BuyTS", "SellTS", and "TotTS". If "BuyTS" goes above `trades`, K.js will stop sending buy orders, and the same for sells. For example, if `trades` is 2 and `/sec` is 1800 (half an hour):
 
@@ -191,6 +197,14 @@ Time     | Side | Price | Size | BuyTS | SellTS | Notes
 * `ewma?` - Use a quote protection of `periods` smoothed line of the price to limit the price while sending new orders.
 
 * `periodsᵉʷᵐᵃ` - Maximum amount of values collected in the sequences used to calculate the `ewma?` quote protection. After collect sequentially every 1 minute the value of the `fair value`, and before place new orders, a limit will be always applied to the new orders price using a `ewma` calculation, taking into account only the last `periods` periods in each sequence.
+
+* `ewmaTrend?` - Use a trend protection of double `periods` (Ultra+Micro) smoothed lines of the price to limit uptrend sells and downtrend buys.
+
+* `threshold` - When trend stregth is above positive threshold value bot stops selling, when strength below negative threshold value bot stops buying.
+
+* `ultra` - Time in minutes to define Ultra EMA
+
+* `micro` - Time in minutes to define Micro EMA
 
 * `stdev`
 
