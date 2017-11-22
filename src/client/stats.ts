@@ -7,12 +7,11 @@ import {SubscriberFactory} from './shared_directives';
 @Component({
   selector: 'market-stats',
   template: `<div class="col-md-6 col-xs-6">
-  <table><tr><td>
-    <chart style="position:relative;top:5px;height:339px;width:700px;" type="StockChart" [options]="fvChartOptions" (load)="saveInstance($event.context, 'fv')"></chart>
-  </td><td>
-    <chart style="position:relative;top:10px;height:167px;width:700px;" [options]="baseChartOptions" (load)="saveInstance($event.context, 'base')"></chart>
-    <chart style="position:relative;top:11px;height:167px;width:700px;" [options]="quoteChartOptions" (load)="saveInstance($event.context, 'quote')"></chart>
-  </td></tr></table>
+    <chart style="height:340px;width:1200px;" type="StockChart" [options]="fvChartOptions" (load)="saveInstance($event.context, 'fv')"></chart>
+	<table><tr>
+    <td><chart style="height:160px;width:600px;float:left;" [options]="baseChartOptions" (load)="saveInstance($event.context, 'base')"></chart></td>
+    <td><chart style="height:160px;width:600px;" [options]="quoteChartOptions" (load)="saveInstance($event.context, 'quote')"></chart></td>
+    </tr></table>
     </div>`
 })
 export class StatsComponent implements OnInit {
@@ -25,7 +24,6 @@ export class StatsComponent implements OnInit {
   public ewmaMedium: number;
   public ewmaLong: number;
   public ewmaQuote: number;
-  public ewmaSMUDiff: number;
   public stdevWidth: Models.IStdev;
   public fvChart: any;
   public quoteChart: any;
@@ -55,10 +53,12 @@ export class StatsComponent implements OnInit {
   public fvChartOptions = {
     title: 'fair value',
     chart: {
-        width: 700,
-        height: 339,
+        width: 1200,
+        height: 340,
         zoomType: false,
         backgroundColor:'rgba(255, 255, 255, 0)',
+        panning: true,
+        panKey: 'shift',
     },
     navigator: {enabled: false},
     rangeSelector:{enabled: false,height:0},
@@ -68,7 +68,7 @@ export class StatsComponent implements OnInit {
       type: 'datetime',
       crosshair: true,
       // events: {setExtremes: this.syncExtremes},
-      labels: {enabled: false},
+      labels: {enabled: true},
       gridLineWidth: 0,
       dateTimeLabelFormats: {millisecond: '%H:%M:%S',second: '%H:%M:%S',minute: '%H:%M',hour: '%H:%M',day: '%m-%d',week: '%m-%d',month: '%m',year: '%Y'}
     },
@@ -234,20 +234,13 @@ export class StatsComponent implements OnInit {
       fillOpacity: 0.2,
       zIndex: -1,
       data: []
-    },{
-      name: 'EWMA SMU Diff',
-      type: 'spline',
-      color: '#fd00ff',
-      tooltip: {pointFormatter: this.pointFormatterBase},
-      yAxis: 1,
-      data: []
     }]
   };
   public quoteChartOptions = {
     title: 'quote wallet',
     chart: {
-        width: 700,
-        height: 167,
+        width: 600,
+        height: 160,
         zoomType: false,
         resetZoomButton: {theme: {display: 'none'}},
         backgroundColor:'rgba(255, 255, 255, 0)'
@@ -316,8 +309,8 @@ export class StatsComponent implements OnInit {
   public baseChartOptions = {
     title: 'base wallet',
     chart: {
-        width: 700,
-        height: 167,
+        width: 600,
+        height: 160,
         zoomType: false,
         resetZoomButton: {theme: {display: 'none'}},
         backgroundColor:'rgba(255, 255, 255, 0)'
@@ -338,7 +331,7 @@ export class StatsComponent implements OnInit {
       type: 'datetime',
       crosshair: true,
       // events: {setExtremes: this.syncExtremes},
-      labels: {enabled: false},
+      labels: {enabled: true},
       dateTimeLabelFormats: {millisecond: '%H:%M:%S',second: '%H:%M:%S',minute: '%H:%M',hour: '%H:%M',day: '%m-%d',week: '%m-%d',month: '%m',year: '%Y'}
     },
     yAxis: [{
@@ -425,51 +418,6 @@ export class StatsComponent implements OnInit {
     (<any>Highcharts).customSymbols = {'circle': '●','diamond': '♦','square': '■','triangle': '▲','triangle-down': '▼'};
     Highcharts.setOptions({global: {getTimezoneOffset: function () {return new Date().getTimezoneOffset(); }}});
     setTimeout(() => {
-      /*this.forEach(document.getElementsByTagName('chart'), function (el) {
-        el.addEventListener('mousemove', function (e) {
-          var chart, point, i, event, containerLeft, thisLeft;
-          for (i = 0; i < Highcharts.charts.length; ++i) {
-            chart = Highcharts.charts[i];
-            containerLeft = chart.container.getBoundingClientRect().left;
-            thisLeft = el.getBoundingClientRect().left;
-            if (containerLeft == thisLeft && chart.container.getBoundingClientRect().top == el.getBoundingClientRect().top) continue;
-            chart.pointer.reset = function () { return undefined; };
-            console.log(e);
-            let ev: any = this.extend(new MouseEvent('mousemove'), {
-                which: 1,
-                chartX: e.originalEvent.chartX,
-                chartY: e.originalEvent.chartY,
-                clientX: (containerLeft != thisLeft)?containerLeft - thisLeft + e.originalEvent.clientX:e.originalEvent.clientX,
-                clientY: e.originalEvent.clientY,
-                pageX: (containerLeft != thisLeft)?containerLeft - thisLeft + e.originalEvent.pageX:e.originalEvent.pageX,
-                pageY: e.originalEvent.pageY,
-                screenX: (containerLeft != thisLeft)?containerLeft - thisLeft + e.originalEvent.screenX:e.originalEvent.screenX,
-                screenY: e.originalEvent.screenY
-            });
-            event = chart.pointer.normalize(ev);
-            point = chart.series[0].searchPoint(event, true);
-            if (point) {
-              point.onMouseOver();
-              point.series.chart.xAxis[0].drawCrosshair(event, point);
-            }
-          }
-        });
-      });
-      this.forEach(document.getElementsByTagName('chart'), function (el) {
-        el.addEventListener('mouseleave', function (e) {
-          var chart, point, i, event;
-          for (i = 0; i < Highcharts.charts.length; ++i) {
-            chart = Highcharts.charts[i];
-            event = chart.pointer.normalize(e.originalEvent);
-            point = chart.series[0].searchPoint(event, true);
-            if (point) {
-              point.onMouseOut();
-              chart.tooltip.hide(point);
-              chart.xAxis[0].hideCrosshair();
-            }
-          }
-        });
-      });*/
 
       this.subscriberFactory
         .getSubscriber(this.zone, Models.Topics.FairValue)
@@ -512,7 +460,6 @@ export class StatsComponent implements OnInit {
         if (this.stdevWidth.ask && this.stdevWidth.bid && this.stdevWidth.askMean && this.stdevWidth.bidMean) Highcharts.charts[this.fvChart].series[16].addPoint([time, this.stdevWidth.bidMean-this.stdevWidth.bid, this.stdevWidth.askMean+this.stdevWidth.ask], this.showStats, false, false);
       }
       if (this.ewmaQuote) Highcharts.charts[this.fvChart].series[6].addPoint([time, this.ewmaQuote], false);
-      if (this.ewmaSMUDiff) Highcharts.charts[this.fvChart].series[17].addPoint([time, this.ewmaSMUDiff], false);
       if (this.ewmaLong) Highcharts.charts[this.fvChart].series[7].addPoint([time, this.ewmaLong], false);
       if (this.ewmaMedium) Highcharts.charts[this.fvChart].series[8].addPoint([time, this.ewmaMedium], false);
       if (this.ewmaShort) Highcharts.charts[this.fvChart].series[9].addPoint([time, this.ewmaShort], false);
@@ -544,7 +491,6 @@ export class StatsComponent implements OnInit {
     if (ewma === null) return;
     this.fairValue = ewma.fairValue;
     if (ewma.ewmaQuote) this.ewmaQuote = ewma.ewmaQuote;
-    if (ewma.ewmaSMUDiff) this.ewmaSMUDiff = ewma.ewmaSMUDiff;
     if (ewma.ewmaShort) this.ewmaShort = ewma.ewmaShort;
     if (ewma.ewmaMedium) this.ewmaMedium = ewma.ewmaMedium;
     if (ewma.ewmaLong) this.ewmaLong = ewma.ewmaLong;

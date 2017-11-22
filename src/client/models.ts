@@ -89,7 +89,6 @@ export interface IStdev {
 export class EWMAChart {
     constructor(public stdevWidth: IStdev,
                 public ewmaQuote: number,
-                public ewmaSMUDiff: number,
                 public ewmaShort: number,
                 public ewmaMedium: number,
                 public ewmaLong: number,
@@ -163,7 +162,7 @@ export class TwoSidedQuote {
     constructor(public bid: Quote, public ask: Quote) {}
 }
 
-export enum QuoteStatus { Live, Disconnected, DisabledQuotes, MissingData, UnknownHeld, TBPHeld, MaxTradesSeconds, WaitingPing, DepletedFunds, Crossed, UpTrendHeld, DownTrendHeld }
+export enum QuoteStatus { Live, Disconnected, DisabledQuotes, MissingData, UnknownHeld, TBPHeld, MaxTradesSeconds, WaitingPing, DepletedFunds, Crossed }
 
 export class TwoSidedQuoteStatus {
     constructor(public bidStatus: QuoteStatus, public askStatus: QuoteStatus, public quotesInMemoryNew: number, public quotesInMemoryWorking: number, public quotesInMemoryDone: number) {}
@@ -173,8 +172,7 @@ export class CurrencyPair {
     constructor(public base: string, public quote: string) {}
 }
 
-export enum QuotingMode { Top, Mid, Join, InverseJoin, InverseTop, HamelinRat, Depth }
-export enum QuotingSafety { Off, PingPong, Boomerang, AK47 }
+export enum QuotingMode { Top, Mid, Join, InverseJoin, InverseTop, PingPong, Boomerang, AK47, HamelinRat, Depth }
 export enum FairValueModel { BBO, wBBO }
 export enum AutoPositionMode { Manual, EWMA_LS, EWMA_LMS }
 export enum DynamicPDivMode { Manual, Linear, Sine, SQRT, Switch }
@@ -200,7 +198,6 @@ export interface QuotingParameters {
     pingAt?: PingAt;
     pongAt?: PongAt;
     mode?: QuotingMode;
-    safety?: QuotingSafety
     fvModel?: FairValueModel;
     targetBasePosition?: number;
     targetBasePositionPercentage?: number;
@@ -216,21 +213,16 @@ export interface QuotingParameters {
     tradesPerMinute?: number;
     tradeRateSeconds?: number;
     quotingEwmaProtection?: boolean;
-    quotingEwmaSMUProtection?: boolean;
     quotingStdevProtection?: STDEV;
     quotingStdevBollingerBands?: boolean;
     audio?: boolean;
     bullets?: number;
     range?: number;
-    rangePercentage?: number;
     ewmaSensiblityPercentage?: number;
     longEwmaPeriods?: number;
     mediumEwmaPeriods?: number;
     shortEwmaPeriods?: number;
     quotingEwmaProtectionPeriods?: number;
-    quotingEwmaSMUThreshold?: number;
-    quotingEwmaSMPeriods?: number;
-    quotingEwmaSUPeriods?: number;
     quotingStdevProtectionFactor?: number;
     quotingStdevProtectionPeriods?: number;
     aprMultiplier?: number;
