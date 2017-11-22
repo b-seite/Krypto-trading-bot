@@ -16,14 +16,14 @@ namespace K {
         handshake(gw->exchange);
       };
       void waitTime() {
-        ((EV*)events)->tWallet->data = (void*)this;
-        uv_timer_start(((EV*)events)->tWallet, [](uv_timer_t *handle) {
+        ((EV*)events)->tWallet->setData(this);
+        ((EV*)events)->tWallet->start([](Timer *handle) {
           GW *k = (GW*)handle->data;
           if (((CF*)k->config)->argDebugEvents) FN::log("DEBUG", "EV GW tWallet timer");
           k->gw->wallet();
         }, 0, 15e+3);
-        ((EV*)events)->tCancel->data = (void*)this;
-        uv_timer_start(((EV*)events)->tCancel, [](uv_timer_t *handle) {
+        ((EV*)events)->tCancel->setData(this);
+        ((EV*)events)->tCancel->start([](Timer *handle) {
           GW *k = (GW*)handle->data;
           if (((CF*)k->config)->argDebugEvents) FN::log("DEBUG", "EV GW tCancel timer");
           if (k->qp->cancelOrdersAuto)

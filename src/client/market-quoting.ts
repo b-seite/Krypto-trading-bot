@@ -8,8 +8,8 @@ import {SubscriberFactory} from './shared_directives';
   selector: 'market-quoting',
   template: `<div class="tradeSafety2" style="margin-top:-4px;padding-top:0px;padding-right:0px;"><div style="padding-top:0px;padding-right:0px;">
       Market Width: <span class="{{ diffMD ? \'text-danger\' : \'text-muted\' }}">{{ diffMD | number:'1.'+product.fixed+'-'+product.fixed }}</span>,
-      Quote Width: <span class="{{ diffPx ? \'text-danger\' : \'text-muted\' }}">{{ diffPx | number:'1.'+product.fixed+'-'+product.fixed }}</span>
-      <div style="padding-left:0px;">Wallet TBP: <span class="text-danger">{{ targetBasePosition | number:'1.3-3' }}</span>, APR: <span class="{{ sideAPRSafety!=\'Off\' ? \'text-danger\' : \'text-muted\' }}">{{ sideAPRSafety }}</span>, Quotes: <span title="New Quotes in memory" class="{{ quotesInMemoryNew ? \'text-danger\' : \'text-muted\' }}">{{ quotesInMemoryNew }}</span>/<span title="Working Quotes in memory" class="{{ quotesInMemoryWorking ? \'text-danger\' : \'text-muted\' }}">{{ quotesInMemoryWorking }}</span>/<span title="Other Quotes in memory" class="{{ quotesInMemoryDone ? \'text-danger\' : \'text-muted\' }}">{{ quotesInMemoryDone }}</span></div>
+      Quote Width: <span class="{{ diffPx ? \'text-danger\' : \'text-muted\' }}">{{ diffPx | number:'1.'+product.fixed+'-'+product.fixed }}</span>, Quotes: <span title="New Quotes in memory" class="{{ quotesInMemoryNew ? \'text-danger\' : \'text-muted\' }}">{{ quotesInMemoryNew }}</span>/<span title="Working Quotes in memory" class="{{ quotesInMemoryWorking ? \'text-danger\' : \'text-muted\' }}">{{ quotesInMemoryWorking }}</span>/<span title="Other Quotes in memory" class="{{ quotesInMemoryDone ? \'text-danger\' : \'text-muted\' }}">{{ quotesInMemoryDone }}</span>
+      <div style="padding-left:0px;">Wallet TBP: <span class="text-danger">{{ targetBasePosition | number:'1.3-3' }}</span>, pDiv: <span class="text-danger">{{ positionDivergence | number:'1.3-3' }}</span>, APR: <span class="{{ sideAPRSafety!=\'Off\' ? \'text-danger\' : \'text-muted\' }}">{{ sideAPRSafety }}</span></div>
       </div></div><div style="padding-right:4px;padding-left:4px;padding-top:4px;"><table class="marketQuoting table table-hover table-responsive text-center">
       <tr class="active">
         <td>bidSize&nbsp;</td>
@@ -26,7 +26,7 @@ import {SubscriberFactory} from './shared_directives';
         <th *ngIf="askStatus != 'Live'" colspan="2" class="text-danger" title="Ask Quote Status">{{ askStatus }}</th>
       </tr>
       <tr class="active" *ngFor="let level of levels; let i = index">
-        <td *ngIf="i == 1 && levels.length == 4" colspan="4"><div class="text-danger" style="height:174px;"><br />To <a href="{{ product.advert.homepage }}/blob/master/README.md#unlock" target="_blank">unlock</a> all market levels<br />and to collaborate with the development<br /><br />make an acceptable Pull Request on github,<br/>or send 0.12100000 BTC or more to:<br /><a href="https://www.blocktrail.com/BTC/address/{{ a }}" target="_blank">{{ a }}</a><br /><br />Wait 2 confirmations and restart this bot.<!-- you can remove this message, but obviously the missing market levels will not be displayed magically. the market levels will be only displayed if the also displayed address is credited with 0.12100000 BTC. Note that if you make a Pull Request i will credit the payment for you easy, just let me know in the description of the PR what is the BTC Address displayed in your bot. --></div></td>
+        <td *ngIf="i == 1 && levels.length == 4" colspan="4"><div class="text-danger" style="height:174px;"><br />To <a href="{{ product.advert.homepage }}/blob/master/README.md#unlock" target="_blank">unlock</a> all market levels<br />and to collaborate with the development..<br /><br />make an acceptable Pull Request on github,<br/>or send 0.01210000 BTC or more to:<br /><a href="https://www.blocktrail.com/BTC/address/{{ a }}" target="_blank">{{ a }}</a><br /><br />Wait 2 confirmations and restart this bot.<!-- you can remove this message, but obviously the missing market levels will not be displayed magically. the market levels will be only displayed if the also displayed address is credited with 0.01210000 BTC. Note that if you make a Pull Request i will credit the payment for you easy, just let me know in the description of the PR what is the BTC Address displayed in your bot. --></div></td>
         <td *ngIf="i != 1 || levels.length != 4" [ngClass]="level.bidClass"><div style="z-index:2;position:relative;" [ngClass]="'bidsz' + i + ' num'">{{ level.bidSize | number:'1.4-4' }}</div><div style="float:right;margin-right:19px;"><div [ngClass]="level.bidClassVisual">&nbsp;</div></div></td>
         <td *ngIf="i != 1 || levels.length != 4" [ngClass]="level.bidClass"><div [ngClass]="'bidsz' + i">{{ level.bidPrice | number:'1.'+product.fixed+'-'+product.fixed }}</div></td>
         <td *ngIf="i != 1 || levels.length != 4" [ngClass]="level.askClass"><div [ngClass]="'asksz' + i">{{ level.askPrice | number:'1.'+product.fixed+'-'+product.fixed }}</div></td>
@@ -53,6 +53,7 @@ export class MarketQuotingComponent implements OnInit {
   public noBidReason: string;
   public noAskReason: string;
   private targetBasePosition: number;
+  private positionDivergence: number;
   private sideAPRSafety: string;
   public a: string;
   @Input() product: Models.ProductState;
@@ -93,6 +94,7 @@ export class MarketQuotingComponent implements OnInit {
   private clearTargetBasePosition = () => {
     this.targetBasePosition = null;
     this.sideAPRSafety = null;
+    this.positionDivergence = null;
   }
 
   private clearAddress = () => {
@@ -120,6 +122,7 @@ export class MarketQuotingComponent implements OnInit {
     if (value == null) return;
     this.targetBasePosition = value.tbp;
     this.sideAPRSafety = value.sideAPR || 'Off';
+    this.positionDivergence = value.pDiv;
   }
 
   private updateMarket = (update: Models.Market) => {

@@ -16,7 +16,7 @@ namespace K {
   enum class mQuoteState: unsigned int { Live, Disconnected, DisabledQuotes, MissingData, UnknownHeld, TBPHeld, MaxTradesSeconds, WaitingPing, DepletedFunds, Crossed, UpTrendHeld, DownTrendHeld };
   enum class mFairValueModel: unsigned int { BBO, wBBO };
   enum class mAutoPositionMode: unsigned int { Manual, EWMA_LS, EWMA_LMS };
-  enum class mPDiffMode: unsigned int { Off, Linear, Sine, SQRT, Switch};
+  enum class mPDivMode: unsigned int { Manual, Linear, Sine, SQRT, Switch};
   enum class mAPR: unsigned int { Off, Size, SizeWidth };
   enum class mSOP: unsigned int { Off, Trades, Size, TradesSize };
   enum class mSTDEV: unsigned int { Off, OnFV, OnFVAPROff, OnTops, OnTopsAPROff, OnTop, OnTopAPROff };
@@ -32,64 +32,64 @@ namespace K {
     WalletChart = 'C', EWMAChart = 'D'
   };
   struct mQuotingParams {
-    double            widthPing                     = 2.0;
-    double            widthPingPercentage           = 0.25;
-    double            widthPong                     = 2.0;
-    double            widthPongPercentage           = 0.25;
-    bool              widthPercentage               = false;
-    bool              bestWidth                     = true;
-    double            buySize                       = 0.02;
-    int               buySizePercentage             = 7;
-    bool              buySizeMax                    = false;
-    double            sellSize                      = 0.01;
-    int               sellSizePercentage            = 7;
-    bool              sellSizeMax                   = false;
-    mPingAt           pingAt                        = mPingAt::BothSides;
-    mPongAt           pongAt                        = mPongAt::ShortPingFair;
-    mQuotingMode      mode                          = mQuotingMode::Top;
-    mQuotingSafety    safety                        = mQuotingSafety::Boomerang;
-    int               bullets                       = 2;
-    double            range                         = 0.5;
-    double            rangePercentage               = 1.0;
-    mFairValueModel   fvModel                       = mFairValueModel::BBO;
-    double            targetBasePosition            = 1.0;
-    int               targetBasePositionPercentage  = 50;
-    double            positionDivergence            = 0.9;
-    double            positionDivergenceMin     	= 0.4;
-    int               positionDivergencePercentage  = 21;
+    double            widthPing                       = 2.0;
+    double            widthPingPercentage             = 0.25;
+    double            widthPong                       = 2.0;
+    double            widthPongPercentage             = 0.25;
+    bool              widthPercentage                 = false;
+    bool              bestWidth                       = true;
+    double            buySize                         = 0.02;
+    int               buySizePercentage               = 7;
+    bool              buySizeMax                      = false;
+    double            sellSize                        = 0.01;
+    int               sellSizePercentage              = 7;
+    bool              sellSizeMax                     = false;
+    mPingAt           pingAt                          = mPingAt::BothSides;
+    mPongAt           pongAt                          = mPongAt::ShortPingFair;
+    mQuotingMode      mode                            = mQuotingMode::Top;
+    mQuotingSafety    safety                          = mQuotingSafety::Boomerang;
+    int               bullets                         = 2;
+    double            range                           = 0.5;
+    double            rangePercentage                 = 1.0;
+    mFairValueModel   fvModel                         = mFairValueModel::BBO;
+    double            targetBasePosition              = 1.0;
+    int               targetBasePositionPercentage    = 50;
+    double            positionDivergence              = 0.9;
+    double            positionDivergenceMin           = 0.4;
+    int               positionDivergencePercentage    = 21;
     int               positionDivergencePercentageMin = 10;
-    mPDiffMode     	  positionDivergenceMode		= mPDiffMode::Off;
-    bool              percentageValues              = false;
-    mAutoPositionMode autoPositionMode              = mAutoPositionMode::EWMA_LS;
-    mAPR              aggressivePositionRebalancing = mAPR::Off;
-    mSOP              superTrades                   = mSOP::Off;
-    double            tradesPerMinute               = 0.9;
-    int               tradeRateSeconds              = 3;
-    bool              quotingEwmaProtection         = true;
-    int               quotingEwmaProtectionPeriods  = 200;
-    bool              quotingEwmaSMUProtection      = false;
-    double            quotingEwmaSMUThreshold       = 2.0;
-    int               quotingEwmaSMPeriods          = 12;
-    int               quotingEwmaSUPeriods          = 3;
-    mSTDEV            quotingStdevProtection        = mSTDEV::Off;
-    bool              quotingStdevBollingerBands    = false;
-    double            quotingStdevProtectionFactor  = 1.0;
-    int               quotingStdevProtectionPeriods = 1200;
-    double            ewmaSensiblityPercentage      = 0.5;
-    int               longEwmaPeriods               = 200;
-    int               mediumEwmaPeriods             = 100;
-    int               shortEwmaPeriods              = 50;
-    double            aprMultiplier                 = 2;
-    double            sopWidthMultiplier            = 2;
-    double            sopSizeMultiplier             = 2;
-    double            sopTradesMultiplier           = 2;
-    int               delayAPI                      = 0;
-    bool              cancelOrdersAuto              = false;
-    double            cleanPongsAuto                = 0.0;
-    double            profitHourInterval            = 0.5;
-    bool              audio                         = false;
-    int               delayUI                       = 7;
-    bool              _matchPings                   = true;
+    mPDivMode         positionDivergenceMode          = mPDivMode::Manual;
+    bool              percentageValues                = false;
+    mAutoPositionMode autoPositionMode                = mAutoPositionMode::EWMA_LS;
+    mAPR              aggressivePositionRebalancing   = mAPR::Off;
+    mSOP              superTrades                     = mSOP::Off;
+    double            tradesPerMinute                 = 0.9;
+    int               tradeRateSeconds                = 3;
+    bool              quotingEwmaProtection           = true;
+    int               quotingEwmaProtectionPeriods    = 200;
+    bool              quotingEwmaSMUProtection        = false;
+    double            quotingEwmaSMUThreshold         = 2.0;
+    int               quotingEwmaSMPeriods            = 12;
+    int               quotingEwmaSUPeriods            = 3;
+    mSTDEV            quotingStdevProtection          = mSTDEV::Off;
+    bool              quotingStdevBollingerBands      = false;
+    double            quotingStdevProtectionFactor    = 1.0;
+    int               quotingStdevProtectionPeriods   = 1200;
+    double            ewmaSensiblityPercentage        = 0.5;
+    int               longEwmaPeriods                 = 200;
+    int               mediumEwmaPeriods               = 100;
+    int               shortEwmaPeriods                = 50;
+    double            aprMultiplier                   = 2;
+    double            sopWidthMultiplier              = 2;
+    double            sopSizeMultiplier               = 2;
+    double            sopTradesMultiplier             = 2;
+    int               delayAPI                        = 0;
+    bool              cancelOrdersAuto                = false;
+    double            cleanPongsAuto                  = 0.0;
+    double            profitHourInterval              = 0.5;
+    bool              audio                           = false;
+    int               delayUI                         = 7;
+    bool              _matchPings                     = true;
   };
   static void to_json(json& j, const mQuotingParams& k) {
     j = {
@@ -178,7 +178,7 @@ namespace K {
     if (j.end() != j.find("targetBasePositionPercentage")) k.targetBasePositionPercentage = j.at("targetBasePositionPercentage").get<int>();
     if (j.end() != j.find("positionDivergenceMin")) k.positionDivergenceMin = j.at("positionDivergenceMin").get<double>();
     if (j.end() != j.find("positionDivergencePercentageMin")) k.positionDivergencePercentageMin = j.at("positionDivergencePercentageMin").get<int>();
-    if (j.end() != j.find("positionDivergenceMode")) k.positionDivergenceMode = (mPDiffMode)j.at("positionDivergenceMode").get<int>();
+    if (j.end() != j.find("positionDivergenceMode")) k.positionDivergenceMode = (mPDivMode)j.at("positionDivergenceMode").get<int>();
     if (j.end() != j.find("positionDivergence")) k.positionDivergence = j.at("positionDivergence").get<double>();
     if (j.end() != j.find("positionDivergencePercentage")) k.positionDivergencePercentage = j.at("positionDivergencePercentage").get<int>();
     if (j.end() != j.find("percentageValues")) k.percentageValues = j.at("percentageValues").get<bool>();
@@ -389,6 +389,21 @@ namespace K {
     mOrder(string o, mExchange e, mPair P, mSide S, double q, mOrderType t, bool i, double p, mTimeInForce F, mORS s, bool O):
       orderId(o), exchangeId(""), exchange(e), pair(P), side(S), quantity(q), type(t), isPong(i), price(p), timeInForce(F), orderStatus(s), preferPostOnly(O), lastQuantity(0), time(0), computationalLatency(0)
     {};
+    string quantity2str() {
+      stringstream ss;
+      ss << setprecision(8) << fixed << quantity;
+      return ss.str();
+    };
+    string lastQuantity2str() {
+      stringstream ss;
+      ss << setprecision(8) << fixed << lastQuantity;
+      return ss.str();
+    };
+    string price2str() {
+      stringstream ss;
+      ss << setprecision(8) << fixed << price;
+      return ss.str();
+    };
   };
   static void to_json(json& j, const mOrder& k) {
     j = {
@@ -497,8 +512,7 @@ namespace K {
   static bool wInit;
   static WINDOW *wBorder,
                 *wLog;
-  static mutex wMutex,
-               ogMutex;
+  static mutex wMutex;
   class Gw {
     public:
       static Gw *E(mExchange e);
@@ -509,7 +523,6 @@ namespace K {
       function<void(mLevels)>       evDataLevels;
       function<void(mConnectivity)> evConnectOrder,
                                     evConnectMarket;
-      mutex                   *hubMutex = nullptr;
       uWS::Hub                *hub      = nullptr;
       uWS::Group<uWS::CLIENT> *gwGroup  = nullptr;
       mExchange exchange = mExchange::Null;
@@ -524,7 +537,7 @@ namespace K {
       virtual string A() = 0;
       virtual   void wallet() = 0,
                      levels() = 0,
-                     send(string oI, mSide oS, double oP, double oQ, mOrderType oLM, mTimeInForce oTIF, bool oPO, unsigned long oT) = 0,
+                     send(string oI, mSide oS, string oP, string oQ, mOrderType oLM, mTimeInForce oTIF, bool oPO, unsigned long oT) = 0,
                      cancel(string oI, string oE, mSide oS, unsigned long oT) = 0,
                      cancelAll() = 0,
                      close() = 0;
@@ -537,7 +550,7 @@ namespace K {
                      *events = nullptr,
                      *memory = nullptr,
                      *client = nullptr,
-                     *orders = nullptr,
+                     *broker = nullptr,
                      *market = nullptr,
                      *wallet = nullptr,
                      *engine = nullptr;
@@ -565,7 +578,7 @@ namespace K {
       void evLink(Klass *k) { events = k; };
       void dbLink(Klass *k) { memory = k; };
       void uiLink(Klass *k) { client = k; };
-      void ogLink(Klass *k) { orders = k; };
+      void ogLink(Klass *k) { broker = k; };
       void mgLink(Klass *k) { market = k; };
       void pgLink(Klass *k) { wallet = k; };
       void qeLink(Klass *k) { engine = k; };

@@ -228,7 +228,7 @@ class DisplayOrder {
                                             <th *ngIf="!pair.quotingParameters.display.autoPositionMode">tbp<span *ngIf="pair.quotingParameters.display.percentageValues">%</span></th>
                                             <th *ngIf="pair.quotingParameters.display.autoPositionMode">pDivMode</th>
                                             <th>pDiv<span *ngIf="pair.quotingParameters.display.percentageValues">%</span></th>
-                                            <th *ngIf="pair.quotingParameters.display.autoPositionMode">pDivMin<span *ngIf="pair.quotingParameters.display.percentageValues">%</span></th>
+                                            <th *ngIf="pair.quotingParameters.display.autoPositionMode && pair.quotingParameters.display.positionDivergenceMode">pDivMin<span *ngIf="pair.quotingParameters.display.percentageValues">%</span></th>
                                             <th>apr</th>
                                             <th *ngIf="pair.quotingParameters.display.aggressivePositionRebalancing">aprFactor</th>
                                             <th>bw?</th>
@@ -282,31 +282,31 @@ class DisplayOrder {
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.targetBasePositionPercentage">
                                             </td>
-                                            <td style="min-width:121px;border-bottom: 3px solid #D64A4A;" *ngIf="pair.quotingParameters.display.autoPositionMode">
+                                            <td style="min-width:121px;border-bottom: 3px solid #DDE28B;" *ngIf="pair.quotingParameters.display.autoPositionMode">
                                                 <select class="form-control input-sm"
                                                     [(ngModel)]="pair.quotingParameters.display.positionDivergenceMode">
                                                    <option *ngFor="let option of pair.quotingParameters.availablePositionDivergenceModes" [ngValue]="option.val">{{option.str}}</option>
                                                 </select>
                                             </td>
-                                            <td style="width:88px;border-bottom: 3px solid #8BE296;" *ngIf="!pair.quotingParameters.display.percentageValues">
+                                            <td style="width:88px;border-bottom: 3px solid #DDE28B;" *ngIf="!pair.quotingParameters.display.percentageValues">
                                                 <input class="form-control input-sm" title="{{ pair_name[0] }}"
                                                    type="number" step="0.01" min="0"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.positionDivergence">
                                             </td>
-                                            <td style="width:88px;border-bottom: 3px solid #8BE296;" *ngIf="pair.quotingParameters.display.percentageValues">
+                                            <td style="width:88px;border-bottom: 3px solid #DDE28B;" *ngIf="pair.quotingParameters.display.percentageValues">
                                                 <input class="form-control input-sm" title="{{ pair_name[0] }}"
                                                    type="number" step="1" min="0" max="100"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.positionDivergencePercentage">
                                             </td>
-                                            <td style="width:88px;border-bottom: 3px solid #8BE296;" *ngIf="!pair.quotingParameters.display.percentageValues && pair.quotingParameters.display.autoPositionMode">
+                                            <td style="width:88px;border-bottom: 3px solid #DDE28B;" *ngIf="!pair.quotingParameters.display.percentageValues && pair.quotingParameters.display.autoPositionMode && pair.quotingParameters.display.positionDivergenceMode">
                                                 <input class="form-control input-sm" title="{{ pair_name[0] }}"
                                                    type="number" step="0.01" min="0"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.positionDivergenceMin">
                                             </td>
-                                            <td style="width:88px;border-bottom: 3px solid #8BE296;" *ngIf="pair.quotingParameters.display.percentageValues && pair.quotingParameters.display.autoPositionMode">
+                                            <td style="width:88px;border-bottom: 3px solid #DDE28B;" *ngIf="pair.quotingParameters.display.percentageValues && pair.quotingParameters.display.autoPositionMode && pair.quotingParameters.display.positionDivergenceMode">
                                                 <input class="form-control input-sm" title="{{ pair_name[0] }}"
                                                    type="number" step="1" min="0" max="100"
                                                    onClick="this.select()"
@@ -916,8 +916,10 @@ class ClientComponent implements OnInit {
     this.product.fixed = Math.max(0, Math.floor(Math.log10(pa.minTick)) * -1);
     setTimeout(this.resizeMatryoshka, 5000);
     console.log("%cK started "+(new Date().toISOString().slice(11, -1))+"\n%c"+this.homepage, "color:green;font-size:32px;", "color:red;font-size:16px;");
+    try {
     if (!document.getElementsByClassName('chatbro_container').length && window.parent === window)
       (function(chats,async) {async=!1!==async;var params={embedChatsParameters:chats instanceof Array?chats:[chats],lang:navigator.language||(<any>navigator).userLanguage,needLoadCode:'undefined'==typeof (<any>window).Chatbro,embedParamsVersion:localStorage.embedParamsVersion,chatbroScriptVersion:localStorage.chatbroScriptVersion},xhr=new XMLHttpRequest;xhr.withCredentials=!0,xhr.onload=function(){eval(xhr.responseText)},xhr.onerror=function(){console.error('Chatbro loading error')},xhr.open('GET','//www.chatbro.com/embed.js?'+btoa((<any>window).unescape(encodeURIComponent(JSON.stringify(params)))),async),xhr.send()})({encodedChatId: '9Wic'},false);
+    } catch(e) {}
   }
 }
 

@@ -210,13 +210,13 @@ namespace K {
         calcEwma(&mgEwmaSM, qp->quotingEwmaSMPeriods);
         calcEwma(&mgEwmaSU, qp->quotingEwmaSUPeriods);
         if(mgEwmaSM && mgEwmaSU)
-		      mgEwmaSMUDiff = ((mgEwmaSU * 100) / mgEwmaSM) - 100;
+          mgEwmaSMUDiff = ((mgEwmaSU * 100) / mgEwmaSM) - 100;
         ((EV*)events)->mgEwmaSMUProtection();
       };
       void filter(mLevels k) {
         levels = k;
         if (empty()) return;
-        map<string, mOrder> ordersSides = ((OG*)orders)->ordersBothSides();
+        map<string, mOrder> ordersSides = ((OG*)broker)->ordersBothSides();
         for (map<string, mOrder>::iterator it = ordersSides.begin(); it != ordersSides.end(); ++it)
           filter(mSide::Bid == it->second.side ? &levels.bids : &levels.asks, it->second);
         if (empty()) return;
