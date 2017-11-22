@@ -8,8 +8,8 @@ import {SubscriberFactory} from './shared_directives';
   selector: 'market-quoting',
   template: `<div class="tradeSafety2">
       Market Width: <span class="{{ diffMD ? \'Ktext-active\' : \'ktext-muted\' }}">{{ diffMD | number:'1.'+product.fixed+'-'+product.fixed }}</span>
-      Quote Width: <span class="{{ diffPx ? \'Ktext-active\' : \'ktext-muted\' }}">{{ diffPx | number:'1.'+product.fixed+'-'+product.fixed }}</span>
-      Wallet TBP: <span class="Ktext-active">{{ targetBasePosition | number:'1.3-3' }}</span><br/>APR: <span class="{{ sideAPRSafety!=\'Off\' ? \'Ktext-active\' : \'ktext-muted\' }}">{{ sideAPRSafety }}</span>, Quotes: <span data-toggle="tooltip" data-placement="top" title="New Quotes in memory" class="{{ quotesInMemoryNew ? \'Ktext-active\' : \'ktext-muted\' }}">{{ quotesInMemoryNew }}</span>/<span data-toggle="tooltip" data-placement="top" title="Working Quotes in memory" class="{{ quotesInMemoryWorking ? \'Ktext-active\' : \'ktext-muted\' }}">{{ quotesInMemoryWorking }}</span>/<span data-toggle="tooltip" data-placement="top" title="Other Quotes in memory" class="{{ quotesInMemoryDone ? \'Ktext-active\' : \'ktext-muted\' }}">{{ quotesInMemoryDone }}</span>
+      Quote Width: <span class="{{ diffPx ? \'Ktext-active\' : \'ktext-muted\' }}">{{ diffPx | number:'1.'+product.fixed+'-'+product.fixed }}</span>, Quotes: <span data-toggle="tooltip" data-placement="top" title="New Quotes in memory" class="{{ quotesInMemoryNew ? \'Ktext-active\' : \'ktext-muted\' }}">{{ quotesInMemoryNew }}</span>/<span data-toggle="tooltip" data-placement="top" title="Working Quotes in memory" class="{{ quotesInMemoryWorking ? \'Ktext-active\' : \'ktext-muted\' }}">{{ quotesInMemoryWorking }}</span>/<span data-toggle="tooltip" data-placement="top" title="Other Quotes in memory" class="{{ quotesInMemoryDone ? \'Ktext-active\' : \'ktext-muted\' }}">{{ quotesInMemoryDone }}</span>
+      Wallet TBP: <span class="Ktext-active">{{ targetBasePosition | number:'1.3-3' }}</span>, pDiv: <span class="Ktext-active">{{ positionDivergence | number:'1.3-3' }}</span><br/>APR: <span class="{{ sideAPRSafety!=\'Off\' ? \'Ktext-active\' : \'ktext-muted\' }}">{{ sideAPRSafety }}</span>
       </div>
       <div><table class="marketQuoting table table-hover text-center">
       <tr class="active heading">
@@ -31,7 +31,7 @@ import {SubscriberFactory} from './shared_directives';
         <th *ngIf="askStatus != 'Live'" colspan="3" data-toggle="tooltip" data-placement="top" title="Ask Quote Status">{{ askStatus }}</th>
       </tr>
       <tr class="active" *ngFor="let level of levels; let i = index">
-        <td *ngIf="i == 1 && levels.length == 4" colspan="6"><div class="Ktext-active KunlockText"><br />Do you want to <a href="{{ product.advert.homepage }}/blob/master/README.md#unlock" target="_blank">unlock</a> all market levels?<br />and to collaborate with the development?<br /><br />Send 0.12100000 BTC or more to:<br /><a href="https://www.blocktrail.com/BTC/address/{{ a }}" target="_blank">{{ a }}</a><br />Wait 2 confirmations and restart this bot.<!-- you can remove this message, but obviously the missing market levels will not be displayed magically. the market levels will be only displayed if the also displayed address is credited with 0.12100000 BTC --></div></td>
+        <td *ngIf="i == 1 && levels.length == 4" colspan="6"><div class="Ktext-active KunlockText"><br />To <a href="{{ product.advert.homepage }}/blob/master/README.md#unlock" target="_blank">unlock</a> all market levels<br />and to collaborate with the development..<br /><br />make an acceptable Pull Request on github,<br/>or send 0.01210000 BTC or more to:<br /><a href="https://www.blocktrail.com/BTC/address/{{ a }}" target="_blank">{{ a }}</a><br /><br />Wait 2 confirmations and restart this bot.<!-- you can remove this message, but obviously the missing market levels will not be displayed magically. the market levels will be only displayed if the also displayed address is credited with 0.01210000 BTC. Note that if you make a Pull Request i will credit the payment for you easy, just let me know in the description of the PR what is the BTC Address displayed in your bot. --></div></td>
         <td *ngIf="i != 1 || levels.length != 4" class ="nopadding" [ngClass]="level.bidClass"><div [ngClass]="level.bidClassVisual"></div></td>
         <td *ngIf="i != 1 || levels.length != 4" [ngClass]="level.bidClass"><div [ngClass]="'bidsz' + i + ' num'">{{ level.bidSize | number:'1.4-4' }}</div></td>
         <td *ngIf="i != 1 || levels.length != 4" [ngClass]="level.bidClass"><div [ngClass]="'bidsz' + i">{{ level.bidPrice | number:'1.'+product.fixed+'-'+product.fixed }}</div></td>
@@ -60,6 +60,7 @@ export class MarketQuotingComponent implements OnInit {
   public noBidReason: string;
   public noAskReason: string;
   private targetBasePosition: number;
+  private positionDivergence: number;
   private sideAPRSafety: string;
   public a: string;
   @Input() product: Models.ProductState;
@@ -100,6 +101,7 @@ export class MarketQuotingComponent implements OnInit {
   private clearTargetBasePosition = () => {
     this.targetBasePosition = null;
     this.sideAPRSafety = null;
+    this.positionDivergence = null;
   }
 
   private clearAddress = () => {
@@ -127,6 +129,7 @@ export class MarketQuotingComponent implements OnInit {
     if (value == null) return;
     this.targetBasePosition = value.tbp;
     this.sideAPRSafety = value.sideAPR || 'Off';
+    this.positionDivergence = value.pDiv;
   }
 
   private updateMarket = (update: Models.Market) => {
@@ -198,7 +201,10 @@ export class MarketQuotingComponent implements OnInit {
   }
 
   private updateQuote = (o) => {
-    if (typeof o[0] == 'object') {
+    if (!o) {
+      this.clearQuote();
+      return;
+    } else if (typeof o[0] == 'object') {
       this.clearQuote();
       return o.forEach(x => setTimeout(this.updateQuote(x), 0));
     }

@@ -16,7 +16,7 @@ export var Topics = {
   ProductAdvertisement: 'j',
   ApplicationState: 'k',
   Notepad: 'l',
-  ToggleConfigs: 'm',
+  ToggleSettings: 'm',
   Position: 'n',
   ExchangeConnectivity: 'o',
   SubmitNewOrder: 'p',
@@ -28,8 +28,8 @@ export var Topics = {
   TargetBasePosition: 'v',
   TradeSafetyValue: 'w',
   CancelAllOrders: 'x',
-  CleanAllClosedOrders: 'y',
-  CleanAllOrders: 'z',
+  CleanAllClosedTrades: 'y',
+  CleanAllTrades: 'z',
   CleanTrade: 'A',
   TradesChart: 'B',
   WalletChart: 'C',
@@ -175,6 +175,7 @@ export class CurrencyPair {
 export enum QuotingMode { Top, Mid, Join, InverseJoin, InverseTop, PingPong, Boomerang, AK47, HamelinRat, Depth }
 export enum FairValueModel { BBO, wBBO }
 export enum AutoPositionMode { Manual, EWMA_LS, EWMA_LMS }
+export enum DynamicPDivMode { Manual, Linear, Sine, SQRT, Switch }
 export enum PingAt { BothSides, BidSide, AskSide, DepletedSide, DepletedBidSide, DepletedAskSide, StopPings }
 export enum PongAt { ShortPingFair, LongPingFair, ShortPingAggressive, LongPingAggressive }
 export enum APR { Off, Size, SizeWidth }
@@ -182,16 +183,16 @@ export enum SOP { Off, Trades, Size, TradesSize }
 export enum STDEV { Off, OnFV, OnFVAPROff, OnTops, OnTopsAPROff, OnTop, OnTopAPROff }
 
 export interface QuotingParameters {
-    widthPing?: number;
+    widthPing?: any;
     widthPingPercentage?: number;
-    widthPong?: number;
+    widthPong?: any;
     widthPongPercentage?: number;
     widthPercentage?: boolean;
     bestWidth?: boolean;
-    buySize?: number;
+    buySize?: any;
     buySizePercentage?: number;
     buySizeMax?: boolean;
-    sellSize?: number;
+    sellSize?: any;
     sellSizePercentage?: number;
     sellSizeMax?: boolean;
     pingAt?: PingAt;
@@ -202,6 +203,9 @@ export interface QuotingParameters {
     targetBasePositionPercentage?: number;
     positionDivergence?: number;
     positionDivergencePercentage?: number;
+    positionDivergenceMin?: number;
+    positionDivergencePercentageMin?: number;
+    positionDivergenceMode?: number;
     percentageValues?: boolean;
     autoPositionMode?: AutoPositionMode;
     aggressivePositionRebalancing?: APR;
@@ -254,6 +258,7 @@ export class TradeSafety {
 export class TargetBasePositionValue {
     constructor(
       public tbp: number,
-      public sideAPR: string
+      public sideAPR: string,
+      public pDiv: number
     ) {}
 }

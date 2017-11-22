@@ -182,7 +182,7 @@ class DisplayOrder {
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.sopWidthMultiplier">
                                             </td>
-											<td style="width:88px; border-bottom: 3px solid #DDE28B;" *ngIf="[2,3].indexOf(pair.quotingParameters.display.superTrades)>-1">
+                                            <td style="width:88px; border-bottom: 3px solid #DDE28B;" *ngIf="[2,3].indexOf(pair.quotingParameters.display.superTrades)>-1">
                                                 <input class="form-control input-sm" title="Trades multiplier"
                                                    type="number" step="0.1" min="1"
                                                    onClick="this.select()"
@@ -240,7 +240,9 @@ class DisplayOrder {
                                             <th *ngIf="pair.quotingParameters.display.autoPositionMode">short</th>
                                             <th *ngIf="pair.quotingParameters.display.autoPositionMode">sensibility</th>
                                             <th *ngIf="!pair.quotingParameters.display.autoPositionMode">tbp<span *ngIf="pair.quotingParameters.display.percentageValues">%</span></th>
+                                            <th *ngIf="pair.quotingParameters.display.autoPositionMode">pDivMode</th>
                                             <th>pDiv<span *ngIf="pair.quotingParameters.display.percentageValues">%</span></th>
+                                            <th *ngIf="pair.quotingParameters.display.autoPositionMode && pair.quotingParameters.display.positionDivergenceMode">pDivMin<span *ngIf="pair.quotingParameters.display.percentageValues">%</span></th>
                                             <th>apr</th>
                                             <th>bw?</th>
                                             <th *ngIf="[9].indexOf(pair.quotingParameters.display.mode)==-1">%w?</th>
@@ -296,17 +298,36 @@ class DisplayOrder {
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.targetBasePositionPercentage">
                                             </td>
-                                            <td style="width:88px;border-bottom: 3px solid #8BE296;" *ngIf="!pair.quotingParameters.display.percentageValues">
-                                                <input class="form-control input-sm" data-toggle="tooltip" data-placement="top" title="{{ pair_name[0] }}"
+
+                                            <td style="min-width:121px;border-bottom: 3px solid #DDE28B;" *ngIf="pair.quotingParameters.display.autoPositionMode">
+                                                <select class="form-control input-sm"
+                                                    [(ngModel)]="pair.quotingParameters.display.positionDivergenceMode">
+                                                   <option *ngFor="let option of pair.quotingParameters.availablePositionDivergenceModes" [ngValue]="option.val">{{option.str}}</option>
+                                                </select>
+                                            </td>
+                                            <td style="width:88px;border-bottom: 3px solid #DDE28B;" *ngIf="!pair.quotingParameters.display.percentageValues">
+                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
                                                    type="number" step="0.01" min="0"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.positionDivergence">
                                             </td>
-                                            <td style="width:88px;border-bottom: 3px solid #8BE296;" *ngIf="pair.quotingParameters.display.percentageValues">
-                                                <input class="form-control input-sm" data-toggle="tooltip" data-placement="top" title="{{ pair_name[0] }}"
+                                            <td style="width:88px;border-bottom: 3px solid #DDE28B;" *ngIf="pair.quotingParameters.display.percentageValues">
+                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
                                                    type="number" step="1" min="0" max="100"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.positionDivergencePercentage">
+                                            </td>
+                                            <td style="width:88px;border-bottom: 3px solid #DDE28B;" *ngIf="!pair.quotingParameters.display.percentageValues && pair.quotingParameters.display.autoPositionMode && pair.quotingParameters.display.positionDivergenceMode">
+                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                   type="number" step="0.01" min="0"
+                                                   onClick="this.select()"
+                                                   [(ngModel)]="pair.quotingParameters.display.positionDivergenceMin">
+                                            </td>
+                                            <td style="width:88px;border-bottom: 3px solid #DDE28B;" *ngIf="pair.quotingParameters.display.percentageValues && pair.quotingParameters.display.autoPositionMode && pair.quotingParameters.display.positionDivergenceMode">
+                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                   type="number" step="1" min="0" max="100"
+                                                   onClick="this.select()"
+                                                   [(ngModel)]="pair.quotingParameters.display.positionDivergencePercentageMin">
                                             </td>
                                             <td style="min-width:121px;border-bottom: 3px solid #D64A4A;">
                                                 <select class="form-control input-sm"
@@ -672,7 +693,7 @@ class ClientComponent implements OnInit {
   public db_size: string;
   public notepad: string;
   public online: boolean;
-  public showConfigs: boolean = false;
+  public showSettings: boolean = false;
   public showStats: number = 0;
   public showWatch: boolean = false;
   public order: DisplayOrder;
@@ -743,21 +764,21 @@ class ClientComponent implements OnInit {
       .fire();
 
     this.cleanAllClosedOrders = () => this.fireFactory
-      .getFire(Models.Topics.CleanAllClosedOrders)
+      .getFire(Models.Topics.CleanAllClosedTrades)
       .fire();
 
     this.cleanAllOrders = () => this.fireFactory
-      .getFire(Models.Topics.CleanAllOrders)
+      .getFire(Models.Topics.CleanAllTrades)
       .fire();
 
     this.changeNotepad = (content:string) => this.fireFactory
       .getFire(Models.Topics.Notepad)
       .fire([content]);
 
-    this.toggleConfigs = (showConfigs:boolean) => {
+    this.toggleSettings = (showSettings:boolean) => {
       this.fireFactory
-        .getFire(Models.Topics.ToggleConfigs)
-        .fire([showConfigs]);
+        .getFire(Models.Topics.ToggleSettings)
+        .fire([showSettings]);
       setTimeout(this.resizeMatryoshka, 100);
     }
 
@@ -790,16 +811,16 @@ class ClientComponent implements OnInit {
       .registerSubscriber(this.onNotepad);
 
     this.subscriberFactory
-      .getSubscriber(this.zone, Models.Topics.ToggleConfigs)
-      .registerSubscriber(this.onToggleConfigs);
+      .getSubscriber(this.zone, Models.Topics.ToggleSettings)
+      .registerSubscriber(this.onToggleSettings);
   }
 
   private onNotepad = (notepad : string) => {
     this.notepad = notepad;
   }
 
-  private onToggleConfigs = (showConfigs: boolean) => {
-    this.showConfigs = showConfigs;
+  private onToggleSettings = (showSettings: boolean) => {
+    this.showSettings = showSettings;
   }
 
   public onTradesLength(tradesLength: number) {
@@ -887,8 +908,10 @@ class ClientComponent implements OnInit {
     this.product.fixed = Math.max(0, Math.floor(Math.log10(pa.minTick)) * -1);
     setTimeout(this.resizeMatryoshka, 5000);
     console.log("%cK started "+(new Date().toISOString().slice(11, -1))+"\n%c"+this.homepage, "color:green;font-size:32px;", "color:red;font-size:16px;");
+    try {
     if (!document.getElementsByClassName('chatbro_container').length && window.parent === window)
       (function(chats,async) {async=!1!==async;var params={embedChatsParameters:chats instanceof Array?chats:[chats],lang:navigator.language||(<any>navigator).userLanguage,needLoadCode:'undefined'==typeof (<any>window).Chatbro,embedParamsVersion:localStorage.embedParamsVersion,chatbroScriptVersion:localStorage.chatbroScriptVersion},xhr=new XMLHttpRequest;xhr.withCredentials=!0,xhr.onload=function(){eval(xhr.responseText)},xhr.onerror=function(){console.error('Chatbro loading error')},xhr.open('GET','//www.chatbro.com/embed.js?'+btoa((<any>window).unescape(encodeURIComponent(JSON.stringify(params)))),async),xhr.send()})({encodedChatId: '9Wic'},false);
+    } catch(e) {}
   }
 }
 
