@@ -86,21 +86,19 @@ class DisplayOrder {
         <div class="container-fluid">
             <div>
 	                <div class="settingsContainer border-bottom">
-	                	<div class="settingsHeader header">
-		                	<div class="title">Settings</div>
-		                	<div class="tabs">
-			                	<div class="tab" [ngClass]="showConfigs == false ? 'active' : ''">
-				                	<a href="#" (click)="toggleConfigs(showConfigs = true)">show</a>
-			                	</div>
-			                	<div class="tab" [ngClass]="showConfigs == true ? 'active' : ''">
-				                	<a href="#" (click)="toggleConfigs(showConfigs = false)">hide</a>
-			                	</div>
-		                	</div>
-	                	</div>
-						<div class="settingscontent content row" [hidden]="!showConfigs">
-                        <div class="col-md-12 col-xs-12">
-                            <div class="row">
-                              
+		                <ngb-tabset [justify]="end">
+		                	<div class="settingsHeader header">
+		                		<div class="title">Settings</div>
+	                		</div>
+							<ngb-tab title="hide">
+								<ng-template ngbTabContent>
+								</ng-template>
+							</ngb-tab>
+							<ngb-tab title="show">
+								<ng-template ngbTabContent>
+									<div class="settingscontent content row">
+										<div class="col-md-12 col-xs-12">
+											<div class="row">                             
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr class="active">
@@ -372,9 +370,9 @@ class DisplayOrder {
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.widthPongPercentage">
                                             </td>
+                                        </tr>
                                     </tbody>
-                                </table>
-                           
+                                </table>                        
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr class="active">
@@ -536,8 +534,11 @@ class DisplayOrder {
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
-                    </div>
+										</div>
+									</div>
+								</ng-template>
+							</ngb-tab>
+	                	</ngb-tabset>
                 	</div>
                     <div class="row">
                         <div class="col-md-2 col-xs-12 sidebar border-right">
@@ -695,6 +696,7 @@ class DisplayOrder {
 class ClientComponent implements OnInit {
 
   public A: string;
+  public title: string;
   public homepage: string;
   public matryoshka: string;
   public server_memory: string;
@@ -842,12 +844,12 @@ class ClientComponent implements OnInit {
       .getFire(Models.Topics.Notepad)
       .fire([content]);
 
-    this.toggleSettings = (showSettings:boolean) => {
+    /*this.toggleSettings = (showSettings:boolean) => {
       this.fireFactory
         .getFire(Models.Topics.ToggleSettings)
         .fire([showSettings]);
       setTimeout(this.resizeMatryoshka, 100);
-    }
+    }*/
 
     window.addEventListener("message", e => {
       if (!e.data.indexOf) return;

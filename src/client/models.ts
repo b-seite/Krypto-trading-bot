@@ -174,7 +174,8 @@ export class CurrencyPair {
     constructor(public base: string, public quote: string) {}
 }
 
-export enum QuotingMode { Top, Mid, Join, InverseJoin, InverseTop, PingPong, Boomerang, AK47, HamelinRat, Depth }
+export enum QuotingMode { Top, Mid, Join, InverseJoin, InverseTop, HamelinRat, Depth }
+export enum QuotingSafety { Off, PingPong, Boomerang, AK47 }
 export enum FairValueModel { BBO, wBBO }
 export enum AutoPositionMode { Manual, EWMA_LS, EWMA_LMS, EWMA_4 }
 export enum DynamicPDivMode { Manual, Linear, Sine, SQRT, Switch }
