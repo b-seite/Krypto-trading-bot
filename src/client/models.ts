@@ -200,6 +200,7 @@ export interface QuotingParameters {
     pingAt?: PingAt;
     pongAt?: PongAt;
     mode?: QuotingMode;
+    safety?: QuotingSafety;
     fvModel?: FairValueModel;
     targetBasePosition?: number;
     targetBasePositionPercentage?: number;
