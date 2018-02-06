@@ -4,16 +4,15 @@ import * as Models from './models';
 
 @Component({
   selector: 'trade-safety',
-  template: `<div div class="tradeSafety img-rounded"><div>
-      Fair Value: <span class="{{ fairValue ? \'text-danger fairvalue\' : \'text-muted\' }}" style="font-size:121%;">{{ fairValue | number:'1.'+product.fixed+'-'+product.fixed }}</span>,
-      BuyPing: <span class="{{ buySizeSafety ? \'text-danger\' : \'text-muted\' }}">{{ buySizeSafety | number:'1.'+product.fixed+'-'+product.fixed }}</span>,
-      SellPing: <span class="{{ sellSizeSafety ? \'text-danger\' : \'text-muted\' }}">{{ sellSizeSafety | number:'1.'+product.fixed+'-'+product.fixed }}</span>,
-      BuyTS: <span class="{{ buySafety ? \'text-danger\' : \'text-muted\' }}">{{ buySafety | number:'1.2-2' }}</span>,
-      SellTS: <span class="{{ sellSafety ? \'text-danger\' : \'text-muted\' }}">{{ sellSafety | number:'1.2-2' }}</span>,
-      TotalTS: <span class="{{ tradeSafetyValue ? \'text-danger\' : \'text-muted\' }}">{{ tradeSafetyValue | number:'1.2-2' }}</span>,
-      openOrders/60sec: <span class="{{ tradeFreq ? \'text-danger\' : \'text-muted\' }}">{{ tradeFreq | number:'1.0-0' }}</span>
-    </div>
-  </div>`
+  template: `<div class="tradeSafety">
+      Fair Value: <span class="{{ fairValue ? \'Ktext-active fairvalue\' : \'ktext-muted\' }}" >{{ fairValue | number:'1.'+product.fixed+'-'+product.fixed }}</span>
+      BuyPing: <span class="{{ buySizeSafety ? \'Ktext-active\' : \'ktext-muted\' }}">{{ buySizeSafety | number:'1.'+product.fixed+'-'+product.fixed }}</span>
+      SellPing: <span class="{{ sellSizeSafety ? \'Ktext-active\' : \'ktext-muted\' }}">{{ sellSizeSafety | number:'1.'+product.fixed+'-'+product.fixed }}</span>
+      BuyTS: <span class="{{ buySafety ? \'Ktext-active\' : \'ktext-muted\' }}">{{ buySafety | number:'1.2-2' }}</span>
+      SellTS: <span class="{{ sellSafety ? \'Ktext-active\' : \'ktext-muted\' }}">{{ sellSafety | number:'1.2-2' }}</span>
+      TotalTS: <span class="{{ tradeSafetyValue ? \'Ktext-active\' : \'ktext-muted\' }}">{{ tradeSafetyValue | number:'1.2-2' }}</span>
+      openOrders/60sec: <span class="{{ tradeFreq ? \'Ktext-active\' : \'ktext-muted\' }}">{{ tradeFreq | number:'1.0-0' }}</span>
+    </div>`
 })
 export class TradeSafetyComponent {
 

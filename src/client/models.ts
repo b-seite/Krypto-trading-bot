@@ -164,7 +164,7 @@ export class TwoSidedQuote {
     constructor(public bid: Quote, public ask: Quote) {}
 }
 
-export enum QuoteStatus { Live, Disconnected, DisabledQuotes, MissingData, UnknownHeld, TBPHeld, MaxTradesSeconds, WaitingPing, DepletedFunds, Crossed, UpTrendHeld, DownTrendHeld }
+export enum QuoteStatus { Live, Disconnected, DisabledQuotes, MissingData, UnknownHeld, TBPHeld, MaxTradesSeconds, WaitingPing, DepletedFunds, Crossed }
 
 export class TwoSidedQuoteStatus {
     constructor(public bidStatus: QuoteStatus, public askStatus: QuoteStatus, public quotesInMemoryNew: number, public quotesInMemoryWorking: number, public quotesInMemoryDone: number) {}
@@ -174,8 +174,7 @@ export class CurrencyPair {
     constructor(public base: string, public quote: string) {}
 }
 
-export enum QuotingMode { Top, Mid, Join, InverseJoin, InverseTop, HamelinRat, Depth }
-export enum QuotingSafety { Off, PingPong, Boomerang, AK47 }
+export enum QuotingMode { Top, Mid, Join, InverseJoin, InverseTop, PingPong, Boomerang, AK47, HamelinRat, Depth }
 export enum FairValueModel { BBO, wBBO }
 export enum AutoPositionMode { Manual, EWMA_LS, EWMA_LMS, EWMA_4 }
 export enum DynamicPDivMode { Manual, Linear, Sine, SQRT, Switch }
@@ -201,7 +200,6 @@ export interface QuotingParameters {
     pingAt?: PingAt;
     pongAt?: PongAt;
     mode?: QuotingMode;
-    safety?: QuotingSafety
     fvModel?: FairValueModel;
     targetBasePosition?: number;
     targetBasePositionPercentage?: number;
@@ -225,7 +223,6 @@ export interface QuotingParameters {
     audio?: boolean;
     bullets?: number;
     range?: number;
-    rangePercentage?: number;
     ewmaSensiblityPercentage?: number;
     veryLongEwmaPeriods?: number;
     longEwmaPeriods?: number;

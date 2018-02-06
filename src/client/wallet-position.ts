@@ -4,16 +4,14 @@ import * as Models from './models';
 
 @Component({
   selector: 'wallet-position',
-  template: `<div class="positions" *ngIf="baseValue || quoteValue">
-    <h4 class="col-md-12 col-xs-2"><small>{{ baseCurrency }}:<br><span title="{{ baseCurrency }} Available" class="text-danger">{{ basePosition | number:'1.8-8' }}</span><br/><span title="{{ baseCurrency }} Held" [ngClass]="baseHeldPosition ? 'sell' : 'text-muted'">{{ baseHeldPosition | number:'1.8-8' }}</span>
-    <hr style="margin:0 30px;color:#fff;opacity:.7">
-    <span class="text-muted" title="{{ baseCurrency }} Total">{{ basePosition + baseHeldPosition | number:'1.8-8' }}</span></small></h4>
-    <h4 class="col-md-12 col-xs-2"><small>{{ quoteCurrency }}:<br><span title="{{ quoteCurrency }} Available" class="text-danger">{{ quotePosition | number:'1.'+product.fixed+'-'+product.fixed }}</span><br/><span title="{{ quoteCurrency }} Held" [ngClass]="quoteHeldPosition ? 'buy' : 'text-muted'">{{ quoteHeldPosition | number:'1.'+product.fixed+'-'+product.fixed }}</span>
-    <hr style="margin:0 30px;color:#fff;opacity:.7">
-    <span class="text-muted" title="{{ quoteCurrency }} Total">{{ quotePosition + quoteHeldPosition | number:'1.'+product.fixed+'-'+product.fixed }}</span></small></h4>
-    <h4 class="col-md-12 col-xs-2" style="margin-bottom: 0px!important;"><small>Value:</small><br><b title="{{ baseCurrency }} Total">{{ baseValue | number:'1.8-8' }}</b><br/><b title="{{ quoteCurrency }} Total">{{ quoteValue | number:'1.'+product.fixed+'-'+product.fixed }}</b></h4>
-    <h4 class="col-md-12 col-xs-2" style="margin-top: 0px!important;"><small style="font-size:69%"><span title="{{ baseCurrency }} profit %" class="{{ profitBase>0 ? \'text-danger\' : \'text-muted\' }}">{{ profitBase>=0?'+':'' }}{{ profitBase | number:'1.2-2' }}%</span>, <span title="{{ quoteCurrency }} profit %" class="{{ profitQuote>0 ? \'text-danger\' : \'text-muted\' }}">{{ profitQuote>=0?'+':'' }}{{ profitQuote | number:'1.2-2' }}%</span></small></h4>
-  </div><div class="positions" *ngIf="!baseCurrency && !quoteCurrency"><br/><b>NO WALLET DATA</b><br/><br/>Do a manual order first using the website of this Market!<br/><br/></div>`
+  template: `<div class="container wallet" *ngIf="baseCurrency || quoteCurrency">
+  	<div class="row"><div class="col-1">{{ baseCurrency }}<br>{{ quoteCurrency }}<span class="wallet-description">currency</span></div>
+  		<div class="col">{{ value | number:'1.8-8' }}<br>{{ quoteValue | number:'1.'+product.fixed+'-'+product.fixed }}<span class="wallet-description">total</span></div>
+  		<div class="col width-120"><span [ngClass]="profitBase<0 ? 'K-Red' : 'K-Green'">{{ profitBase>=0?'+':'' }}{{ profitBase | number:'1.2-2' }}%</span><br><span [ngClass]="profitQuote<0 ? 'K-Red' : 'K-Green'">{{ profitQuote>=0?'+':'' }}{{ profitQuote | number:'1.2-2' }}%</span><br><span class="wallet-description">profit last {{ profitTime | number:'1.0-2'}} h</span></div>
+  		<div class="col">{{ basePosition | number:'1.8-8' }}<br>{{ quotePosition | number:'1.'+product.fixed+'-'+product.fixed }}<br><span class="wallet-description">Available</span></div>
+  		<div class="col"><span [ngClass]="baseHeldPosition ? '' : 'ktext-muted'">{{ baseHeldPosition | number:'1.8-8' }}</span><br><span [ngClass]="quoteHeldPosition ? '' : 'ktext-muted'">{{ quoteHeldPosition | number:'1.'+product.fixed+'-'+product.fixed }}</span><br><span class="wallet-description">Held</span></div>
+	</div>
+</div><div class="positions" *ngIf="!baseCurrency && !quoteCurrency"><br/><b>NO WALLET DATA</b><br/><br/>Do a manual order first using the website of this Market!<br/></div>`
 })
 export class WalletPositionComponent {
 

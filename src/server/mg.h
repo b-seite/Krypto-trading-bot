@@ -318,7 +318,17 @@ namespace K {
         else if (qp->autoPositionMode == mAutoPositionMode::EWMA_4) {
           if (mgEwmaL < mgEwmaVL) newTargetPosition = -1;
           else newTargetPosition = ((mgEwmaS * 100 / mgEwmaM) - 100) * (1 / qp->ewmaSensiblityPercentage);
-        }
+        } else if (qp->autoPositionMode == mAutoPositionMode::EWMA_TakeProfit) {
+		  double pTakeProfit = 0.02; //set to 2% for now
+		  takeProfit = pTakeProfit * lastBid;
+		  if (mgEwmaM > mgEwmaL) {
+		    if (SMA3 > mgEwmaS) newTargetPosition = 1;
+			else newTargetPosition = 1 - pTakeProfit;
+		  } else {
+			if (SMA3 > mgEwmaS) newTargetPosition = -1 + pTakeProfit;
+			else newTargetPosition = -1;
+		  }
+		}
         if (newTargetPosition > 1) newTargetPosition = 1;
         else if (newTargetPosition < -1) newTargetPosition = -1;
         targetPosition = newTargetPosition;

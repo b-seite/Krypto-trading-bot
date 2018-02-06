@@ -50,6 +50,7 @@ class EvalAsyncSubscriber<T> implements Subscribe.ISubscribe<T> {
 })
 export class BaseCurrencyCellComponent implements AgRendererComponent {
   private params:any;
+  public refresh;
 
   agInit(params:any):void {
     this.params = params;
@@ -67,7 +68,7 @@ export class BaseCurrencyCellComponent implements AgRendererComponent {
 export class QuoteCurrencyCellComponent implements AgRendererComponent {
   private params:any;
   private quoteSymbol:string = 'USD';
-  private productFixed:number = 8;
+  private productFixed:number = 2;
 
   agInit(params:any):void {
     this.params = params;

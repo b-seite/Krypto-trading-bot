@@ -7,12 +7,11 @@ import * as Models from './models';
 @Component({
   selector: 'market-stats',
   template: `<div class="col-md-6 col-xs-6">
-  <table><tr><td>
-    <chart style="position:relative;top:5px;height:380px;width:700px;" [options]="fvChartOptions" (load)="saveInstance($event.context, 'fv')"></chart>
-  </td><td>
-    <chart style="position:relative;top:10px;height:180px;width:700px;" [options]="baseChartOptions" (load)="saveInstance($event.context, 'base')"></chart>
-    <chart style="position:relative;top:11px;height:180px;width:700px;" [options]="quoteChartOptions" (load)="saveInstance($event.context, 'quote')"></chart>
-  </td></tr></table>
+    <chart style="height:340px;width:1200px;" type="StockChart" [options]="fvChartOptions" (load)="saveInstance($event.context, 'fv')"></chart>
+	<table><tr>
+    <td><chart style="height:160px;width:600px;float:left;" [options]="baseChartOptions" (load)="saveInstance($event.context, 'base')"></chart></td>
+    <td><chart style="height:160px;width:600px;" [options]="quoteChartOptions" (load)="saveInstance($event.context, 'quote')"></chart></td>
+    </tr></table>
     </div>`
 })
 export class StatsComponent implements OnInit {
@@ -70,10 +69,12 @@ export class StatsComponent implements OnInit {
     title: 'fair value',
     chart: {
         type: 'bubble',
-        width: 700,
-        height: 380,
+        width: 1200,
+        height: 340,
         zoomType: false,
         backgroundColor:'rgba(255, 255, 255, 0)',
+        panning: true,
+        panKey: 'shift',
     },
     plotOptions: {series: {marker: {enabled: false}}},
     navigator: {enabled: false},
@@ -311,8 +312,8 @@ export class StatsComponent implements OnInit {
   public quoteChartOptions = {
     title: 'quote wallet',
     chart: {
-        width: 700,
-        height: 180,
+        width: 600,
+        height: 160,
         zoomType: false,
         resetZoomButton: {theme: {display: 'none'}},
         backgroundColor:'rgba(255, 255, 255, 0)'
@@ -390,8 +391,8 @@ export class StatsComponent implements OnInit {
   public baseChartOptions = {
     title: 'base wallet',
     chart: {
-        width: 700,
-        height: 180,
+        width: 600,
+        height: 160,
         zoomType: false,
         resetZoomButton: {theme: {display: 'none'}},
         backgroundColor:'rgba(255, 255, 255, 0)'
@@ -412,7 +413,7 @@ export class StatsComponent implements OnInit {
       type: 'datetime',
       crosshair: true,
       // events: {setExtremes: this.syncExtremes},
-      labels: {enabled: false},
+      labels: {enabled: true},
       dateTimeLabelFormats: {millisecond: '%H:%M:%S',second: '%H:%M:%S',minute: '%H:%M',hour: '%H:%M',day: '%m-%d',week: '%m-%d',month: '%m',year: '%Y'}
     },
     yAxis: [{
