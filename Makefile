@@ -18,7 +18,7 @@ V_SQL   := 3210000
 V_QF    := v.1.14.4
 V_UV    := 1.18.0
 V_PVS   := 6.21.24657.1946
-KZIP     = 6b393e683c5f8a7f9701a27e839d3111b1028e86
+KZIP     = 639e73bcb5c8c16fc875d21d06313d938b042ca6
 KARGS    = -Wextra -std=c++11 -O3 -I$(KLOCAL)/include      \
   src/server/K.cxx -pthread -rdynamic                      \
   -DK_STAMP='"$(shell date "+%Y-%m-%d %H:%M:%S")"'         \
@@ -60,6 +60,7 @@ help:
 	#                                                  #
 	#  make client       - compile K client src        #
 	#  make www          - compile K client src        #
+	#  make css          - compile K client css        #
 	#  make bundle       - compile K client bundle     #
 	#                                                  #
 	#  make test         - run tests                   #
@@ -200,10 +201,10 @@ cleandb: /data/db/K*
 	rm -rf /data/db/K*.db
 
 packages:
-	test -n "`command -v apt-get`" && sudo apt-get -y install g++ build-essential automake autoconf libtool libxml2 libxml2-dev zlib1g-dev openssl stunnel python curl gzip screen \
-	|| (test -n "`command -v yum`" && sudo yum -y install gcc-c++ automake autoconf libtool libxml2 libxml2-devel openssl stunnel python curl gzip screen) \
-	|| (test -n "`command -v brew`" && (xcode-select --install || :) && (brew install automake autoconf libxml2 sqlite openssl zlib stunnel python curl gzip proctools || brew upgrade || :)) \
- 	|| (test -n "`command -v pacman`" && sudo pacman --noconfirm -S --needed base-devel libxml2 zlib sqlite curl libcurl-compat openssl stunnel python gzip screen)
+	test -n "`command -v apt-get`" && sudo apt-get -y install g++ build-essential automake autoconf libtool libxml2 libxml2-dev zlib1g-dev openssl stunnel python curl gzip screen rename \
+	|| (test -n "`command -v yum`" && sudo yum -y install gcc-c++ automake autoconf libtool libxml2 libxml2-devel openssl stunnel python curl gzip screen rename) \
+	|| (test -n "`command -v brew`" && (xcode-select --install || :) && (brew install automake autoconf libxml2 sqlite openssl zlib stunnel python curl gzip proctools rename || brew upgrade || :)) \
+ 	|| (test -n "`command -v pacman`" && sudo pacman --noconfirm -S --needed base-devel libxml2 zlib sqlite curl libcurl-compat openssl stunnel python gzip screen rename)
 	sudo mkdir -p /data/db/
 	sudo chown $(shell id -u) /data/db
 
@@ -292,11 +293,19 @@ www: src/www $(KLOCAL)/var/www
 	cp -R src/www/* $(KLOCAL)/var/www/
 	@echo DONE
 
-bundle: client www node_modules/.bin/browserify node_modules/.bin/uglifyjs $(KLOCAL)/var/www/js/main.js
+css:
+	@echo Building CSS files..
+	rm -rf $(KLOCAL)/var/www/css
+	mkdir -p $(KLOCAL)/var/www/css
+	./node_modules/.bin/node-sass --output-style compressed --output $(KLOCAL)/var/www/css/ src/www/sass/
+	ls -1 $$PWD/$(KLOCAL)/var/www/css/*[^\.min].css | rename 's/(\.css)$$/\.min$$1/'
+	@echo DONE
+
+bundle: client www css node_modules/.bin/browserify node_modules/.bin/uglifyjs $(KLOCAL)/var/www/js/main.js
 	@echo Building client bundle file..
 	mkdir -p $(KLOCAL)/var/www/js/client
 	./node_modules/.bin/browserify -t [ babelify --presets [ babili env ] ] $(KLOCAL)/var/www/js/main.js $(KLOCAL)/var/www/js/lib/*.js | ./node_modules/.bin/uglifyjs | gzip > $(KLOCAL)/var/www/js/client/bundle.min.js
-	rm $(KLOCAL)/var/www/js/*.js
+	rm -rf $(KLOCAL)/var/www/js/*.js $(KLOCAL)/var/www/sass
 	echo $(CARCH) | tr ' ' "\n" | xargs -I % echo % | grep -v $(CHOST) | xargs -I % sh -c 'if test -d build-%; then rm -rf build-%/local/var;mkdir -p build-%/local/var;cp -R $(KLOCAL)/var build-%/local; fi'
 	@echo DONE
 
