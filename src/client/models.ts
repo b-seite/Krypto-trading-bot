@@ -7,7 +7,7 @@ export var Topics = {
   FairValue: 'a',
   Quote: 'b',
   ActiveSubscription: 'c',
-  ActiveState: 'd',
+  Connectivity: 'd',
   MarketData: 'e',
   QuotingParametersChange: 'f',
   SafetySettings: 'g',
@@ -18,7 +18,6 @@ export var Topics = {
   Notepad: 'l',
   ToggleSettings: 'm',
   Position: 'n',
-  ExchangeConnectivity: 'o',
   SubmitNewOrder: 'p',
   CancelOrder: 'q',
   MarketTrade: 'r',
@@ -33,7 +32,8 @@ export var Topics = {
   CleanTrade: 'A',
   TradesChart: 'B',
   WalletChart: 'C',
-  EWMAChart: 'D'
+  EWMAChart: 'D',
+  MarketDataLongTerm: 'G'
 }
 
 export class MarketSide {
@@ -54,8 +54,7 @@ export class MarketStats {
 }
 
 export class MarketTrade {
-    constructor(public exchange: Exchange,
-                public pair: CurrencyPair,
+    constructor(public pair: CurrencyPair,
                 public price: number,
                 public quantity: number,
                 public time: number,
@@ -63,7 +62,7 @@ export class MarketTrade {
 }
 
 export enum Connectivity { Disconnected, Connected }
-export enum Exchange { Null, HitBtc, OkCoin, Coinbase, Bitfinex, Korbit, Poloniex }
+export enum Exchange { Null, HitBtc, OkCoin, Coinbase, Bitfinex, Kraken, OkEx, BitfinexMargin, Korbit, Poloniex }
 export enum Side { Bid, Ask, Unknown }
 export enum OrderType { Limit, Market }
 export enum TimeInForce { IOC, FOK, GTC }
@@ -89,9 +88,14 @@ export interface IStdev {
 export class EWMAChart {
     constructor(public stdevWidth: IStdev,
                 public ewmaQuote: number,
+                public ewmaWidth: number,
                 public ewmaShort: number,
                 public ewmaMedium: number,
                 public ewmaLong: number,
+                public ewmaVeryLong: number,
+                public ewmaTrendDiff: number,
+                public tradesBuySize: number,
+                public tradesSellSize: number,
                 public fairValue: number) {}
 }
 
@@ -106,7 +110,6 @@ export class TradeChart {
 export class Trade {
     constructor(public tradeId: string,
                 public time: number,
-                public exchange: Exchange,
                 public pair: CurrencyPair,
                 public price: number,
                 public quantity: number,
@@ -132,12 +135,11 @@ export class PositionReport {
                 public quoteAmount: number,
                 public baseHeldAmount: number,
                 public quoteHeldAmount: number,
-                public value: number,
+                public baseValue: number,
                 public quoteValue: number,
                 public profitBase: number,
                 public profitQuote: number,
-                public pair: CurrencyPair,
-                public exchange: Exchange) {}
+                public pair: CurrencyPair) {}
 }
 
 export class OrderRequestFromUI {
@@ -174,7 +176,7 @@ export class CurrencyPair {
 
 export enum QuotingMode { Top, Mid, Join, InverseJoin, InverseTop, PingPong, Boomerang, AK47, HamelinRat, Depth }
 export enum FairValueModel { BBO, wBBO }
-export enum AutoPositionMode { Manual, EWMA_LS, EWMA_LMS }
+export enum AutoPositionMode { Manual, EWMA_LS, EWMA_LMS, EWMA_4 }
 export enum DynamicPDivMode { Manual, Linear, Sine, SQRT, Switch }
 export enum PingAt { BothSides, BidSide, AskSide, DepletedSide, DepletedBidSide, DepletedAskSide, StopPings }
 export enum PongAt { ShortPingFair, LongPingFair, ShortPingAggressive, LongPingAggressive }
@@ -212,24 +214,29 @@ export interface QuotingParameters {
     superTrades?: SOP;
     tradesPerMinute?: number;
     tradeRateSeconds?: number;
-    quotingEwmaProtection?: boolean;
+    protectionEwmaWidthPing?: boolean;
+    protectionEwmaQuotePrice?: boolean;
+    quotingEwmaTrendProtection?: boolean;
+    quotingEwmaTrendThreshold?: number;
     quotingStdevProtection?: STDEV;
     quotingStdevBollingerBands?: boolean;
     audio?: boolean;
     bullets?: number;
     range?: number;
     ewmaSensiblityPercentage?: number;
+    veryLongEwmaPeriods?: number;
     longEwmaPeriods?: number;
     mediumEwmaPeriods?: number;
     shortEwmaPeriods?: number;
-    quotingEwmaProtectionPeriods?: number;
+    extraShortEwmaPeriods?: number;
+    ultraShortEwmaPeriods?: number;
+    protectionEwmaPeriods?: number;
     quotingStdevProtectionFactor?: number;
     quotingStdevProtectionPeriods?: number;
     aprMultiplier?: number;
     sopWidthMultiplier?: number;
     sopSizeMultiplier?: number;
     sopTradesMultiplier?: number;
-    delayAPI?: number;
     cancelOrdersAuto?: boolean;
     cleanPongsAuto?: number;
     stepOverSize?: number;
@@ -242,7 +249,7 @@ export class ProductAdvertisement {
 }
 
 export class ApplicationState {
-    constructor(public memory: number, public hour: number, public freq: number, public dbsize: number) { }
+    constructor(public memory: number, public freq: number, public bids: number, public asks: number, public theme: number, public dbsize: number) { }
 }
 
 export class TradeSafety {
@@ -251,7 +258,7 @@ export class TradeSafety {
       public sell: number,
       public combined: number,
       public buyPing: number,
-      public sellPong: number
+      public sellPing: number
     ) {}
 }
 

@@ -1,7 +1,6 @@
-import {NgZone, Component, Inject, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 
-import Models = require('./models');
-import {SubscriberFactory} from './shared_directives';
+import * as Models from './models';
 
 @Component({
   selector: 'wallet-position',
@@ -14,7 +13,7 @@ import {SubscriberFactory} from './shared_directives';
 	</div>
 </div><div class="positions" *ngIf="!baseCurrency && !quoteCurrency"><br/><b>NO WALLET DATA</b><br/><br/>Do a manual order first using the website of this Market!<br/></div>`
 })
-export class WalletPositionComponent implements OnInit {
+export class WalletPositionComponent {
 
   public baseCurrency: string;
   public basePosition: number;
@@ -22,48 +21,36 @@ export class WalletPositionComponent implements OnInit {
   public quotePosition: number;
   public baseHeldPosition: number;
   public quoteHeldPosition: number;
-  public value: number;
+  public baseValue: number;
   public quoteValue: number;
   private profitBase: number = 0;
   private profitQuote: number = 0;
+
   @Input() product: Models.ProductState;
 
-  constructor(
-    @Inject(NgZone) private zone: NgZone,
-    @Inject(SubscriberFactory) private subscriberFactory: SubscriberFactory
-  ) {}
-
-  ngOnInit() {
-    this.subscriberFactory
-      .getSubscriber(this.zone, Models.Topics.Position)
-      .registerDisconnectedHandler(this.clearPosition)
-      .registerSubscriber(this.updatePosition);
-  }
-
-  private clearPosition = () => {
-    this.baseCurrency = null;
-    this.quoteCurrency = null;
-    this.basePosition = null;
-    this.quotePosition = null;
-    this.baseHeldPosition = null;
-    this.quoteHeldPosition = null;
-    this.value = null;
-    this.quoteValue = null;
-    this.profitBase = 0;
-    this.profitQuote = 0;
-  }
-
-  private updatePosition = (o: Models.PositionReport) => {
-    if (o === null) return;
-    this.basePosition = o.baseAmount;
-    this.quotePosition = o.quoteAmount;
-    this.baseHeldPosition = o.baseHeldAmount;
-    this.quoteHeldPosition = o.quoteHeldAmount;
-    this.value = o.value;
-    this.quoteValue = o.quoteValue;
-    this.profitBase = o.profitBase;
-    this.profitQuote = o.profitQuote;
-    this.baseCurrency = o.pair.base;
-    this.quoteCurrency = o.pair.quote;
+  @Input() set setPosition(o: Models.PositionReport) {
+    if (o === null) {
+      this.baseCurrency = null;
+      this.quoteCurrency = null;
+      this.basePosition = null;
+      this.quotePosition = null;
+      this.baseHeldPosition = null;
+      this.quoteHeldPosition = null;
+      this.baseValue = null;
+      this.quoteValue = null;
+      this.profitBase = 0;
+      this.profitQuote = 0;
+    } else {
+      this.basePosition = o.baseAmount;
+      this.quotePosition = o.quoteAmount;
+      this.baseHeldPosition = o.baseHeldAmount;
+      this.quoteHeldPosition = o.quoteHeldAmount;
+      this.baseValue = o.baseValue;
+      this.quoteValue = o.quoteValue;
+      this.profitBase = o.profitBase;
+      this.profitQuote = o.profitQuote;
+      this.baseCurrency = o.pair.base;
+      this.quoteCurrency = o.pair.quote;
+    }
   }
 }

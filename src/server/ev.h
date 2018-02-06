@@ -1,140 +1,184 @@
 #ifndef K_EV_H_
 #define K_EV_H_
 
+#define _errorEvent_ ((EV*)events)->error
+
+#define _debugEvent_ ((EV*)events)->debug(__PRETTY_FUNCTION__);
+
 namespace K  {
   class EV: public Klass {
     private:
       uWS::Hub *hub = nullptr;
+      Async *aEngine = nullptr;
+      vector<function<void()>> slowFn;
     public:
       uWS::Group<uWS::SERVER> *uiGroup = nullptr;
-      Timer *tCalcs = nullptr,
-            *tStart = nullptr,
-            *tDelay = nullptr,
-            *tWallet = nullptr,
-            *tCancel = nullptr;
-      function<void(mOrder)> ogOrder;
-      function<void(mTrade)> ogTrade;
-      function<void()>       mgLevels,
-                             mgEwmaSMUProtection,
-                             mgEwmaQuoteProtection,
-                             mgTargetPosition,
-                             pgTargetBasePosition,
-                             uiQuotingParameters;
+      Timer *tServer = nullptr,
+            *tClient = nullptr;
+      function<void(mOrder*)> ogOrder;
+      function<void(mTrade*)> ogTrade;
+      function<void()>        mgLevels,
+                              mgTargetPosition,
+                              uiQuotingParameters;
     protected:
       void load() {
-        evExit = &happyEnding;
+        gwEndings.push_back(&happyEnding);
         signal(SIGINT, quit);
         signal(SIGUSR1, wtf);
         signal(SIGABRT, wtf);
         signal(SIGSEGV, wtf);
+        version();
+        if (!gw) exit(error("GW", string("Unable to load a valid gateway using --exchange=") + ((CF*)config)->argExchange + " argument"));
         gw->hub = hub = new uWS::Hub(0, true);
       };
-      void waitTime() {
-        tCalcs = new Timer(hub->getLoop());
-        tStart = new Timer(hub->getLoop());
-        tDelay = new Timer(hub->getLoop());
-        tWallet = new Timer(hub->getLoop());
-        tCancel = new Timer(hub->getLoop());
-      };
       void waitData() {
+        aEngine = new Async(hub->getLoop());
+        aEngine->setData(this);
+        aEngine->start(asyncLoop);
         gw->gwGroup = hub->createGroup<uWS::CLIENT>();
+      };
+      void waitTime() {
+        tServer = new Timer(hub->getLoop());
+        tClient = new Timer(hub->getLoop());
       };
       void waitUser() {
         uiGroup = hub->createGroup<uWS::SERVER>(uWS::PERMESSAGE_DEFLATE);
       };
       void run() {
-        if (FN::output("test -d .git || echo -n zip") == "zip")
-          FN::logVer("", -1);
-        else {
-          FN::output("git fetch");
-          string k = changelog();
-          FN::logVer(k, count(k.begin(), k.end(), '\n'));
-        }
+        if (((CF*)config)->argDebugEvents) return;
+        debug = [&](string k) {};
       };
     public:
-      void start() {
+      void start(/* KMxTWEpb9ig */) {
+        THIS_WAS_A_TRIUMPH
+          << "- roll-out: " << to_string(_Tstamp_) << '\n';
         hub->run();
       };
-      void stop(int code, function<void()> gwCancelAll) {
-        tCancel->stop();
-        tWallet->stop();
-        tCalcs->stop();
-        tStart->stop();
-        tDelay->stop();
+      void stop(function<void()> gwCancelAll) {
+        tServer->stop();
+        tClient->stop();
         gw->close();
         gw->gwGroup->close();
         gwCancelAll();
+        asyncLoop(aEngine);
         uiGroup->close();
-        halt(code);
       };
-      void listen(int port) {
-        string protocol("HTTP");
-        if ((access("etc/sslcert/server.crt", F_OK) != -1) and (access("etc/sslcert/server.key", F_OK) != -1)
-          and hub->listen(port, uS::TLS::createContext("etc/sslcert/server.crt", "etc/sslcert/server.key", ""), 0, uiGroup)
-        ) protocol += "S";
-        else if (!hub->listen(port, nullptr, 0, uiGroup))
-          FN::logExit("IU", string("Use another UI port number, ")
-            + to_string(port) + " seems already in use by:\n"
-            + FN::output(string("netstat -anp 2>/dev/null | grep ") + to_string(port)),
-            EXIT_SUCCESS);
-        FN::logUI(protocol, port);
-      }
+      void listen() {
+        ((SH*)screen)->protocol = "HTTP";
+        if (!((CF*)config)->argWithoutSSL
+          and (access("etc/sslcert/server.crt", F_OK) != -1) and (access("etc/sslcert/server.key", F_OK) != -1)
+          and hub->listen(((CF*)config)->argPort, uS::TLS::createContext("etc/sslcert/server.crt", "etc/sslcert/server.key", ""), 0, uiGroup)
+        ) ((SH*)screen)->protocol += "S";
+        else if (!hub->listen(((CF*)config)->argPort, nullptr, 0, uiGroup))
+          exit(error("IU", string("Use another UI port number, ")
+            + to_string(((CF*)config)->argPort) + " seems already in use by:\n"
+            + FN::output(string("netstat -anp 2>/dev/null | grep ") + to_string(((CF*)config)->argPort))
+          ));
+        ((SH*)screen)->port = ((CF*)config)->argPort;
+        ((SH*)screen)->logUI();
+      };
+      void deferred(function<void()> fn) {
+        slowFn.push_back(fn);
+        aEngine->send();
+      };
+      void async(function<bool()> &fn) {
+        if (fn()) aEngine->send();
+      };
+      int error(string k, string s, bool reboot = false) {
+        ((SH*)screen)->quit();
+        ((SH*)screen)->logErr(k, s);
+        return reboot ? EXIT_FAILURE : EXIT_SUCCESS;
+      };
+      function<void(string)> debug = [&](string k) {
+        ((SH*)screen)->log("DEBUG", string("EV ") + k);
+      };
     private:
-      void halt(int code) {
-        cout << FN::uiT() << "K exit code " << to_string(code) << "." << '\n';
-        exit(code);
+      function<void()> happyEnding = [&]() {
+        cout << ((SH*)screen)->stamp() << gw->name;
+        for (unsigned int i = 0; i < 21; ++i)
+          cout << " THE END IS NEVER";
+        cout << " THE END." << '\n';
       };
-      function<void(int)> happyEnding = [&](int code) {
-        cout << FN::uiT();
-        for(unsigned int i = 0; i < 21; ++i)
-          cout << "THE END IS NEVER ";
-        cout << "THE END." << '\n';
-        halt(code);
-      };
-      static void quit(int sig) {
-        FN::screen_quit();
-        cout << '\n';
-        json k = FN::wJet("https://api.icndb.com/jokes/random?escape=javascript&limitTo=[nerdy]");
-        cout << FN::uiT() << "Excellent decision! "
-          << ((k.is_null() or !k["/value/joke"_json_pointer].is_string())
-            ? "let's plant a tree instead.." : k["/value/joke"_json_pointer].get<string>()
-          ) << '\n';
-        (*evExit)(EXIT_SUCCESS);
-      };
-      static void wtf(int sig) {
-        FN::screen_quit();
-        cout << FN::uiT() << RCYAN << "Errrror: Signal " << sig << " "  << strsignal(sig);
-        if (latest()) {
-          cout << " (Three-Headed Monkey found)." << '\n';
-          report();
-          this_thread::sleep_for(chrono::seconds(3));
-        } else {
-          cout << " (deprecated K version found)." << '\n';
-          upgrade();
-          this_thread::sleep_for(chrono::seconds(21));
+      void (*asyncLoop)(Async*) = [](Async *aEngine) {
+        EV* k = (EV*)aEngine->getData();
+        if (!k->slowFn.empty()) {
+          for (function<void()> &it : k->slowFn) it();
+          k->slowFn.clear();
         }
-        (*evExit)(EXIT_FAILURE);
+        if (k->gw->waitForData())
+          aEngine->send();
+        ((SH*)screen)->waitForUser();
       };
-      static bool latest() {
-        return FN::output("test -d .git && git rev-parse @") == FN::output("test -d .git && git rev-parse @{u}");
-      }
-      static string changelog() {
-        return FN::output("test -d .git && git --no-pager log --graph --oneline @..@{u}");
-      }
+      void version() {
+        if (access(".git", F_OK) != -1) {
+          FN::output("git fetch");
+          string k = changelog();
+          ((SH*)screen)->logVer(k, count(k.begin(), k.end(), '\n'));
+        } else ((SH*)screen)->logVer("", -1);
+        THIS_WAS_A_TRIUMPH
+          << "- upstream: " << ((CF*)config)->argExchange << '\n'
+          << "- currency: " << ((CF*)config)->argCurrency << '\n';
+      };
+      static void halt(int last_int_alive) {
+        for (function<void()>* &it : gwEndings) (*it)();
+        if (last_int_alive == EXIT_FAILURE)
+          this_thread::sleep_for(chrono::seconds(3));
+        cout << ((SH*)screen)->stamp() << "K exit code " << to_string(last_int_alive) << "." << '\n';
+        exit(last_int_alive);
+      };
+      static void quit(int last_int_alive) {
+        THIS_WAS_A_TRIUMPH.str("");
+        THIS_WAS_A_TRIUMPH
+          << "Excellent decision! "
+          << FN::wJet("https://api.icndb.com/jokes/random?escape=javascript&limitTo=[nerdy]", true)
+             .value("/value/joke"_json_pointer, "let's plant a tree instead..") << '\n';
+        halt(EXIT_SUCCESS);
+      };
+      static void  wtf(int last_int_alive) {
+        ostringstream rollout(THIS_WAS_A_TRIUMPH.str());
+        THIS_WAS_A_TRIUMPH.str("");
+        THIS_WAS_A_TRIUMPH
+          << RCYAN << "Errrror: Signal " << last_int_alive << " "  << strsignal(last_int_alive);
+        if (unsupported()) upgrade();
+        else {
+          THIS_WAS_A_TRIUMPH
+            << " (Three-Headed Monkey found):" << '\n' << rollout.str()
+            << "- lastbeat: " << to_string(_Tstamp_) << '\n'
+            << "- os-uname: " << FN::output("uname -srvm")
+            << "- tracelog: " << '\n';
+          void *k[69];
+          size_t jumps = backtrace(k, 69);
+          char **trace = backtrace_symbols(k, jumps);
+          size_t i;
+          for (i = 0; i < jumps; i++)
+            THIS_WAS_A_TRIUMPH
+              << trace[i] << '\n';
+          free(trace);
+          report();
+        }
+        halt(EXIT_FAILURE);
+      };
+      static void report() {
+        THIS_WAS_A_TRIUMPH
+          << '\n' << BRED << "Yikes!" << RRED
+          << '\n' << "please copy and paste the error above into a new github issue (noworry for duplicates)."
+          << '\n' << "If you agree, go to https://github.com/ctubio/Krypto-trading-bot/issues/new"
+          << '\n' << '\n';
+      };
       static void upgrade() {
-        cout << '\n' << BYELLOW << "Hint!" << RYELLOW
+        THIS_WAS_A_TRIUMPH
+          << " (deprecated K version found)." << '\n'
+          << '\n' << BYELLOW << "Hint!" << RYELLOW
           << '\n' << "please upgrade to the latest commit; the encountered error may be already fixed at:"
           << '\n' << changelog()
           << '\n' << "If you agree, consider to run \"make latest\" prior further executions."
           << '\n' << '\n';
       };
-      static void report() {
-        void *k[69];
-        backtrace_symbols_fd(k, backtrace(k, 69), STDERR_FILENO);
-        cout << '\n' << BRED << "Yikes!" << RRED
-          << '\n' << "please copy and paste the error above into a new github issue (noworry for duplicates)."
-          << '\n' << "If you agree, go to https://github.com/ctubio/Krypto-trading-bot/issues/new"
-          << '\n' << '\n';
+      static bool unsupported() {
+        return FN::output("test -d .git && git rev-parse @") != FN::output("test -d .git && git rev-parse @{u}");
+      };
+      static string changelog() {
+        return FN::output("test -d .git && git --no-pager log --graph --oneline @..@{u}");
       };
   };
 }
