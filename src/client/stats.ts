@@ -7,7 +7,7 @@ import * as Models from './models';
 @Component({
   selector: 'market-stats',
   template: `<div class="col-md-6 col-xs-6">
-    <chart style="height:340px;width:1200px;" type="StockChart" [options]="fvChartOptions" (load)="saveInstance($event.context, 'fv')"></chart>
+    <chart style="height:340px;width:1200px;" [options]="fvChartOptions" (load)="saveInstance($event.context, 'fv')"></chart>
 	<table><tr>
     <td><chart style="height:160px;width:600px;float:left;" [options]="baseChartOptions" (load)="saveInstance($event.context, 'base')"></chart></td>
     <td><chart style="height:160px;width:600px;" [options]="quoteChartOptions" (load)="saveInstance($event.context, 'quote')"></chart></td>

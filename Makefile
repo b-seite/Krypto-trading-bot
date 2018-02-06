@@ -297,7 +297,7 @@ css:
 	@echo Building CSS files..
 	rm -rf $(KLOCAL)/var/www/css
 	mkdir -p $(KLOCAL)/var/www/css
-	./node_modules/.bin/node-sass --output-style compressed --output $(KLOCAL)/var/www/css/ src/www/sass/
+	./node_modules/.bin/node-sass --output-style compressed --output $(KLOCAL)/var/www/css/ src/www/sass/ -q
 	ls -1 $$PWD/$(KLOCAL)/var/www/css/*[^\.min].css | rename 's/(\.css)$$/\.min$$1/'
 	@echo DONE
 
