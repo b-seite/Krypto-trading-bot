@@ -2,20 +2,22 @@
 // Bootstrap and its default variables
 @import "node_modules/bootstrap/scss/bootstrap";
 
+
 $red: #ff6939;
 $blue: #81e7ff;
 $green: #84f766;
 $lightgrey: #c2c2c2;
 $darkgrey: #1e2b34;
 $greybackgr: #162732;
-$white: #ffffff;
 $greyborder: rgba(255, 255, 255, 0.2);
 
+$body-bg: $greybackgr;
+$body-color: #bbc5cc;
+
+$font-family-base: "opensans", $font-family-sans-serif;
+$font-size-base: 0.688rem;
+
 body {
-	font-family: "opensans", sans-serif;
-	background: $greybackgr;
-	font-size: 11px;
-	color: #bbc5cc;
 	-webkit-font-smoothing: antialiased;
 }
 

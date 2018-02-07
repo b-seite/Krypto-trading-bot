@@ -4,9 +4,9 @@ import * as Models from './models';
 
 @Component({
   selector: 'wallet-position',
-  template: `<div class="container wallet" *ngIf="baseCurrency || quoteCurrency">
+  template: `<div class="container wallet" *ngIf="baseValue || quoteValue">
   	<div class="row"><div class="col-1">{{ baseCurrency }}<br>{{ quoteCurrency }}<span class="wallet-description">currency</span></div>
-  		<div class="col">{{ value | number:'1.8-8' }}<br>{{ quoteValue | number:'1.'+product.fixed+'-'+product.fixed }}<span class="wallet-description">total</span></div>
+  		<div class="col">{{ baseValue | number:'1.8-8' }}<br>{{ quoteValue | number:'1.'+product.fixed+'-'+product.fixed }}<span class="wallet-description">total</span></div>
   		<div class="col width-120"><span [ngClass]="profitBase<0 ? 'K-Red' : 'K-Green'">{{ profitBase>=0?'+':'' }}{{ profitBase | number:'1.2-2' }}%</span><br><span [ngClass]="profitQuote<0 ? 'K-Red' : 'K-Green'">{{ profitQuote>=0?'+':'' }}{{ profitQuote | number:'1.2-2' }}%</span><br><span class="wallet-description">profit last {{ profitTime | number:'1.0-2'}} h</span></div>
   		<div class="col">{{ basePosition | number:'1.8-8' }}<br>{{ quotePosition | number:'1.'+product.fixed+'-'+product.fixed }}<br><span class="wallet-description">Available</span></div>
   		<div class="col"><span [ngClass]="baseHeldPosition ? '' : 'ktext-muted'">{{ baseHeldPosition | number:'1.8-8' }}</span><br><span [ngClass]="quoteHeldPosition ? '' : 'ktext-muted'">{{ quoteHeldPosition | number:'1.'+product.fixed+'-'+product.fixed }}</span><br><span class="wallet-description">Held</span></div>
