@@ -57,10 +57,9 @@ class QuotingButtonViewModel extends FormViewModel<any> {
   }
 
    public getClass = () => {
-	let btnclass = "btn btn-lg btn-block btn-";
-    if (this.pending) return btnclass + "warning";
-    if (this.display.state) return btnclass + "green";
-    return btnclass + "red";
+    if (this.pending) return "btn btn-warning";
+    if (this.display.state) return "btn btn-green";
+    return "btn btn-red";
   }
   
   public getStartStop = () => {
@@ -72,6 +71,7 @@ class QuotingButtonViewModel extends FormViewModel<any> {
 
 class DisplayQuotingParameters extends FormViewModel<Models.QuotingParameters> {
   availableQuotingModes = [];
+  availableQuotingSafeties = [];
   availableFvModels = [];
   availableAutoPositionModes = [];
   availablePositionDivergenceModes = [];
@@ -92,6 +92,7 @@ class DisplayQuotingParameters extends FormViewModel<Models.QuotingParameters> {
     });
 
     this.availableQuotingModes = DisplayQuotingParameters.getMapping(Models.QuotingMode);
+    this.availableQuotingSafeties = DisplayQuotingParameters.getMapping(Models.QuotingSafety);
     this.availableFvModels = DisplayQuotingParameters.getMapping(Models.FairValueModel);
     this.availableAutoPositionModes = DisplayQuotingParameters.getMapping(Models.AutoPositionMode);
     this.availableAggressivePositionRebalancings = DisplayQuotingParameters.getMapping(Models.APR);

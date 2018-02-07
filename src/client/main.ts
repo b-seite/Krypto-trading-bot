@@ -755,6 +755,40 @@ class ClientComponent implements OnInit {
       (new (<any>window).cryptowatch.Embed(watchExchange, watchPair.replace('-',''), {timePeriod: '1d',customColorScheme: {bg:"000000",text:"b2b2b2",textStrong:"e5e5e5",textWeak:"7f7f7f",short:"FD4600",shortFill:"FF672C",long:"6290FF",longFill:"002782",cta:"363D52",ctaHighlight:"414A67",alert:"FFD506"}})).mount('#container'+watchExchange+watchPair);
     } else (<any>window).setDialog('cryptoWatch'+watchExchange+watchPair, 'close', {content:''});
   };
+public rotateSide = () => {
+    var sideOption = (document.getElementById("selectSide")) as HTMLSelectElement;
+    if (sideOption.selectedIndex < sideOption.options.length - 1) sideOption.selectedIndex++; else sideOption.selectedIndex = 0;
+  };
+
+  public insertBidAskPrice = () => {
+    var sideOption = (document.getElementById("selectSide")) as HTMLSelectElement;
+    var sideOptionText = ((sideOption.options[sideOption.selectedIndex]) as HTMLOptionElement).innerText;
+    var orderPriceInput = (document.getElementById('orderPriceInput') as HTMLSelectElement);
+    var price = '0';
+    if (sideOptionText.toLowerCase().indexOf('bid'.toLowerCase()) > -1) {
+      price = (document.getElementsByClassName('bidsz0')[1] as HTMLScriptElement).innerText;
+      console.log( 'bid' );
+    }
+    if (sideOptionText.toLowerCase().indexOf('ask'.toLowerCase()) > -1) {
+      price = (document.getElementsByClassName('asksz0')[0] as HTMLScriptElement).innerText;
+      console.log( 'ask' );
+    }
+    orderPriceInput.value = price.replace(',', '');
+  };
+
+  public insertBidAskSize = () => {
+    var sideOption = (document.getElementById("selectSide") as HTMLSelectElement);
+    var sideOptionText = (sideOption.options[sideOption.selectedIndex] as HTMLOptionElement).innerText;
+    var orderSizeInput = (document.getElementById('orderSizeInput') as HTMLSelectElement);
+    var size = '0';
+    if (sideOptionText.toLowerCase().indexOf('bid'.toLowerCase()) > -1) {
+      size = (document.getElementsByClassName('bidsz0')[0] as HTMLScriptElement).innerText;
+    }
+    if (sideOptionText.toLowerCase().indexOf('ask'.toLowerCase()) > -1) {
+      size = (document.getElementsByClassName('asksz0')[1] as HTMLScriptElement).innerText;
+    }
+    orderSizeInput.value = size.replace(',', '');
+  };
 
   public openMatryoshka = () => {
     const url = window.prompt('Enter the URL of another instance:',this.matryoshka||'https://');
