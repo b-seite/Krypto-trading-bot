@@ -320,7 +320,6 @@ namespace K {
           else newTargetPosition = ((mgEwmaS * 100 / mgEwmaM) - 100) * (1 / qp->ewmaSensiblityPercentage);
         } else if (qp->autoPositionMode == mAutoPositionMode::EWMA_TakeProfit) {
 		  double pTakeProfit = 0.02; //set to 2% for now
-		  takeProfit = pTakeProfit * lastBid;
 		  if (mgEwmaM > mgEwmaL) {
 		    if (SMA3 > mgEwmaS) newTargetPosition = 1;
 			else newTargetPosition = 1 - pTakeProfit;

@@ -77,7 +77,7 @@ class DisplayOrder {
 			</div>
 			<div  *ngIf="online">
 				<span class="navbar-text exchange">{{ title }}<br/>{{ exchange_name }}<br/>{{ pair_name.join('/') }}</span>
-				<span class="navbar-text verticaltop mr-auto"><wallet-position [product]="product"></wallet-position></span>
+				<span class="navbar-text verticaltop mr-auto"><wallet-position [product]="product" [setPosition]="Position"></wallet-position></span>
 				<span class="statuscircle" [ngClass]="pair.connected ? 'circlegreen' : 'circlered'"></span>
 			</div>
 	</nav>
@@ -616,20 +616,20 @@ class DisplayOrder {
 								</div>
 							</div>
 							<div [hidden]="!showStats" [ngClass]="showStats == 2 ? 'col-md-12 col-xs-12 absolute-charts' : 'col-md-12 col-xs-12 relative-charts'">
-								<market-stats [setShowStats]="!!showStats" [product]="product"></market-stats>
+								<market-stats [setShowStats]="!!showStats" [product]="product" [setQuotingParameters]="pair.quotingParameters.display" [setTargetBasePosition]="TargetBasePosition"  [setMarketData]="MarketData" [setEWMAChartData]="EWMAChartData" [setTradesChartData]="TradesChartData" [setPosition]="Position" [setFairValue]="FairValue"></market-stats>
 							</div>
 							<div class="row">
 								<div [hidden]="showStats === 1" class="col-md-10 col-xs-12 border-right">
 									<div class="tradesafetyheader header">
 										<div class="title">Trade-Safety</div>
 									</div>
-									<trade-safety [tradeFreq]="tradeFreq" [product]="product"></trade-safety>
+									<trade-safety [tradeFreq]="tradeFreq" [product]="product" [setFairValue]="FairValue" [setTradeSafety]="TradeSafety"></trade-safety>
 									<div class="row" >
 										<div class="col-md-4 col-xs-12 marketquoting border-right" >
 											<div class="marketquotingheader header">
 												<div class="title">Market Quoting</div>
 											</div>
-											<market-quoting [online]="!!pair.active.display.state" [product]="product"></market-quoting>
+											<market-quoting [online]="!!pair.active.display.state" [product]="product" [a]="A" [setQuoteStatus]="QuoteStatus" [setMarketData]="MarketData" [setOrderList]="orderList" [setTargetBasePosition]="TargetBasePosition"></market-quoting>
 										</div>
 										<div class="col-md-8 col-xs-12" >
 											<div class="orderlistheader header">
@@ -641,7 +641,7 @@ class DisplayOrder {
 													</button>
                                   				</div>
 											</div>
-											<order-list [online]="!!pair.active.display.state" [product]="product"></order-list>
+											<order-list [online]="!!pair.active.display.state" [product]="product" [setOrderList]="orderList"></order-list>
 											<div class="tradelistheader header">
 												<div class="title">Trade List</div>
 												<div class="info">
@@ -662,7 +662,7 @@ class DisplayOrder {
 													</button>
 								  				</div>
 											</div>							
-											<trade-list (onTradesLength)="onTradesLength($event)" [product]="product"></trade-list>
+											<trade-list (onTradesLength)="onTradesLength($event)" [product]="product" [setQuotingParameters]="pair.quotingParameters.display" [setTrade]="Trade"></trade-list>
 										
 										</div>
 									</div>
@@ -962,8 +962,8 @@ public rotateSide = () => {
   }
 
   private setTheme = () => {
-    if ((<any>document.getElementById('daynight').attributes).href.value!='/css/bootstrap-theme'+this.system_theme+'.min.css')
-      (<any>document.getElementById('daynight').attributes).href.value = '/css/bootstrap-theme'+this.system_theme+'.min.css';
+    if ((<any>document.getElementById('daynight').attributes).href.value!='/css/K-theme'+this.system_theme+'.min.css')
+      (<any>document.getElementById('daynight').attributes).href.value = '/css/K-theme'+this.system_theme+'.min.css';
   }
 
   public changeTheme = () => {
