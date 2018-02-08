@@ -149,8 +149,9 @@ namespace K {
         for (unsigned int i = 0; i < SHA384_DIGEST_LENGTH; i++) sprintf(&k_[i*2], "%02x", (unsigned int)digest[i]);
         return k_;
       };
-      static void stunnel() {
-        system("(pkill stunnel || :) && stunnel etc/K-stunnel.conf");
+      static void stunnel(bool reboot = false) {
+        system("pkill stunnel || :");
+        if (reboot) system("stunnel etc/K-stunnel.conf");
       };
       static int memory() {
         string ps = output(string("ps -p") + to_string(::getpid()) + " -orss | tail -n1");
@@ -186,8 +187,7 @@ namespace K {
       };
       static string wGet(string k, bool f) {
         string k_;
-        CURL* curl;
-        curl = curl_easy_init();
+        CURL* curl = curl_easy_init();
         if (curl) {
           curl_easy_setopt(curl, CURLOPT_CAINFO, "etc/K-cabundle.pem");
           curl_easy_setopt(curl, CURLOPT_URL, k.data());
@@ -208,8 +208,7 @@ namespace K {
       };
       static string wGet(string k, string p) {
         string k_;
-        CURL* curl;
-        curl = curl_easy_init();
+        CURL* curl = curl_easy_init();
         if (curl) {
           struct curl_slist *h_ = NULL;
           curl_easy_setopt(curl, CURLOPT_CAINFO, "etc/K-cabundle.pem");
@@ -221,7 +220,7 @@ namespace K {
           curl_easy_setopt(curl, CURLOPT_WRITEDATA, &k_);
           curl_easy_setopt(curl, CURLOPT_USERAGENT, "K");
           CURLcode r = curl_easy_perform(curl);
-          if(r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wPost failed ") + curl_easy_strerror(r));
+          if (r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wPost failed ") + curl_easy_strerror(r));
           curl_easy_cleanup(curl);
         }
         if (k_.empty() or (k_[0]!='{' and k_[0]!='[')) k_ = "{}";
@@ -232,8 +231,7 @@ namespace K {
       };
       static string wGet(string k, string t, bool auth) {
         string k_;
-        CURL* curl;
-        curl = curl_easy_init();
+        CURL* curl = curl_easy_init();
         if (curl) {
           struct curl_slist *h_ = NULL;
           curl_easy_setopt(curl, CURLOPT_CAINFO, "etc/K-cabundle.pem");
@@ -244,7 +242,7 @@ namespace K {
           curl_easy_setopt(curl, CURLOPT_WRITEDATA, &k_);
           curl_easy_setopt(curl, CURLOPT_USERAGENT, "K");
           CURLcode r = curl_easy_perform(curl);
-          if(r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wPost failed ") + curl_easy_strerror(r));
+          if (r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wPost failed ") + curl_easy_strerror(r));
           curl_easy_cleanup(curl);
         }
         if (k_.empty() or (k_[0]!='{' and k_[0]!='[')) k_ = "{}";
@@ -255,8 +253,7 @@ namespace K {
       };
       static string wGet(string k, bool p, string a, string s, string n) {
         string k_;
-        CURL* curl;
-        curl = curl_easy_init();
+        CURL* curl = curl_easy_init();
         if (curl) {
           struct curl_slist *h_ = NULL;
           curl_easy_setopt(curl, CURLOPT_CAINFO, "etc/K-cabundle.pem");
@@ -269,7 +266,7 @@ namespace K {
           curl_easy_setopt(curl, CURLOPT_WRITEDATA, &k_);
           curl_easy_setopt(curl, CURLOPT_USERAGENT, "K");
           CURLcode r = curl_easy_perform(curl);
-          if(r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wPost failed ") + curl_easy_strerror(r));
+          if (r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wPost failed ") + curl_easy_strerror(r));
           curl_easy_cleanup(curl);
         }
         if (k_.empty() or (k_[0]!='{' and k_[0]!='[')) k_ = "{}";
@@ -280,8 +277,7 @@ namespace K {
       };
       static string wGet(string k, bool a, string p, string s) {
         string k_;
-        CURL* curl;
-        curl = curl_easy_init();
+        CURL* curl = curl_easy_init();
         if (curl) {
           curl_easy_setopt(curl, CURLOPT_CAINFO, "etc/K-cabundle.pem");
           curl_easy_setopt(curl, CURLOPT_URL, k.data());
@@ -294,7 +290,7 @@ namespace K {
           curl_easy_setopt(curl, CURLOPT_WRITEDATA, &k_);
           curl_easy_setopt(curl, CURLOPT_USERAGENT, "K");
           CURLcode r = curl_easy_perform(curl);
-          if(r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wGet failed ") + curl_easy_strerror(r));
+          if (r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wGet failed ") + curl_easy_strerror(r));
           curl_easy_cleanup(curl);
         }
         if (k_.empty() or (k_[0]!='{' and k_[0]!='[')) k_ = "{}";
@@ -305,8 +301,7 @@ namespace K {
       };
       static string wGet(string k, string p, string s, bool post) {
         string k_;
-        CURL* curl;
-        curl = curl_easy_init();
+        CURL* curl = curl_easy_init();
         if (curl) {
           struct curl_slist *h_ = NULL;
           curl_easy_setopt(curl, CURLOPT_CAINFO, "etc/K-cabundle.pem");
@@ -318,7 +313,7 @@ namespace K {
           curl_easy_setopt(curl, CURLOPT_WRITEDATA, &k_);
           curl_easy_setopt(curl, CURLOPT_USERAGENT, "K");
           CURLcode r = curl_easy_perform(curl);
-          if(r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wPost failed ") + curl_easy_strerror(r));
+          if (r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wPost failed ") + curl_easy_strerror(r));
           curl_easy_cleanup(curl);
         }
         if (k_.empty() or (k_[0]!='{' and k_[0]!='[')) k_ = "{}";
@@ -329,8 +324,7 @@ namespace K {
       };
       static string wGet(string k, string p, string a, string s) {
         string k_;
-        CURL* curl;
-        curl = curl_easy_init();
+        CURL* curl = curl_easy_init();
         if (curl) {
           struct curl_slist *h_ = NULL;
           curl_easy_setopt(curl, CURLOPT_CAINFO, "etc/K-cabundle.pem");
@@ -344,7 +338,7 @@ namespace K {
           curl_easy_setopt(curl, CURLOPT_WRITEDATA, &k_);
           curl_easy_setopt(curl, CURLOPT_USERAGENT, "K");
           CURLcode r = curl_easy_perform(curl);
-          if(r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wPost failed ") + curl_easy_strerror(r));
+          if (r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wPost failed ") + curl_easy_strerror(r));
           curl_easy_cleanup(curl);
         }
         if (k_.empty() or (k_[0]!='{' and k_[0]!='[')) k_ = "{}";
@@ -355,8 +349,7 @@ namespace K {
       };
       static string wGet(string k, string p, string a, string s, bool post) {
         string k_;
-        CURL* curl;
-        curl = curl_easy_init();
+        CURL* curl = curl_easy_init();
         if (curl) {
           struct curl_slist *h_ = NULL;
           curl_easy_setopt(curl, CURLOPT_CAINFO, "etc/K-cabundle.pem");
@@ -370,7 +363,7 @@ namespace K {
           curl_easy_setopt(curl, CURLOPT_WRITEDATA, &k_);
           curl_easy_setopt(curl, CURLOPT_USERAGENT, "K");
           CURLcode r = curl_easy_perform(curl);
-          if(r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wPost failed ") + curl_easy_strerror(r));
+          if (r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wPost failed ") + curl_easy_strerror(r));
           curl_easy_cleanup(curl);
         }
         if (k_.empty() or (k_[0]!='{' and k_[0]!='[')) k_ = "{}";
@@ -381,8 +374,7 @@ namespace K {
       };
       static string wGet(string k, string p, string a, string s, bool post, bool auth) {
         string k_;
-        CURL* curl;
-        curl = curl_easy_init();
+        CURL* curl = curl_easy_init();
         if (curl) {
           struct curl_slist *h_ = NULL;
           curl_easy_setopt(curl, CURLOPT_CAINFO, "etc/K-cabundle.pem");
@@ -395,7 +387,7 @@ namespace K {
           curl_easy_setopt(curl, CURLOPT_WRITEDATA, &k_);
           curl_easy_setopt(curl, CURLOPT_USERAGENT, "K");
           CURLcode r = curl_easy_perform(curl);
-          if(r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wPost failed ") + curl_easy_strerror(r));
+          if (r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wPost failed ") + curl_easy_strerror(r));
           curl_easy_cleanup(curl);
         }
         if (k_.empty() or (k_[0]!='{' and k_[0]!='[')) k_ = "{}";
@@ -406,8 +398,7 @@ namespace K {
       };
       static string wGet(string k, string t, string a, string s, string p) {
         string k_;
-        CURL* curl;
-        curl = curl_easy_init();
+        CURL* curl = curl_easy_init();
         if (curl) {
           struct curl_slist *h_ = NULL;
           curl_easy_setopt(curl, CURLOPT_CAINFO, "etc/K-cabundle.pem");
@@ -421,7 +412,7 @@ namespace K {
           curl_easy_setopt(curl, CURLOPT_WRITEDATA, &k_);
           curl_easy_setopt(curl, CURLOPT_USERAGENT, "K");
           CURLcode r = curl_easy_perform(curl);
-          if(r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wGet failed ") + curl_easy_strerror(r));
+          if (r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wGet failed ") + curl_easy_strerror(r));
           curl_easy_cleanup(curl);
         }
         if (k_.empty() or (k_[0]!='{' and k_[0]!='[')) k_ = "{}";
@@ -432,8 +423,7 @@ namespace K {
       };
       static string wGet(string k, string t, string a, string s, string p, bool d) {
         string k_;
-        CURL* curl;
-        curl = curl_easy_init();
+        CURL* curl = curl_easy_init();
         if (curl) {
           struct curl_slist *h_ = NULL;
           curl_easy_setopt(curl, CURLOPT_CAINFO, "etc/K-cabundle.pem");
@@ -448,7 +438,7 @@ namespace K {
           curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, "DELETE");
           curl_easy_setopt(curl, CURLOPT_USERAGENT, "K");
           CURLcode r = curl_easy_perform(curl);
-          if(r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wGet failed ") + curl_easy_strerror(r));
+          if (r != CURLE_OK) ((SH*)screen)->logWar("CURL", string("wGet failed ") + curl_easy_strerror(r));
           curl_easy_cleanup(curl);
         }
         if (k_.empty() or (k_[0]!='{' and k_[0]!='[')) k_ = "{}";
