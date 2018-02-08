@@ -74,7 +74,7 @@ class DisplayOrder {
     <div [hidden]="!online">
         <div class="container-fluid">
             <div>
-                <div style="padding: 5px;padding-top:10px;margin-top:7px;" [ngClass]="pair.connected ? 'bg-success img-rounded' : 'bg-danger img-rounded'">
+                <div style="padding: 5px;padding-top:10px;margin-top:7px;" [ngClass]="pair.connected ? 'bg-success rounded' : 'bg-danger rounded'">
                     <div *ngIf="online" class="row" [hidden]="!showSettings">
                         <div class="col-md-12 col-xs-12">
                             <div class="row">
@@ -109,81 +109,81 @@ class DisplayOrder {
                                                    [(ngModel)]="pair.quotingParameters.display.percentageValues">
                                             </td>
                                             <td style="min-width:121px;border-bottom: 3px solid #DDE28B;">
-                                                <select class="form-control input-sm"
+                                                <select class="form-control form-control-sm"
                                                   [(ngModel)]="pair.quotingParameters.display.mode">
                                                   <option *ngFor="let option of pair.quotingParameters.availableQuotingModes" [ngValue]="option.val">{{option.str}}</option>
                                                 </select>
                                             </td>
                                             <td style="min-width:121px;border-bottom: 3px solid #DDE28B;">
-                                                <select class="form-control input-sm"
+                                                <select class="form-control form-control-sm"
                                                   [(ngModel)]="pair.quotingParameters.display.safety">
                                                   <option *ngFor="let option of pair.quotingParameters.availableQuotingSafeties" [ngValue]="option.val">{{option.str}}</option>
                                                 </select>
                                             </td>
                                             <td style="width:78px;border-bottom: 3px solid #DDE28B;" *ngIf="pair.quotingParameters.display.safety==3">
-                                                <input class="form-control input-sm"
+                                                <input class="form-control form-control-sm"
                                                    type="number" step="1" min="1"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.bullets">
                                             </td>
                                             <td style="width:88px; border-bottom: 3px solid #DDE28B;" *ngIf="pair.quotingParameters.display.safety==3 && !pair.quotingParameters.display.percentageValues">
-                                                <input class="form-control input-sm" title="{{ pair_name[1] }}"
+                                                <input class="form-control form-control-sm" title="{{ pair_name[1] }}"
                                                    type="number"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.range">
                                             </td>
                                             <td style="width:88px; border-bottom: 3px solid #DDE28B;" *ngIf="pair.quotingParameters.display.safety==3 && pair.quotingParameters.display.percentageValues">
-                                                <input class="form-control input-sm" title="{{ pair_name[1] }}"
+                                                <input class="form-control form-control-sm" title="{{ pair_name[1] }}"
                                                    type="number" step="0.1" min="0" max="100"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.rangePercentage">
                                             </td>
                                             <td style="min-width:142px;border-bottom: 3px solid #8BE296;" *ngIf="[1,2,3].indexOf(pair.quotingParameters.display.safety)>-1">
-                                                <select class="form-control input-sm"
+                                                <select class="form-control form-control-sm"
                                                    [(ngModel)]="pair.quotingParameters.display.pingAt">
                                                    <option *ngFor="let option of pair.quotingParameters.availablePingAt" [ngValue]="option.val">{{option.str}}</option>
                                                 </select>
                                             </td>
                                             <td style="border-bottom: 3px solid #8BE296;" *ngIf="[1,2,3].indexOf(pair.quotingParameters.display.safety)>-1">
-                                                <select class="form-control input-sm"
+                                                <select class="form-control form-control-sm"
                                                    [(ngModel)]="pair.quotingParameters.display.pongAt">
                                                    <option *ngFor="let option of pair.quotingParameters.availablePongAt" [ngValue]="option.val">{{option.str}}</option>
                                                 </select>
                                             </td>
                                             <td style="min-width:121px;border-bottom: 3px solid #DDE28B;">
-                                                <select class="form-control input-sm"
+                                                <select class="form-control form-control-sm"
                                                     [(ngModel)]="pair.quotingParameters.display.superTrades">
                                                    <option *ngFor="let option of pair.quotingParameters.availableSuperTrades" [ngValue]="option.val">{{option.str}}</option>
                                                 </select>
                                             </td>
                                             <ng-container *ngIf="pair.quotingParameters.display.superTrades">
                                             <td style="width:88px; border-bottom: 3px solid #DDE28B;">
-                                                <input class="form-control input-sm" title="Width multiplier"
+                                                <input class="form-control form-control-sm" title="Width multiplier"
                                                    type="number" step="0.1" min="1"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.sopWidthMultiplier">
                                             </td>
                                             <td style="width:88px; border-bottom: 3px solid #DDE28B;" *ngIf="[1,3].indexOf(pair.quotingParameters.display.superTrades)>-1">
-                                                <input class="form-control input-sm" title="Trades multiplier"
+                                                <input class="form-control form-control-sm" title="Trades multiplier"
                                                    type="number" step="0.1" min="1"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.sopTradesMultiplier">
                                             </td>
                                             <td style="width:88px; border-bottom: 3px solid #DDE28B;" *ngIf="[2,3].indexOf(pair.quotingParameters.display.superTrades)>-1">
-                                                <input class="form-control input-sm" title="Size multiplier"
+                                                <input class="form-control form-control-sm" title="Size multiplier"
                                                    type="number" step="0.1" min="1"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.sopSizeMultiplier">
                                             </td>
                                             </ng-container>
                                             <td style="width:169px;border-bottom: 3px solid #D64A4A;" *ngIf="!pair.quotingParameters.display.percentageValues">
-                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                <input class="form-control form-control-sm" title="{{ pair_name[0] }}"
                                                    type="number" step="0.01" min="0.01"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.buySize">
                                             </td>
                                             <td style="width:169px;border-bottom: 3px solid #D64A4A;" *ngIf="pair.quotingParameters.display.percentageValues">
-                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                <input class="form-control form-control-sm" title="{{ pair_name[0] }}"
                                                    type="number" step="1" min="1" max="100"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.buySizePercentage">
@@ -193,13 +193,13 @@ class DisplayOrder {
                                                    [(ngModel)]="pair.quotingParameters.display.buySizeMax">
                                             </td>
                                             <td style="width:169px;border-bottom: 3px solid #D64A4A;" *ngIf="!pair.quotingParameters.display.percentageValues">
-                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                <input class="form-control form-control-sm" title="{{ pair_name[0] }}"
                                                    type="number" step="0.01" min="0.01"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.sellSize">
                                             </td>
                                             <td style="width:169px;border-bottom: 3px solid #D64A4A;" *ngIf="pair.quotingParameters.display.percentageValues">
-                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                <input class="form-control form-control-sm" title="{{ pair_name[0] }}"
                                                    type="number" step="1" min="1" max="100"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.sellSizePercentage">
@@ -240,91 +240,91 @@ class DisplayOrder {
                                     <tbody>
                                         <tr class="active">
                                             <td style="min-width:121px;border-bottom: 3px solid #8BE296;">
-                                                <select class="form-control input-sm"
+                                                <select class="form-control form-control-sm"
                                                     [(ngModel)]="pair.quotingParameters.display.autoPositionMode">
                                                    <option *ngFor="let option of pair.quotingParameters.availableAutoPositionModes" [ngValue]="option.val">{{option.str}}</option>
                                                 </select>
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #8BE296;" *ngIf="pair.quotingParameters.display.autoPositionMode==3">
-                                                <input class="form-control input-sm"
+                                                <input class="form-control form-control-sm"
                                                    type="number" step="1" min="1"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.veryLongEwmaPeriods">
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #8BE296;" *ngIf="pair.quotingParameters.display.autoPositionMode">
-                                                <input class="form-control input-sm"
+                                                <input class="form-control form-control-sm"
                                                    type="number" step="1" min="1"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.longEwmaPeriods">
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #8BE296;" *ngIf="pair.quotingParameters.display.autoPositionMode>1">
-                                                <input class="form-control input-sm"
+                                                <input class="form-control form-control-sm"
                                                    type="number" step="1" min="1"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.mediumEwmaPeriods">
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #8BE296;" *ngIf="pair.quotingParameters.display.autoPositionMode">
-                                                <input class="form-control input-sm"
+                                                <input class="form-control form-control-sm"
                                                    type="number" step="1" min="1"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.shortEwmaPeriods">
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #8BE296;" *ngIf="pair.quotingParameters.display.autoPositionMode">
-                                                <input class="form-control input-sm"
+                                                <input class="form-control form-control-sm"
                                                    type="number" step="0.01" min="0.01" max="1.00"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.ewmaSensiblityPercentage">
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #8BE296;" *ngIf="!pair.quotingParameters.display.percentageValues && pair.quotingParameters.display.autoPositionMode==0">
-                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                <input class="form-control form-control-sm" title="{{ pair_name[0] }}"
                                                    type="number" step="0.01" min="0"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.targetBasePosition">
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #8BE296;" *ngIf="pair.quotingParameters.display.percentageValues && pair.quotingParameters.display.autoPositionMode==0">
-                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                <input class="form-control form-control-sm" title="{{ pair_name[0] }}"
                                                    type="number" step="1" min="0" max="100"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.targetBasePositionPercentage">
                                             </td>
                                             <td style="min-width:121px;border-bottom: 3px solid #DDE28B;" *ngIf="pair.quotingParameters.display.autoPositionMode">
-                                                <select class="form-control input-sm"
+                                                <select class="form-control form-control-sm"
                                                     [(ngModel)]="pair.quotingParameters.display.positionDivergenceMode">
                                                    <option *ngFor="let option of pair.quotingParameters.availablePositionDivergenceModes" [ngValue]="option.val">{{option.str}}</option>
                                                 </select>
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #DDE28B;" *ngIf="!pair.quotingParameters.display.percentageValues">
-                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                <input class="form-control form-control-sm" title="{{ pair_name[0] }}"
                                                    type="number" step="0.01" min="0"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.positionDivergence">
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #DDE28B;" *ngIf="pair.quotingParameters.display.percentageValues">
-                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                <input class="form-control form-control-sm" title="{{ pair_name[0] }}"
                                                    type="number" step="1" min="0" max="100"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.positionDivergencePercentage">
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #DDE28B;" *ngIf="!pair.quotingParameters.display.percentageValues && pair.quotingParameters.display.autoPositionMode && pair.quotingParameters.display.positionDivergenceMode">
-                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                <input class="form-control form-control-sm" title="{{ pair_name[0] }}"
                                                    type="number" step="0.01" min="0"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.positionDivergenceMin">
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #DDE28B;" *ngIf="pair.quotingParameters.display.percentageValues && pair.quotingParameters.display.autoPositionMode && pair.quotingParameters.display.positionDivergenceMode">
-                                                <input class="form-control input-sm" title="{{ pair_name[0] }}"
+                                                <input class="form-control form-control-sm" title="{{ pair_name[0] }}"
                                                    type="number" step="1" min="0" max="100"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.positionDivergencePercentageMin">
                                             </td>
                                             <td style="min-width:121px;border-bottom: 3px solid #D64A4A;">
-                                                <select class="form-control input-sm"
+                                                <select class="form-control form-control-sm"
                                                     [(ngModel)]="pair.quotingParameters.display.aggressivePositionRebalancing">
                                                    <option *ngFor="let option of pair.quotingParameters.availableAggressivePositionRebalancings" [ngValue]="option.val">{{option.str}}</option>
                                                 </select>
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #D64A4A;" *ngIf="pair.quotingParameters.display.aggressivePositionRebalancing">
-                                                <input class="form-control input-sm"
+                                                <input class="form-control form-control-sm"
                                                    type="number" step="0.1" min="1" max="10.00"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.aprMultiplier">
@@ -338,25 +338,25 @@ class DisplayOrder {
                                                    [(ngModel)]="pair.quotingParameters.display.widthPercentage">
                                             </td>
                                             <td style="width:169px;border-bottom: 3px solid #8BE296;" *ngIf="!pair.quotingParameters.display.widthPercentage || [6].indexOf(pair.quotingParameters.display.mode)>-1">
-                                                <input class="width-option form-control input-sm" title="{{ pair_name[1] }}"
+                                                <input class="width-option form-control form-control-sm" title="{{ pair_name[1] }}"
                                                    type="number" step="{{ product.advert.minTick}}" min="{{ product.advert.minTick}}"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.widthPing">
                                             </td>
                                             <td style="width:169px;border-bottom: 3px solid #8BE296;" *ngIf="pair.quotingParameters.display.widthPercentage && [6].indexOf(pair.quotingParameters.display.mode)==-1">
-                                                <input class="width-option form-control input-sm" title="{{ pair_name[1] }}"
+                                                <input class="width-option form-control form-control-sm" title="{{ pair_name[1] }}"
                                                    type="number" step="0.01" min="0.01" max="100"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.widthPingPercentage">
                                             </td>
                                             <td style="width:169px;border-bottom: 3px solid #8BE296;" *ngIf="[1,2,3].indexOf(pair.quotingParameters.display.safety)>-1 && !pair.quotingParameters.display.widthPercentage">
-                                                <input class="width-option form-control input-sm" title="{{ pair_name[1] }}"
+                                                <input class="width-option form-control form-control-sm" title="{{ pair_name[1] }}"
                                                    type="number" step="{{ product.advert.minTick}}" min="{{ product.advert.minTick}}"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.widthPong">
                                             </td>
                                             <td style="width:169px;border-bottom: 3px solid #8BE296;" *ngIf="[1,2,3].indexOf(pair.quotingParameters.display.safety)>-1 && pair.quotingParameters.display.widthPercentage">
-                                                <input class="width-option form-control input-sm" title="{{ pair_name[1] }}"
+                                                <input class="width-option form-control form-control-sm" title="{{ pair_name[1] }}"
                                                    type="number" step="0.01" min="0.01" max="100"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.widthPongPercentage">
@@ -398,20 +398,20 @@ class DisplayOrder {
                                     <tbody>
                                         <tr class="active">
                                             <td style="width:88px;border-bottom: 3px solid #8BE296;">
-                                                <select class="form-control input-sm"
+                                                <select class="form-control form-control-sm"
                                                     [(ngModel)]="pair.quotingParameters.display.fvModel">
                                                    <option *ngFor="let option of pair.quotingParameters.availableFvModels" [ngValue]="option.val">{{option.str}}</option>
                                                 </select>
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #DDE28B;">
-                                                <input class="form-control input-sm"
+                                                <input class="form-control form-control-sm"
                                                    type="number" step="0.1" min="0"
                                                    style="text-align:right;"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.tradesPerMinute">
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #DDE28B;">
-                                                <input class="form-control input-sm"
+                                                <input class="form-control form-control-sm"
                                                    type="number" step="1" min="0"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.tradeRateSeconds">
@@ -421,7 +421,7 @@ class DisplayOrder {
                                                    [(ngModel)]="pair.quotingParameters.display.protectionEwmaQuotePrice">
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #F0A0A0;" *ngIf="pair.quotingParameters.display.protectionEwmaQuotePrice || pair.quotingParameters.display.protectionEwmaWidthPing">
-                                                <input class="form-control input-sm"
+                                                <input class="form-control form-control-sm"
                                                    type="number" step="1" min="1"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.protectionEwmaPeriods">
@@ -431,19 +431,19 @@ class DisplayOrder {
                                                    [(ngModel)]="pair.quotingParameters.display.protectionEwmaWidthPing">
                                             </td>
                                             <td style="width:121px;border-bottom: 3px solid #AF451E;">
-                                                <select class="form-control input-sm"
+                                                <select class="form-control form-control-sm"
                                                     [(ngModel)]="pair.quotingParameters.display.quotingStdevProtection">
                                                    <option *ngFor="let option of pair.quotingParameters.availableSTDEV" [ngValue]="option.val">{{option.str}}</option>
                                                 </select>
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #AF451E;" *ngIf="pair.quotingParameters.display.quotingStdevProtection">
-                                                <input class="form-control input-sm"
+                                                <input class="form-control form-control-sm"
                                                    type="number" step="1" min="1"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.quotingStdevProtectionPeriods">
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #AF451E;" *ngIf="pair.quotingParameters.display.quotingStdevProtection">
-                                                <input class="form-control input-sm"
+                                                <input class="form-control form-control-sm"
                                                    type="number" step="0.1" min="0.1"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.quotingStdevProtectionFactor">
@@ -457,19 +457,19 @@ class DisplayOrder {
                                                    [(ngModel)]="pair.quotingParameters.display.cancelOrdersAuto">
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #DDE28B;">
-                                                <input class="form-control input-sm"
+                                                <input class="form-control form-control-sm"
                                                    type="number" step="0.01" min="0.01"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.profitHourInterval">
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #8BE296;">
-                                                <input class="form-control input-sm"
+                                                <input class="form-control form-control-sm"
                                                    type="number" step="0.01"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.cleanPongsAuto">
                                             </td>
                                             <td style="width:88px;border-bottom: 3px solid #A0A0A0;">
-                                                <input class="form-control input-sm"
+                                                <input class="form-control form-control-sm"
                                                    type="number" step="1" min="0"
                                                    onClick="this.select()"
                                                    [(ngModel)]="pair.quotingParameters.display.delayUI">
@@ -479,19 +479,19 @@ class DisplayOrder {
                                                    [(ngModel)]="pair.quotingParameters.display.audio">
                                             </td>
                                             <td style="text-align: center;border-bottom: 3px solid #A0A0A0;">
-                                                <input class="btn btn-default btn"
+                                                <input class="btn btn-secondary btn"
                                                     style="width:61px"
                                                     type="button"
                                                     (click)="pair.quotingParameters.backup()"
                                                     value="Backup" />
-                                                <input class="btn btn-default btn"
+                                                <input class="btn btn-secondary btn"
                                                     style="width:55px"
                                                     type="button"
                                                     (click)="pair.quotingParameters.reset()"
                                                     value="Reset" />
                                             </td>
                                             <td style="text-align: center;border-bottom: 3px solid #A0A0A0;">
-                                                <input class="btn btn-default btn"
+                                                <input class="btn btn-secondary btn"
                                                     style="width:50px"
                                                     type="submit"
                                                     (click)="pair.quotingParameters.submit()"
@@ -506,7 +506,7 @@ class DisplayOrder {
                     </div>
                     <div class="row">
                         <div class="col-md-1 col-xs-12 text-center" style="padding-right:0px;">
-                            <div class="row img-rounded exchange">
+                            <div class="row rounded exchange">
                                 <div *ngIf="pair.connectionMessage">{{ pair.connectionMessage }}</div>
                                 <button style="font-size:16px;" class="col-md-12 col-xs-3" [ngClass]="pair.active.getClass()" (click)="pair.active.submit()">
                                     {{ exchange_name.replace('Margin', ' [M]') }}<br/>{{ pair_name.join('/') }}
@@ -532,10 +532,10 @@ class DisplayOrder {
                             </div>
                             <div class="col-md-8 col-xs-12" style="padding-left:0px;padding-right:0px;padding-top:0px;">
                               <div class="row">
-                                <div class="exchangeActions col-md-2 col-xs-12 text-center img-rounded">
+                                <div class="exchangeActions col-md-2 col-xs-12 text-center rounded">
                                   <div>
                                       <button type="button"
-                                              class="btn btn-primary navbar-btn"
+                                              class="btn btn-primary nav-item"
                                               id="order_form"
                                               [popover]="myPopover">Submit Order
                                       </button>
@@ -546,28 +546,28 @@ class DisplayOrder {
                                               <table border="0" style="width:139px;">
                                                 <tr>
                                                     <td><label (click)="rotateSide()" style="text-decoration:underline;cursor:pointer">Side:</label></td>
-                                                    <td style="padding-bottom:5px;"><select id="selectSide" class="form-control input-sm" [(ngModel)]="order.side">
+                                                    <td style="padding-bottom:5px;"><select id="selectSide" class="form-control form-control-sm" [(ngModel)]="order.side">
                                                       <option *ngFor="let option of order.availableSides" [ngValue]="option">{{option}}</option>
                                                     </select>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td><label (click)="insertBidAskPrice()" style="text-decoration:underline;cursor:pointer;padding-right:5px">Price:</label></td>
-                                                    <td style="padding-bottom:5px;"><input id="orderPriceInput" class="form-control input-sm" type="number" step="{{ product.advert.minTick}}" [(ngModel)]="order.price" /></td>
+                                                    <td style="padding-bottom:5px;"><input id="orderPriceInput" class="form-control form-control-sm" type="number" step="{{ product.advert.minTick}}" [(ngModel)]="order.price" /></td>
                                                 </tr>
                                                 <tr>
                                                     <td><label (click)="insertBidAskSize()" style="text-decoration:underline;cursor:pointer">Size:</label></td>
-                                                    <td style="padding-bottom:5px;"><input id="orderSizeInput" class="form-control input-sm" type="number" step="0.01" [(ngModel)]="order.quantity" /></td>
+                                                    <td style="padding-bottom:5px;"><input id="orderSizeInput" class="form-control form-control-sm" type="number" step="0.01" [(ngModel)]="order.quantity" /></td>
                                                 </tr>
                                                 <tr>
                                                     <td><label>TIF:</label></td>
-                                                    <td style="padding-bottom:5px;"><select class="form-control input-sm" [(ngModel)]="order.timeInForce">
+                                                    <td style="padding-bottom:5px;"><select class="form-control form-control-sm" [(ngModel)]="order.timeInForce">
                                                       <option *ngFor="let option of order.availableTifs" [ngValue]="option">{{option}}</option>
                                                     </select></td>
                                                 </tr>
                                                 <tr>
                                                     <td><label>Type:</label></td>
-                                                    <td style="padding-bottom:5px;"><select class="form-control input-sm" [(ngModel)]="order.orderType">
+                                                    <td style="padding-bottom:5px;"><select class="form-control form-control-sm" [(ngModel)]="order.orderType">
                                                       <option *ngFor="let option of order.availableOrderTypes" [ngValue]="option">{{option}}</option>
                                                     </select></td>
                                                 </tr>
@@ -577,14 +577,14 @@ class DisplayOrder {
                                   </div>
                                   <div style="padding-top: 2px;padding-bottom: 2px;">
                                       <button type="button"
-                                              class="btn btn-danger navbar-btn"
+                                              class="btn btn-danger nav-item"
                                               (click)="cancelAllOrders()"
                                               data-placement="bottom">Cancel Orders
                                       </button>
                                   </div>
                                   <div style="padding-bottom: 2px;">
                                       <button type="button"
-                                              class="btn btn-info navbar-btn"
+                                              class="btn btn-info nav-item"
                                               (click)="cleanAllClosedOrders()"
                                               *ngIf="[1,2,3].indexOf(pair.quotingParameters.display.safety)>-1"
                                               data-placement="bottom">Clean Pongs
@@ -592,7 +592,7 @@ class DisplayOrder {
                                   </div>
                                   <div>
                                       <button type="button"
-                                              class="btn btn-danger navbar-btn"
+                                              class="btn btn-danger nav-item"
                                               (click)="cleanAllOrders()"
                                               data-placement="bottom">{{ [1,2,3].indexOf(pair.quotingParameters.display.safety)>-1 ? 'Clean Pings' : 'Clean Trades' }}
                                       </button>
