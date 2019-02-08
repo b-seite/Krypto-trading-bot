@@ -1,9 +1,7 @@
 /*.sh
-/app
+/doc/html*
 /build*
-/test/coverage
-/node_modules
-/etc/sslcert/fix.gdax.com.pem
 /Vagrantfile
+/*.gcno
+/*.gcda
 .DS_Store
-.idea

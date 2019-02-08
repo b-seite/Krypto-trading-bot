@@ -1,17 +1,14 @@
-FROM node:8-stretch
-RUN apt-get update
+FROM overlordq/8-buster
 
-RUN apt-get install -y git sudo
+RUN apt-get update \
+ && apt-get install --no-install-recommends -y git sudo
 
 # Feel free to choose the branch you want to build:
-RUN git clone -b master https://github.com/ctubio/Krypto-trading-bot.git K
+RUN git clone -b master https://github.com/ctubio/Krypto-trading-bot.git /K
 
-WORKDIR K
+WORKDIR /K
 
-# Remove the ssl certificate (GUI accessible over plain HTTP, not recommended):
-#RUN rm -rf etc/sslcert/server.*
-
-RUN make docker
+RUN make docker && rm -rf /var/lib/apt/lists/
 
 EXPOSE 3000 5000
 
@@ -32,5 +29,6 @@ ENV API_PASSPHRASE NULL
 ENV API_USERNAME NULL
 ENV API_HTTP_ENDPOINT NULL
 ENV API_WSS_ENDPOINT NULL
+ENV K_BINARY_FILE K-trading-bot
 
-CMD ["./K.sh", "--naked"]
+CMD ["./K.sh", "--naked", "--without-ssl"]

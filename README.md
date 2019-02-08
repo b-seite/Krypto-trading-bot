@@ -1,56 +1,27 @@
 <img align="left" src="https://user-images.githubusercontent.com/1634027/36237231-e611590e-11fa-11e8-8486-6675078501dc.jpg" /><p align="right">self reminder:<br><b>patience is the mother of science</b></p><br><a href="http://ciutatrefugi.barcelona/en/welcome-barcelona">\*\*\* REFUGEES WELCOME! \*\*\*</a><br/>&thinsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://missingmigrants.iom.int/">\*\*\* FATAL ROUTES? \*\*\*</a>
 <br clear="left">
-<!--
-
-```c++
-#include <iostream>
-
-int main()
-{
-  std::cout << "Hello World! did you know?";
-}
-```
-<p align="center"><img src="https://user-images.githubusercontent.com/1634027/32386807-b0bd1808-c0c2-11e7-9d98-9cb28e6fd51d.jpg" /></p>
-<p align="center"><img src="https://user-images.githubusercontent.com/1634027/31733764-e79df244-b43c-11e7-9186-92b6744db290.png" /></p>
-<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-<p align="center">I am from a country that is certainly old,<br />
-It has been a long time forgotten and oppressed.<br />
-<br />
-I am from a country where fear is called sanity,<br />
-that walks one step forward and two backwards.<br />
-<br />
-I am from a country that slowly breaks down,<br />
-and between illusions and frustrations goes forth.<br /><br />
-<img src="https://user-images.githubusercontent.com/1634027/32696081-78efb9dc-c76e-11e7-87df-f67db7cbfda8.jpg" /><br />Our battle? freedom, democracy and peace.<br />We will never surrender.<br /><br />There is no jail, prision guard, lock or court decision<br />that can, if we do not want it to, deprive ourselves of begin the way we are.</p>
-<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-<p align="center"><img src="https://user-images.githubusercontent.com/1634027/31734164-1ab05c66-b43e-11e7-9e52-3fd874045876.jpg" /></p>
-<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-
-<p align="center">yet Today, is a beautiful day.<br/><br/><a href="https://www.youtube.com/embed/BK7DIJq4slg"><img src="https://user-images.githubusercontent.com/1634027/33692212-60b1ad80-daec-11e7-8875-93d0a39813e3.png" /></a></p-->
 
 [![Release](https://img.shields.io/github/release/ctubio/Krypto-trading-bot.svg)](https://github.com/ctubio/Krypto-trading-bot/releases)
-[![Platform](https://img.shields.io/badge/platform-unix--like-lightgray.svg)](https://www.gnu.org/)
+[![Platform](https://img.shields.io/badge/platform-unix--like-111111.svg)](https://www.gnu.org/)
 [![g0t0 Counter](https://tinyurl.com/g0t0search)](https://tinyurl.com/g0t0docs)
 [![Code Size](https://img.shields.io/github/languages/code-size/ctubio/Krypto-trading-bot.svg)](https://github.com/ctubio/Krypto-trading-bot)
-[![Software License](https://img.shields.io/badge/license-ISC-111111.svg)](https://raw.githubusercontent.com/ctubio/Krypto-trading-bot/master/LICENSE)
-[![Software License](https://img.shields.io/badge/license-MIT-111111.svg)](https://raw.githubusercontent.com/ctubio/Krypto-trading-bot/master/COPYING)
+[![Software License](https://img.shields.io/badge/license-ISC-551a8b.svg)](https://raw.githubusercontent.com/ctubio/Krypto-trading-bot/master/LICENSE)
+[![Software License](https://img.shields.io/badge/license-MIT-551a8b.svg)](https://raw.githubusercontent.com/ctubio/Krypto-trading-bot/master/COPYING)
 
-[`K.sh`](https://github.com/ctubio/Krypto-trading-bot) is a very low latency [market making](https://github.com/ctubio/Krypto-trading-bot/blob/master/MANUAL.md#what-is-market-making) trading bot with a fully featured [web interface](https://github.com/ctubio/Krypto-trading-bot#web-ui). The bot can place and cancel orders on one of [several supported cryptocoin exchanges](https://github.com/ctubio/Krypto-trading-bot#compatible-exchanges) in less than a few miliseconds per order on a decent machine.
+[`K`](https://github.com/ctubio/Krypto-trading-bot) is a very low latency [market making](https://github.com/ctubio/Krypto-trading-bot/blob/master/doc/MANUAL.md#what-is-market-making) trading bot with a fully featured [web interface](https://github.com/ctubio/Krypto-trading-bot#web-ui). The bot can place and cancel orders on one of [several supported cryptocoin exchanges](https://github.com/ctubio/Krypto-trading-bot#compatible-exchanges) in less than a few miliseconds per order on a decent machine.
 
-### <img src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4be.png" align="middle" /> Latest version at https://github.com/ctubio/Krypto-trading-bot <img src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f51e.png" align="middle" /> <img src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4b8.png" align="middle" />
+### <img src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4be.png" height="64" width="64"  align="middle" /> Latest version at https://github.com/ctubio/Krypto-trading-bot <img src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f51e.png" height="64" width="64" align="middle" /> <img src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4b8.png" height="64" width="64" align="middle" />
 
-[![Build Status](https://img.shields.io/travis/ctubio/Krypto-trading-bot/master.svg?label=test)](https://travis-ci.org/ctubio/Krypto-trading-bot)<!--[![Coverage Status](https://img.shields.io/coveralls/ctubio/Krypto-trading-bot/master.svg?label=code%20coverage)](https://coveralls.io/r/ctubio/Krypto-trading-bot?branch=master)-->
-[![Quality Status](https://img.shields.io/codacy/grade/d48a59c313504f7988e3df031665f90f/master.svg?label=review)](https://www.codacy.com/app/ctubio/Krypto-trading-bot)
-[![Last Commit](https://img.shields.io/github/last-commit/ctubio/Krypto-trading-bot.svg)](https://github.com/ctubio/Krypto-trading-bot)
-[![Dependency Status](https://img.shields.io/david/ctubio/Krypto-trading-bot.svg)](https://david-dm.org/ctubio/Krypto-trading-bot)
+[![Build Status](https://img.shields.io/travis/ctubio/Krypto-trading-bot/master.svg?label=test)](https://travis-ci.org/ctubio/Krypto-trading-bot)
+[![Coverage Status](https://img.shields.io/coveralls/ctubio/Krypto-trading-bot/master.svg)](https://coveralls.io/r/ctubio/Krypto-trading-bot?branch=master)
+[![Quality Status](https://img.shields.io/badge/review-clang--tidy%20+%20pvs-4cc61e.svg)](https://www.codacy.com/app/ctubio/Krypto-trading-bot)
 [![Open Issues](https://img.shields.io/github/issues/ctubio/Krypto-trading-bot.svg)](https://github.com/ctubio/Krypto-trading-bot/issues)
-[![Open Issues](https://img.shields.io/github/issues/ctubio/tribeca.svg)](https://github.com/ctubio/tribeca/issues)
+[![Last Commit](https://img.shields.io/github/last-commit/ctubio/Krypto-trading-bot.svg)](https://github.com/ctubio/Krypto-trading-bot)
 [![Downloads Last 21 Commits](https://img.shields.io/github/downloads/ctubio/Krypto-trading-bot/total.svg?label=downloads%20last%2021%20commits)](https://github.com/ctubio/Krypto-trading-bot)
 
-Runs on unix-like systems. A built-in server-less SQLite database persists data through a C++ interface. The bot can be installed with Docker, but manual installation in a dedicated [Debian](https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/)/[Raspbian](https://www.raspberrypi.org/downloads/raspbian/), [CentOS](https://wiki.centos.org/Download) or macOS instance is recommended.
+Runs on unix-like systems. Persistence is achieved through a built-in server-less SQLite C++ interface. Installation via Docker is supported, but manual installation in a dedicated [Debian](https://cdimage.debian.org/cdimage/weekly-builds/amd64/iso-cd/)/[Raspbian](https://www.raspberrypi.org/downloads/raspbian/), [CentOS](https://wiki.centos.org/Download) or macOS instance is recommended.
 
-![Web UI Preview](https://raw.githubusercontent.com/ctubio/Krypto-trading-bot/master/etc/img/web_ui_preview.png)
+![Web UI Preview](https://user-images.githubusercontent.com/1634027/44740469-d5c7ff00-aafa-11e8-9252-73b9c1283adb.png)
 
 The web UI is compatible with most web browsers/devices/resolutions, but Firefox or Chrome at 1600px are recommended. Doesn't require configuration of any web server (unless installed behind your own reverse proxy).
 
@@ -58,15 +29,15 @@ The web UI is compatible with most web browsers/devices/resolutions, but Firefox
 
 ||with Post-Only Orders support|without Post-Only|
 |---|---|---|
-|**without Maker fees**|[Coinbase GDAX](https://www.gdax.com/)<br> &#10239; _REST + WebSocket + FIX_|[HitBTC](https://hitbtc.com/)<br> &#10239; _REST + WebSocket_<br><br>|
-|**with Maker and Taker fees**|[Bitfinex](https://www.bitfinex.com/)<br> &#10239; _REST + WebSocket_<br><br>[Kraken](https://www.kraken.com/)<br> &#10239; _REST_<br><br>[Poloniex](https://www.poloniex.com/)<br> &#10239; _REST_|[OKCoin.com](https://www.okcoin.com/)<br>[OKCoin.cn](https://www.okcoin.cn/)<br>[OKEx.com](https://www.okex.com/)<br> &#10239; _REST + WebSocket_<br><br>[Korbit](https://www.korbit.co.kr/)<br> &#10239; _REST_|
+|**without Maker fees**|[Coinbase](https://pro.coinbase.com/)<br> &#10239; _REST + WebSocket + FIX_<br><br>[HitBTC](https://hitbtc.com/)<br> &#10239; _REST + WebSocket_||
+|**with Maker and Taker fees**|[Bitfinex](https://www.bitfinex.com/)<br>[Ethfinex](https://www.ethfinex.com/)<br> &#10239; _REST + WebSocket_<br><br>[Kraken](https://www.kraken.com/)<br> &#10239; _REST_<br><br>[Poloniex](https://www.poloniex.com/)<br> &#10239; _REST_|[FCoin](https://fcoin.com/)<br> &#10239; _REST + WebSocket_<br><br>[Korbit](https://www.korbit.co.kr/)<br> &#10239; _REST_|
 
 All currency pairs are supported.
 
 ## README
 - Documentation
   - [README](#readme)
-  - [MANUAL](https://github.com/ctubio/Krypto-trading-bot/blob/master/MANUAL.md)
+  - [MANUAL](https://github.com/ctubio/Krypto-trading-bot/blob/master/doc/MANUAL.md)
 - Installation
   - [Docker Installation](#docker-installation)
   - [Manual GIT Installation](#manual-git-installation)
@@ -83,17 +54,14 @@ All currency pairs are supported.
   - [Charts](#charts)
   - [Cloud Hosting](#cloud-hosting)
 - Development
-  - [XMR miner](#xmr-miner)
-  - [Test units and Build notes](#test-units-and-build-notes)
-  - [Unreleased Changelog](#unreleased-changelog)
-  - [Release 3.0 Changelog](#release-30-changelog)
-  - [Release 2.0 Changelog](#release-20-changelog)
-  - [Release 1.0 Changelog](#release-10-changelog)
+  - [Build notes](#build-notes)
+  - [Changelogs](#unreleased-changelog)
 - Humans and Milk Mammals
   - [Unlock](#unlock)
   - [Trading for Fun](#trading-for-fun)
   - [Donations](#donations)
   - [Very Special Thanks](#very-special-thanks-to)
+  - [General Discussion](#general-discussion)
   - [Help](#help)
   - [Issues](#issues)
   - [Votes](#votes)
@@ -108,7 +76,7 @@ See [etc/Dockerfile](https://github.com/ctubio/Krypto-trading-bot/tree/master/et
 
 1. Ensure your target machine has `git`, `make` and `vim` installed.
 
-2. Install it wherever you want (feel free to customize the suggested folder name K):
+2. Download it wherever you want (feel free to customize the suggested folder name K) and execute the installer:
 ```
  $ git clone ssh://git@github.com/ctubio/Krypto-trading-bot K
  $ cd K
@@ -128,7 +96,7 @@ To upgrade anytime see [Upgrade to the latest commit](#upgrade-to-the-latest-com
 
 1. Ensure your target machine has `curl`, `make` and `vim` installed.
 
-2. Install it wherever you want (feel free to customize the suggested folder name K):
+2. Download it wherever you want (feel free to customize the suggested folder name K) and execute the installer:
 ```
  $ mkdir K
  $ cd K
@@ -154,7 +122,7 @@ Once the config file is ready, you can start the bot:
 
 Alternatively use `make start` to run `K.sh` in the background using [screen](https://www.decf.berkeley.edu/help/unix/screen.html) (to see the output, attach the screen with `make screen` [or run all at once with `make start screen`]).
 
-Feel free to run `make stop` or `make restart` anytime, and don't forget to [read the fucking manual](https://github.com/ctubio/Krypto-trading-bot/blob/master/MANUAL.md).
+Feel free to run `make stop` or `make restart` anytime, and don't forget to [read the fucking manual](https://github.com/ctubio/Krypto-trading-bot/blob/master/doc/MANUAL.md).
 
 Troubleshooting:
 
@@ -164,13 +132,13 @@ Troubleshooting:
 
  * See `./K.sh --help` and `make help`.
 
- * Replace the certificate at `etc/sslcert` folder with your own, see [web ui](https://github.com/ctubio/Krypto-trading-bot#web-ui) section. But, the certificate provided is a fully featured default openssl, that you may just need to authorise in your browser.
+ * Use your own SSL certificate with `--ssl-crt` and `--ssl-key`, see [web ui](https://github.com/ctubio/Krypto-trading-bot#web-ui) section. Otherwise, the unsecure built-in certificate is a fully featured default openssl, that you may just need to authorise in your browser.
 
 ### Configuration
 
 See [etc/K.sh.dist](https://github.com/ctubio/Krypto-trading-bot/blob/master/etc/K.sh.dist) file or your own `./K.sh` file.
 
-It just contains a few variables with examples ready to be reused (the suggested urls will work). The very end of the file contains the code that starts the bot.
+It just contains a few variables with examples ready to be reused. The very end of the file contains the code that starts the bot.
 
 ### Upgrade to the latest commit
 
@@ -184,7 +152,7 @@ Feel free anytime to check if there are new modifications with `make diff`.
 
 Once you decide that is time to upgrade, execute `make latest` to download and install the latest modifications in your remote branch (or directly `make reinstall` to skip the validation of the new commit messages).
 
-If you only use `git` to pull the latest commits, you will still need to recompile using `make reinstall` (or using `make dist K bundle` if you have modified source files) and then `make restart` to start using the latest version.
+If you only use `git` to pull the latest commits, you will still need to recompile using `make reinstall` (or using `make dist K` or just `make` if you have modified source files) and then `make restart` to start using the latest version.
 
 ### Multiple instances party time
 
@@ -210,13 +178,13 @@ After multiple config files are setup, to control them all together instead of o
 
 1. Open your web browser to connect to HTTPS port `3000` (or your configured port number) of the machine running K. If you're running K locally on Mac/Windows on Docker, replace "localhost" with the address returned by `boot2docker ip`.
 
-2. Read up on how to use K and market making in the [manual](https://github.com/ctubio/Krypto-trading-bot/blob/master/MANUAL.md).
+2. Read up on how to use K and market making in the [manual](https://github.com/ctubio/Krypto-trading-bot/blob/master/doc/MANUAL.md).
 
 3. Use the web UI to change the quoting parameters. Click the "BTC/USD" button to start making markets. Click it again to stop. When the button is green, the bot is actively placing orders.
 
 ### Web UI
 
-Once `K` is up and running, visit HTTPS port `3000` (or your configured port number) to access the UI (i.e. [https://localhost:3000](https://localhost:3000)). There are inputs for quoting parameters, grids to display market orders, market trades, your trades, your order history, your positions, and a big button with the currency pair you are trading. When you're ready, click that button green to begin sending out quotes. The UI uses a healthy mixture of socket.io and angularjs observed with reactivexjs.
+Once `K` is up and running, visit HTTPS port `3000` (or your configured port number) to access the UI (i.e. [https://localhost:3000](https://localhost:3000)). There are inputs for quoting parameters, grids to display market orders, market trades, your trades, your order history, your positions, and a big button with the currency pair you are trading. When you're ready, click that button green to begin sending out quotes. The UI uses angularjs hydrated with websockets observed with reactivexjs.
 
 If you want to generate your own certificate see [SSL for internal usage](http://www.akadia.com/services/ssh_test_certificate.html).
 
@@ -226,15 +194,15 @@ In case you really want to use plain HTTP, use `--without-ssl` argument.
 
 Each currency pair of each exchange will use a different sqlite database file.
 
-All database files are located at `/data/db/K.*.db`, where `*` is the identifier with format `exchange.base_currency.quote_currency`; it is located outside the application path to survive reinstalls and wild `rm -rf path/to/K`.
+All database files are located at `/var/lib/K/db/K-*.db`. It is located outside the download folder to survive reinstalls and wild `rm -rf path/to/K`.
 
-You can copy any `.db` file to another machine when migrating or as a backup.
+You can copy any `*.db` file to another machine when migrating or as a backup.
 
 If a database file does not exist, the application will create it on boot; otherwise, it will use the existing one.
 
 To explore each database file you can use https://github.com/sqlitebrowser/sqlitebrowser or a similar tool.
 
-To set a different database path or to set an [in-memory database](https://sqlite.org/inmemorydb.html), use `--database=PATH` argument (see `--help`).
+To set a different database filename or to set an [in-memory database](https://sqlite.org/inmemorydb.html), use `--database=FILE` argument (see `--help`).
 
 Even if using an in-memory database, the quoting parameters are always loaded from and saved into the disk file database.
 
@@ -258,23 +226,17 @@ The metrics are not saved anywhere, it is just UI data collected with a visibili
 
 If you ask me, [<img height="20px" src="https://user-images.githubusercontent.com/1634027/29756933-3e64c62e-8ba8-11e7-916a-3b0ae1481a52.png">](https://www.dreamhost.com/r.cgi?475987/cloud/) is a very nice web hosting company (awesome support team, awesome servers). Feel free to use this referral link to get a discount subtracted from my referral earnings (i'm a user since 2008).
 
-### XMR miner
-
-Because testing requires coins (or patience), the UI includes a XMR miner to generate coins, but it is disabled by default.
-
-Once enabled, the UI (and only the UI, which lives in your own web browser) will start mining XMR coins; the server will not  be used to mine (so cpu trading cycles of the server are not affected when you enable this).
-
-Is there because I use it, but you can run it too if you decide to collaborate with the development of both XMR and K.
-
-On the server side, there is a seperate XMR miner that is disabled by default (see `--free-version` argument at [Trading for Fun](#trading-for-fun) section).
-
-### Test units and Build notes
+### Build notes
 
 Make sure your build machine has [node](https://nodejs.org/en/download/package-manager/) installed, and also ensure `make dist` provides all dependencies without errors.
 
-Then, feel free to run `make test` anytime.
+To rebuild the application with your modifications, see `make help` and choose a target (just `make` may be what you are looking for).
 
-To rebuild the application with your modifications, see `make help` and choose a target.
+Test units are executed before the application exits, only if the application was compiled with `KUNITS=1 make`.
+
+Otherwise, just `make` without the environment var `KUNITS` produces an application that simply exits on exit.
+
+A quick test runner therefore is `./K.sh --version` or the alias `make test` or all at once with `KUNITS=1 make K test`.
 
 To pipe the output to stdout, execute the application in the foreground with `./K.sh --naked`.
 
@@ -288,23 +250,34 @@ js sandbox: [jsfiddle.net](https://jsfiddle.net)
 
 ws sandbox: [websocket.org](https://www.websocket.org/echo.html)
 
-### Unreleased Changelog:
+<details><summary><a id="unreleased-changelog"><b>Unreleased v0.4.x Changelog</b></a></summary>
+
+Added main KryptoNinja class derived from all other classes and ready to be extended.
+
+Added C++ OOP everywhere.
+
+Added test units.
+
+Added --interface=IP argument to bind outgoing traffic to a specific network interface.
+
+Added Ethfinex and FCoin API.
+
+Added build-in document root to stop reading files from disk.
 
 Added build chain for win32.
 
-Updated OKEx websocket to binary data.
+~~Updated OKEx websocket to binary data.~~
 
 Added build chain for OSX v10.13.
+</details>
 
-### Release 4.0 Changelog:
+<details><summary><b>Release v0.4.0 Changelog</b></summary>
 
 Updated HitBTC API v2.
 
 Added ZIP installation steps for non-git-lovers.
 
 Added HamelinRat quoting mode and Trend safety thanks to b-seite and serzhiio contributions.
-
-Added XMR network ecosystem optional support.
 
 Added command-line arguments.
 
@@ -319,8 +292,9 @@ Added built-in C++ WWW Server to replace expressjs and socketio.
 Added built-in SQLite C++ interface to replace external mongodb server.
 
 Added Poloniex API.
+</details>
 
-### Release 3.0 Changelog:
+<details><summary><b>Release v0.3.0 Changelog</b></summary>
 
 Updated application name to K because of Kira.
 
@@ -342,11 +316,12 @@ Updated OKCoin API (since https://www.okcoin.com/t-354.html).
 
 Updated Bitfinex API v2.
 
-Added GDAX FIX API with stunnel.
+Added Coinbase FIX API.
 
 Added Korbit API.
+</details>
 
-### Release 2.0 Changelog:
+<details><summary><b>Release v0.2.0 Changelog</b></summary>
 
 Added new quoting styles PingPong, Boomerang, AK-47.
 
@@ -357,10 +332,12 @@ Added audio notices, realtime wallet display, and grafana integration.
 Added https, dark theme and new UI elements.
 
 Added a bit of love to Kira.
+</details>
 
-### Release 1.0 Changelog:
+<details><summary><b>Release v0.1.0 Changelog</b></summary>
 
 see the upstream project [michaelgrosner/tribeca](https://github.com/michaelgrosner/tribeca).
+</details>
 
 ### Unlock
 
@@ -370,17 +347,15 @@ While locked, you are limited to using the first 3 market levels; once unlocked 
 
 Anonymous users can also unlock any API Key by paying 0.01210000 BTC to the address displayed in the UI of the bot. Once unlocked you may use different currency pairs or reinstall on a different machine with the same unlocked API Key. However, if you want to use more than one exchange, you will need to pay again to unlock the API Key for each exchange.
 
-Otherwise if you choose to not support further development by ctubio, just keep running some old commit and do not upgrade (any commit prior to v3.0 was completely unlocked).
+Otherwise if you choose to not support further development by ctubio, just keep running some old commit and do not upgrade (any commit prior to v0.3.0 was completely unlocked).
 
 ### Trading for Fun
 
 Use `--free-version` argument to anonymously unlock any API Key and avoid the payment.
 
-All market levels will be visible and usable but not in realtime, instead will be slowdown around 4 seconds with a [XMR mining calculation](https://github.com/monero-project/monero/blob/master/src/crypto/hash.c#L42) of 21 hashes.
+All market levels will be visible and usable but not in realtime, instead will be slowdown around 7 seconds doing nothing.
 
-If any hash meets the current XMR network target, it will be send to my XMR pool for my fun and profit.
-
-`--free-version` effectively slows down fun and profit for you and me. Please don't open issues asking how much % less the bot generates with `--free-version`; it is relative to your trading strategy, the market conditions, and the bot's performance. It is almost impossible to know.
+Please don't open issues asking how much % less the bot generates with `--free-version`; it is relative to your trading strategy, the market conditions, and the bot's performance.
 
 ### Donations
 
@@ -388,7 +363,7 @@ nope, this project doesn't have maintenance costs. but you can donate to your fa
 
 or see the upstream project [michaelgrosner/tribeca](https://github.com/michaelgrosner/tribeca).
 
-or donate your time with programming or financial suggestions in the topical IRC channel [##tradingBot](https://kiwiirc.com/client/irc.domirc.net:6697/?theme=cli##tradingBot) at irc.domirc.net on port 6697 (SSL), or 6667 (plain) or feel free to make any question, but questions technically are not donations.
+or donate your time with programming or financial suggestions in the IRC channel [#tradingBot](https://kiwiirc.com/client/irc.freenode.net:6697/?theme=cli#tradingBot) at irc.freenode.net on port 6697 (SSL), or 6667 (plain) or feel free to make any question, but questions technically are not donations.
 
 ### Very Special Thanks to:
 
@@ -404,6 +379,10 @@ or donate your time with programming or financial suggestions in the topical IRC
 - https://www.sqlite.org
 - https://github.com/michaelgrosner/tribeca (https://github.com/michaelgrosner)
 - but Most Special Thanks goes to [your mother](https://youtu.be/YDafHsyyTNk).
+
+### General Discussion
+
+[IRC](https://kiwiirc.com/client/irc.freenode.net:6697/?theme=cli#tradingBot) is awesome!<br/>but if you dislike it, there is an unofficial Discord channel at https://discord.gg/vdZHyJH (with nice users but without me).
 
 ### Help
 
@@ -424,7 +403,6 @@ What exchange you don't want to be deleted from the bot?
 
 [![](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/GDAX)](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/GDAX/vote)
 [![](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/Bitfinex)](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/Bitfinex/vote)
-[![](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/OkCoin)](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/OkCoin/vote)
 [![](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/HitBTC)](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/HitBTC/vote)
 [![](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/Korbit)](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/Korbit/vote)
 [![](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/Poloniex)](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/Poloniex/vote)
@@ -434,27 +412,28 @@ What exchange you don't want to be deleted from the bot?
 
 ![bcn](https://user-images.githubusercontent.com/1634027/29495722-1d924018-85c5-11e7-8d61-d83f5716ae9e.jpg)
 
-### every new day we sing:
+#### every new day we sing:
 
  - https://www.youtube.com/watch?v=g--fsK6aLf8
+ - https://www.youtube.com/watch?v=uEqxj58g6To
  - https://www.youtube.com/watch?v=SS9DJX8gTKk
  - https://www.youtube.com/watch?v=Rom4qWtEkMA
  - https://www.youtube.com/watch?v=wXHm9Yl5tRM
  - https://www.youtube.com/watch?v=xPg_e_3cK-E
  - https://www.youtube.com/watch?v=KKpcQIfIAi8
- - https://www.youtube.com/watch?v=lwspxyzOfkY
  - https://www.youtube.com/watch?v=pZAmer0EmMQ
  - https://www.youtube.com/watch?v=50aXt1ctmUU
  - https://www.youtube.com/watch?v=vofff0Ei3kk
  - https://www.youtube.com/watch?v=4Ois3zB7SJ4
- - https://www.youtube.com/watch?v=1rNT0paAGTs
  - https://www.youtube.com/watch?v=_wGDcWD1E1A
  - https://www.youtube.com/watch?v=DVg2EJvvlF8
  - add your song here (please open a [new issue](https://github.com/ctubio/Krypto-trading-bot/issues/new?title=Today,%20I%20sing) to share your link)
-<p align="center"><!--img src="https://user-images.githubusercontent.com/1634027/32134633-642bb47a-bbf1-11e7-809c-f2d4d57678e0.jpg" />
-<br /><br /><br /><br /><br /><br /><br />
+<p align="center"><img src="https://user-images.githubusercontent.com/1634027/32134633-642bb47a-bbf1-11e7-809c-f2d4d57678e0.jpg" />
+<br /><br />
+We have already enough policemen,<br />if you like adventures choose to be a <a href="https://www.youtube.com/watch?v=pT_GM35fM7I">brave firefighter</a>.
+<br /><br /><br /><br /><br />
 <img src="https://user-images.githubusercontent.com/1634027/32695988-22681724-c76b-11e7-8557-7f2b15b2686b.jpg" />
-<br /><br /><br /><br />Violence should not be the answer to those who<br />are asking for freedom.<br /--><br /><br /><br /><br />
+<br /><br /><br /><br />Violence should not be the answer to those who<br />are asking for freedom.<br /><br /><br /><br /><br />
 <img src="https://user-images.githubusercontent.com/1634027/29746351-7478d556-8ad7-11e7-8b27-445eefa8f960.jpg" />
 <br /><br /><br /><br /><br /><br /><br /><br /><br />
 <img width="300" src="http://hits.dwyl.io/ctubio/Krypto-trading-bot.svg" /></p>
