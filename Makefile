@@ -1,8 +1,8 @@
 K       ?= K.sh
 MAJOR    = 0
 MINOR    = 4
-PATCH    = 12
-BUILD    = 19
+PATCH    = 13
+BUILD    = 31
 SOURCE  := $(notdir $(wildcard src/bin/*))
 CARCH    = x86_64-linux-gnu      \
            arm-linux-gnueabihf   \
@@ -10,32 +10,37 @@ CARCH    = x86_64-linux-gnu      \
            x86_64-apple-darwin17 \
            x86_64-w64-mingw32
 
-CHOST   ?= $(shell (test -d .git && test -n "`command -v g++`") && g++ -dumpmachine \
+CHOST   ?= $(shell test -n "`command -v g++`" && g++ -dumpmachine \
              || echo $(subst build-,,$(firstword $(wildcard build-*))))
+ABI     ?= $(shell echo '\#include <string>'   \
+             | $(CHOST)-g++ -x c++ -dM -E -    \
+             | grep '_GLIBCXX_USE_CXX11_ABI 1' \
+             | wc -l                           )
 
-KHOST   := $(shell echo $(CHOST) | sed 's/\([a-z_0-9]*\)-\([a-z_0-9]*\)-.*/\2-\1/' | sed 's/^w64/win64/')
+KHOST   := $(shell echo $(CHOST)                               \
+             | sed 's/-\([a-z_0-9]*\)-\(linux\)$$/-\2-\1/'     \
+             | sed 's/\([a-z_0-9]*\)-\([a-z_0-9]*\)-.*/\2-\1/' \
+             | sed 's/^w64/win64/'                             )
 KLOCAL  := build-$(KHOST)/local
 
 ERR      = *** K require g++ v7 or greater, but it was not found.
 HINT    := consider a symlink at /usr/bin/$(CHOST)-g++ pointing to your g++-7 or g++-8 executable
 
 STEP     = $(shell tput setaf 2;tput setab 0)Building $(1)..$(shell tput sgr0)
-KARGS   := -pthread -std=c++17 -O3 -I$(realpath src/lib)  \
-  -DK_BUILD='"$(KHOST)"'                                  \
-  -DK_SOURCE='"K-$(KSRC)"' -DK_0_GIT='"$(shell            \
-  cat .git/refs/heads/master 2>/dev/null || echo HEAD)"'  \
-  -DK_STAMP='"$(shell date "+%Y-%m-%d %H:%M:%S")"'        \
-  -DK_0_DAY='"v$(MAJOR).$(MINOR).$(PATCH)+$(BUILD)"'      \
-  -I$(KLOCAL)/include         $(KLOCAL)/include/uWS/*.cpp \
-  $(KLOCAL)/lib/K-$(KHOST).a                              \
-  $(KLOCAL)/lib/libquickfix.a $(KLOCAL)/lib/libsqlite3.a  \
-  $(KLOCAL)/lib/libz.a        $(KLOCAL)/lib/libcurl.a     \
-  $(KLOCAL)/lib/libssl.a      $(KLOCAL)/lib/libcrypto.a   \
-  $(KLOCAL)/lib/libncurses.a                              \
-  $(wildcard                                              \
-    $(KLOCAL)/lib/lib*.dll.a                              \
-    $(KLOCAL)/lib/libcares.a  $(KLOCAL)/lib/libuv.a       \
-    $(KLOCAL)/lib/K-$(KSRC)-assets.o                      \
+KARGS   := -std=c++17 -O3 -pthread -DK_0_GIT='"$(shell          \
+  cat .git/refs/heads/master 2>/dev/null || echo HEAD)"'        \
+  -DK_STAMP='"$(shell date "+%Y-%m-%d %H:%M:%S")"'              \
+  -DK_0_DAY='"v$(MAJOR).$(MINOR).$(PATCH)+$(BUILD)"'            \
+  -DK_BUILD='"$(KHOST)"'      -DK_SOURCE='"K-$(KSRC)"'          \
+  -I$(KLOCAL)/include         -I$(realpath src/lib)             \
+  $(KLOCAL)/include/uWS/*.cpp $(KLOCAL)/lib/K-$(KHOST).$(ABI).a \
+  $(KLOCAL)/lib/libsqlite3.a  $(KLOCAL)/lib/libncurses.a        \
+  $(KLOCAL)/lib/libquickfix.a $(KLOCAL)/lib/libz.a              \
+  $(KLOCAL)/lib/libcurl.a     $(KLOCAL)/lib/libssl.a            \
+  $(KLOCAL)/lib/libcrypto.a   $(wildcard                        \
+    $(KLOCAL)/lib/lib*.dll.a                                    \
+    $(KLOCAL)/lib/libcares.a  $(KLOCAL)/lib/libuv.a             \
+    $(KLOCAL)/lib/K-$(KSRC)-assets.o                            \
   )
 
 all K: $(SOURCE)
@@ -96,16 +101,18 @@ $(SOURCE):
 
 assets: src/bin/$(KSRC)/Makefile
 	$(info $(call STEP,$(KSRC) $@))
-	$(MAKE) -C src/bin/$(KSRC) KASSETS=$(abspath $(KLOCAL)/assets)
-	$(foreach chost,$(subst $(CHOST),,$(CARCH)) $(CHOST), \
-	  assets=build-$(shell echo $(chost) | sed 's/\([a-z_0-9]*\)-\([a-z_0-9]*\)-.*/\2-\1/' | sed 's/^w64/win64/')/local/assets  \
-	  && ! test -d $(abspath $${assets}/../..) || ((test -d $${assets} \
-	  || cp -R $(KLOCAL)/assets $${assets})                            \
-	  && $(MAKE) assets.o CHOST=$(chost) && rm -rf $${assets})         \
+	$(MAKE) -C src/bin/$(KSRC)
+	$(foreach chost,$(CARCH), \
+	  build=build-$(shell echo $(chost) | sed 's/-\([a-z_0-9]*\)-\(linux\)$$/-\2-\1/' | sed 's/\([a-z_0-9]*\)-\([a-z_0-9]*\)-.*/\2-\1/' | sed 's/^w64/win64/') \
+	  && ! test -d $${build} || ((test -d $${build}/local/assets \
+	  || cp -R /var/lib/K/assets $${build}/local/assets)         \
+	  && $(MAKE) assets.o CHOST=$(chost) chost=$(shell test -n "`command -v $(chost)-g++`" && echo $(chost)- || :) \
+	  && rm -rf $${build}/local/assets) \
 	;)
+	rm -rf /var/lib/K/assets
 
 assets.o: src/bin/$(KSRC)/$(KSRC).S
-	$(CHOST)-g++ -Wa,-I,$(KLOCAL)/assets,-I,src/bin/$(KSRC) -c $^ \
+	$(chost)g++ -Wa,-I,$(KLOCAL)/assets,-I,src/bin/$(KSRC) -c $^ \
 	  -o $(KLOCAL)/lib/K-$(notdir $(basename $^))-$@
 
 src: src/bin/$(KSRC)/$(KSRC).cxx
@@ -156,10 +163,11 @@ download:
 	@$(MAKE) upgrade_old_installations -s
 
 upgrade_old_installations:
-	-@$(foreach db,$(wildcard /data/db/K*.db), mv $(db) /var/lib/K/db;)
-	-@$(foreach db,$(wildcard /var/lib/K/db/K.*), mv $(db) $(shell echo $(db) | sed 's/\(.*\/K\/db\/\)K\.\(.*\)/\1K-trading-bot\.\2/');)
-	-@test -d /data/db && sudo rmdir /data/db || :
-	-@test -d /data && sudo rmdir /data || :
+	-@$(foreach json,$(wildcard /var/lib/K/cache/handshake.*), rm $(json) || :;)
+	-@test "1" = "$(ABI)" || (echo                                                            \
+	&& echo This app will crash because was compiled with CXX11 ABI, missing in your system.. \
+	&& echo A temporary solution is to recompile the app in your own system with: make dist K \
+	&& echo A permanent solution is to upgrade your OS to a newer version.                    )
 
 cleandb: /var/lib/K/db/K*
 	rm -rf /var/lib/K/db/K*.db
@@ -171,6 +179,7 @@ packages:
 	|| (test -n "`command -v pacman`" && sudo pacman --noconfirm -S --needed base-devel libxml2 zlib curl python gzip screen)
 
 uninstall:
+	rm -vrf /var/lib/K/cache /var/lib/K/node_modules
 	@$(foreach bin,$(addprefix /usr/local/bin/,$(notdir $(wildcard $(KLOCAL)/bin/K-*))), sudo rm -v $(bin);)
 
 system_install:
@@ -185,14 +194,15 @@ system_install:
 	@LS_COLORS="ex=40;92" CLICOLOR="Yes" ls $(shell ls --color > /dev/null 2>&1 && echo --color) -lah $(addprefix /usr/local/bin/,$(notdir $(wildcard $(KLOCAL)/bin/K-$(KSRC)*)))
 	@echo
 	@sudo curl -s --time-cond /etc/ssl/certs/ca-certificates.crt https://curl.haxx.se/ca/cacert.pem -o /etc/ssl/certs/ca-certificates.crt
+	@mkdir -p /var/lib/K/cache
 
 install: packages
 	@yes = | head -n`expr $(shell tput cols) / 2` | xargs echo && echo " _  __\n| |/ /  v$(MAJOR).$(MINOR).$(PATCH)+$(BUILD)\n| ' /\n| . \\   Select your (beloved) architecture\n|_|\\_\\  to download pre-compiled binaries:\n"
 	@echo $(CARCH) | tr ' ' "\n" | cat -n && echo "\n(Hint! uname says \"`uname -sm`\", and win32 auto-install does not work yet)\n"
-	@read -p "[`echo $(CARCH) | tr ' ' "\n" | cat -n | tr "\t" ' ' | sed 's/ *\([0-9]\) .*/\1/' | tr "\n" '/' | sed 's/^\(.*\)\/$$/\1/'`]: " chost && $(MAKE) download CHOST=`echo $(CARCH) | cut -d ' ' -f$${chost}`
+	@read -p "[$(shell seq -s / `echo $(CARCH) | tr ' ' "\n" | wc -l`)]: " chost && $(MAKE) download CHOST=`echo $(CARCH) | cut -d ' ' -f$${chost}`
 
 docker: packages download
-	@sed -i "/Usage/,+94d" K.sh
+	@sed -i "/Usage/,+87d" K.sh
 
 reinstall:
 	test -d .git && ((test -n "`git diff`" && (echo && echo !!Local changes will be lost!! press CTRL-C to abort. && echo && sleep 5) || :) \
@@ -299,7 +309,7 @@ ifdef KALL
 else ifndef KTARGZ
 	@$(MAKE) KTARGZ="K-$(MAJOR).$(MINOR).$(PATCH).$(BUILD)-$(KHOST).tar.gz" $@
 else
-	@tar -cvzf $(KTARGZ) $(KLOCAL)/bin/K-* $(KLOCAL)/lib/K-* LICENSE COPYING README.md Makefile doc/[^html]* etc test             \
+	@tar -cvzf $(KTARGZ) $(KLOCAL)/bin/K-* $(KLOCAL)/lib/K-* LICENSE COPYING README.md Makefile doc etc test                      \
 	$(shell test -n "`echo $(CHOST) | grep mingw32`" && echo $(KLOCAL)/bin/*dll || :) src                                         \
 	&& curl -s -n -H "Content-Type:application/octet-stream" -H "Authorization: token ${KRELEASE}"                                \
 	--data-binary "@$(PWD)/$(KTARGZ)" "https://uploads.github.com/repos/ctubio/Krypto-trading-bot/releases/$(shell curl -s        \

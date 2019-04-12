@@ -2,6 +2,7 @@ PROJECT_NAME           = Krypto.ninja
 PROJECT_NUMBER         =
 PROJECT_BRIEF          =
 PROJECT_LOGO           =
+OUTPUT_DIRECTORY       = /var/lib/K/doc
 HTML_OUTPUT            = html4
 INPUT                  = ../src/lib
 STRIP_FROM_PATH        = ../src

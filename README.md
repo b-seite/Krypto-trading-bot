@@ -7,10 +7,11 @@
 [![Code Size](https://img.shields.io/github/languages/code-size/ctubio/Krypto-trading-bot.svg)](https://github.com/ctubio/Krypto-trading-bot)
 [![Software License](https://img.shields.io/badge/license-ISC-551a8b.svg)](https://raw.githubusercontent.com/ctubio/Krypto-trading-bot/master/LICENSE)
 [![Software License](https://img.shields.io/badge/license-MIT-551a8b.svg)](https://raw.githubusercontent.com/ctubio/Krypto-trading-bot/master/COPYING)
+[![Bounties](https://img.shields.io/bountysource/team/Krypto-trading-bot/activity.svg)](https://www.bountysource.com/teams/krypto-trading-bot/issues)
 
 [`K`](https://github.com/ctubio/Krypto-trading-bot) is a very low latency [market making](https://github.com/ctubio/Krypto-trading-bot/blob/master/doc/MANUAL.md#what-is-market-making) trading bot with a fully featured [web interface](https://github.com/ctubio/Krypto-trading-bot#web-ui). The bot can place and cancel orders on one of [several supported cryptocoin exchanges](https://github.com/ctubio/Krypto-trading-bot#compatible-exchanges) in less than a few miliseconds per order on a decent machine.
 
-### <img src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4be.png" height="64" width="64"  align="middle" /> Latest version at https://github.com/ctubio/Krypto-trading-bot <img src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f51e.png" height="64" width="64" align="middle" /> <img src="https://assets-cdn.github.com/images/icons/emoji/unicode/1f4b8.png" height="64" width="64" align="middle" />
+### <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f4be.png" height="64" width="64"  align="middle" /> Latest version at https://github.com/ctubio/Krypto-trading-bot <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f51e.png" height="64" width="64" align="middle" /> <img src="https://github.githubassets.com/images/icons/emoji/unicode/1f4b8.png" height="64" width="64" align="middle" />
 
 [![Build Status](https://img.shields.io/travis/ctubio/Krypto-trading-bot/master.svg?label=test)](https://travis-ci.org/ctubio/Krypto-trading-bot)
 [![Coverage Status](https://img.shields.io/coveralls/ctubio/Krypto-trading-bot/master.svg)](https://coveralls.io/r/ctubio/Krypto-trading-bot?branch=master)
@@ -19,7 +20,7 @@
 [![Last Commit](https://img.shields.io/github/last-commit/ctubio/Krypto-trading-bot.svg)](https://github.com/ctubio/Krypto-trading-bot)
 [![Downloads Last 21 Commits](https://img.shields.io/github/downloads/ctubio/Krypto-trading-bot/total.svg?label=downloads%20last%2021%20commits)](https://github.com/ctubio/Krypto-trading-bot)
 
-Runs on unix-like systems. Persistence is achieved through a built-in server-less SQLite C++ interface. Installation via Docker is supported, but manual installation in a dedicated [Debian](https://cdimage.debian.org/cdimage/weekly-builds/amd64/iso-cd/)/[Raspbian](https://www.raspberrypi.org/downloads/raspbian/), [CentOS](https://wiki.centos.org/Download) or macOS instance is recommended.
+Runs on unix-like systems. Persistence is achieved through a built-in server-less SQLite C++ interface. Installation via Docker is supported, but manual installation in a dedicated [Debian](https://cdimage.debian.org/cdimage/weekly-builds/amd64/iso-cd/)/[Raspbian](https://www.raspberrypi.org/downloads/raspbian/), [Red Hat](https://developers.redhat.com/products/rhel/download), [CentOS](https://wiki.centos.org/Download) or macOS instance is recommended.
 
 ![Web UI Preview](https://user-images.githubusercontent.com/1634027/44740469-d5c7ff00-aafa-11e8-9252-73b9c1283adb.png)
 
@@ -29,8 +30,8 @@ The web UI is compatible with most web browsers/devices/resolutions, but Firefox
 
 ||with Post-Only Orders support|without Post-Only|
 |---|---|---|
-|**without Maker fees**|[Coinbase](https://pro.coinbase.com/)<br> &#10239; _REST + WebSocket + FIX_<br><br>[HitBTC](https://hitbtc.com/)<br> &#10239; _REST + WebSocket_||
-|**with Maker and Taker fees**|[Bitfinex](https://www.bitfinex.com/)<br>[Ethfinex](https://www.ethfinex.com/)<br> &#10239; _REST + WebSocket_<br><br>[Kraken](https://www.kraken.com/)<br> &#10239; _REST_<br><br>[Poloniex](https://www.poloniex.com/)<br> &#10239; _REST_|[FCoin](https://fcoin.com/)<br> &#10239; _REST + WebSocket_<br><br>[Korbit](https://www.korbit.co.kr/)<br> &#10239; _REST_|
+|**without Maker fees**|*none*|*none*|
+|**with Maker and Taker fees**|[Coinbase](https://pro.coinbase.com/) <sub>([fees](https://pro.coinbase.com/orders/fees))</sub><br> &#10239; _REST + WebSocket + FIX_<br><br>[HitBTC](https://hitbtc.com/) <sub>([fees](https://hitbtc.com/fee-tier))</sub><br>[Bequant](https://bequant.io/) <sub>([fees](https://bequant.io/fees-and-limits))</sub><br> &#10239; _REST + WebSocket_<br><br>[Bitfinex](https://www.bitfinex.com/) <sub>([fees](https://www.bitfinex.com/fees))</sub><br>[Ethfinex](https://www.ethfinex.com/) <sub>([fees](https://www.ethfinex.com/fees))</sub><br> &#10239; _REST + WebSocket_<br><br>[Kraken](https://www.kraken.com/) <sub>([fees](https://www.kraken.com/features/fee-schedule))</sub><br> &#10239; _REST_<br><br>[Poloniex](https://www.poloniex.com/) <sub>([fees](https://poloniex.com/fees/))</sub><br> &#10239; _REST_|[FCoin](https://fcoin.com/) <sub>([fees](https://support.fcoin.com/hc/en-us/articles/360003715514))</sub><br> &#10239; _REST + WebSocket_|
 
 All currency pairs are supported.
 
@@ -64,7 +65,6 @@ All currency pairs are supported.
   - [General Discussion](#general-discussion)
   - [Help](#help)
   - [Issues](#issues)
-  - [Votes](#votes)
 
 ### Docker Installation
 
@@ -192,15 +192,15 @@ In case you really want to use plain HTTP, use `--without-ssl` argument.
 
 ### Databases
 
-Each currency pair of each exchange will use a different sqlite database file.
+Each currency pair of each exchange will use a different sqlite database file with [WAL mode](https://www.sqlite.org/wal.html) enabled.
 
-All database files are located at `/var/lib/K/db/K-*.db`. It is located outside the download folder to survive reinstalls and wild `rm -rf path/to/K`.
+All database files are located at `/var/lib/K/db/K-*.db*`, outside the download folder to survive wild `rm -rf path/to/K` or reinstalls.
 
-You can copy any `*.db` file to another machine when migrating or as a backup.
+You can copy any group of `*.db*` files to another machine when migrating or as a backup.
 
-If a database file does not exist, the application will create it on boot; otherwise, it will use the existing one.
+If a database does not exist, the application will create it on boot; otherwise, it will use the existing one.
 
-To explore each database file you can use https://github.com/sqlitebrowser/sqlitebrowser or a similar tool.
+To explore each database you can use https://github.com/sqlitebrowser/sqlitebrowser or a similar tool.
 
 To set a different database filename or to set an [in-memory database](https://sqlite.org/inmemorydb.html), use `--database=FILE` argument (see `--help`).
 
@@ -318,7 +318,7 @@ Updated Bitfinex API v2.
 
 Added Coinbase FIX API.
 
-Added Korbit API.
+~~Added Korbit API.~~
 </details>
 
 <details><summary><b>Release v0.2.0 Changelog</b></summary>
@@ -394,19 +394,10 @@ To request new features open a [new issue](https://github.com/ctubio/Krypto-trad
 
 To report errors open a [new issue](https://github.com/ctubio/Krypto-trading-bot/issues/new?title=Error%20report) only after collecting all possible relevant log messages.
 
-Pull Requests are welcome, but adhere to the Contributor License Agreement:
+For fun (not required), everybody can create or claim bounties related to any issue at [bountysource.com](https://www.bountysource.com/teams/krypto-trading-bot/issues).
+
+Consequently, Pull Requests are welcome, but adhere to the Contributor License Agreement:
 - Your biological and technological distinctiveness will be added to our own. Resistance is futile.
-
-### Votes
-
-What exchange you don't want to be deleted from the bot?
-
-[![](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/GDAX)](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/GDAX/vote)
-[![](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/Bitfinex)](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/Bitfinex/vote)
-[![](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/HitBTC)](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/HitBTC/vote)
-[![](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/Korbit)](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/Korbit/vote)
-[![](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/Poloniex)](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/Poloniex/vote)
-[![](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/Delete%20all%2C%20my%20exchange%20is%20none%20of%20these.)](https://m131jyck4m.execute-api.us-west-2.amazonaws.com/prod/poll/01BPF861CD0EVTZHPF0JJ7TZQJ/Delete%20all%2C%20my%20exchange%20is%20none%20of%20these./vote)
 
 ### like yesterday, since 0day and ∞
 
@@ -415,8 +406,10 @@ What exchange you don't want to be deleted from the bot?
 #### every new day we sing:
 
  - https://www.youtube.com/watch?v=g--fsK6aLf8
+ - https://www.youtube.com/watch?v=BncXzyjdREc
  - https://www.youtube.com/watch?v=uEqxj58g6To
  - https://www.youtube.com/watch?v=SS9DJX8gTKk
+ - https://www.youtube.com/watch?v=e8ULyjcSukM
  - https://www.youtube.com/watch?v=Rom4qWtEkMA
  - https://www.youtube.com/watch?v=wXHm9Yl5tRM
  - https://www.youtube.com/watch?v=xPg_e_3cK-E

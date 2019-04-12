@@ -5,7 +5,8 @@ ERR        = *** Unexpected MAKE_VERSION < 4.
 HINT       = This Makefile can't be used with your make version, consider to upgrade before try again
 $(if $(shell ver=${MAKE_VERSION} && test $${ver%%.*} -lt 4 || echo 1),,$(warning $(ERR));$(error $(HINT)))
 
-NODE_PATH := /var/lib/K/node_modules
+KASSETS    = /var/lib/K/assets
+NODE_PATH  = /var/lib/K/node_modules
 PATH      := $(NODE_PATH)/.bin:$(PATH)
 
 STEPS     := $(shell grep "call\ STEP" Makefile | wc -l)
@@ -20,7 +21,7 @@ all $(KSRC): js css
 npm: package.json
 	$(info $(STEP_1))
 	@cd $(abspath $(NODE_PATH)/..) && $@ install
-ifndef TRAVIS_DEPLOY
+ifndef TRAVIS_OS_NAME
 	@rm $(abspath $(NODE_PATH)/..)/$(basename $^)*
 endif
 
@@ -42,30 +43,30 @@ css: www/sass/*.scss
 export define PACKAGE_JSON
 {
   "dependencies": {
-    "@angular/common": "^7.2.0",
-    "@angular/compiler": "^7.2.0",
-    "@angular/core": "^7.2.0",
-    "@angular/forms": "^7.2.0",
-    "@angular/http": "^7.2.0",
-    "@angular/platform-browser": "^7.2.0",
-    "@angular/platform-browser-dynamic": "^7.2.0",
-    "@angular/router": "^7.2.0",
-    "@babel/core": "^7.2.2",
-    "@babel/preset-env": "^7.2.3",
-    "ag-grid-angular": "^20.0.0",
-    "ag-grid-community": "^20.0.0",
+    "@angular/common": "^7.2.12",
+    "@angular/compiler": "^7.2.12",
+    "@angular/core": "^7.2.12",
+    "@angular/forms": "^7.2.12",
+    "@angular/http": "^7.2.12",
+    "@angular/platform-browser": "^7.2.12",
+    "@angular/platform-browser-dynamic": "^7.2.12",
+    "@angular/router": "^7.2.12",
+    "@babel/core": "^7.4.3",
+    "@babel/preset-env": "^7.4.3",
+    "ag-grid-angular": "^20.2.0",
+    "ag-grid-community": "^20.2.0",
     "angular2-highcharts": "^0.5.5",
     "babelify": "^10.0.0",
     "browserify": "^16.2.3",
-    "highcharts": "^7.0.1",
+    "highcharts": "7.0.3",
     "ng4-popover": "^1.0.23",
-    "reflect-metadata": "^0.1.12",
+    "reflect-metadata": "^0.1.13",
     "rxjs": "6.4.0",
     "rxjs-compat": "^6.4.0",
-    "sass": "^1.16.0",
-    "typescript": "^3.2.2",
+    "sass": "^1.17.4",
+    "typescript": "^3.4.2",
     "uglify-es": "^3.3.9",
-    "zone.js": "^0.8.27"
+    "zone.js": "^0.9.0"
   },
   "description": "K",
   "homepage": "https://github.com/ctubio/Krypto-trading-bot",

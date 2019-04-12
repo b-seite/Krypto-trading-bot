@@ -5,6 +5,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -19,6 +20,7 @@
 #include <random>
 #include <locale>
 #include <csignal>
+#include <variant>
 #include <algorithm>
 #include <functional>
 #include <getopt.h>
@@ -78,6 +80,10 @@ using Clock  = long long int;
 //! \def
 //! \brief Redundant placeholder to enforce private references.
 #define private_ref private
+
+//! \def
+//! \brief Redundant placeholder to enforce public nested classes.
+#define public_friend public
 
 //! \def
 //! \brief A number used as impossible or unset value, when 0 is not appropiate.

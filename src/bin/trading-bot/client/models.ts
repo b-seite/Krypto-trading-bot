@@ -5,13 +5,9 @@ export var Prefixes = {
 
 export var Topics = {
   FairValue: 'a',
-  Quote: 'b',
-  ActiveSubscription: 'c',
   Connectivity: 'd',
   MarketData: 'e',
   QuotingParametersChange: 'f',
-  SafetySettings: 'g',
-  Product: 'h',
   OrderStatusReports: 'i',
   ProductAdvertisement: 'j',
   ApplicationState: 'k',
@@ -23,7 +19,6 @@ export var Topics = {
   CancelOrder: 'q',
   MarketTrade: 'r',
   Trades: 's',
-  ExternalValuation: 't',
   QuoteStatus: 'u',
   TargetBasePosition: 'v',
   TradeSafetyValue: 'w',
@@ -31,7 +26,6 @@ export var Topics = {
   CleanAllClosedTrades: 'y',
   CleanAllTrades: 'z',
   CleanTrade: 'A',
-  WalletChart: 'C',
   MarketChart: 'D',
   Notepad: 'E',
   MarketDataLongTerm: 'H'
@@ -71,7 +65,8 @@ export enum Liquidity { Make, Take }
 
 export interface ProductState {
     advert: ProductAdvertisement;
-    fixed: number
+    fixedPrice: number;
+    fixedSize: number;
 }
 
 export interface IStdev {
@@ -164,10 +159,12 @@ export class TwoSidedQuote {
 
 export enum QuoteStatus { Disconnected, Live, DisabledQuotes, MissingData, UnknownHeld, WidthMustBeSmaller, TBPHeld, MaxTradesSeconds, WaitingPing, DepletedFunds, Crossed, UpTrendHeld, DownTrendHeld }
 
+export enum SideAPR { Off, Buy, Sell }
+
 export class TwoSidedQuoteStatus {
     constructor(public bidStatus: QuoteStatus,
                 public askStatus: QuoteStatus,
-                public sideAPR: string,
+                public sideAPR: SideAPR,
                 public quotesInMemoryWaiting: number,
                 public quotesInMemoryWorking: number,
                 public quotesInMemoryZombies: number) {}
@@ -247,11 +244,11 @@ export interface QuotingParameters {
 }
 
 export class ProductAdvertisement {
-    constructor(public exchange: string, public base: string, public quote: string, public environment: string, public matryoshka: string, public minTick: number) { }
+    constructor(public exchange: string, public inet: string, public base: string, public quote: string, public environment: string, public matryoshka: string, public minTick: number) { }
 }
 
 export class ApplicationState {
-    constructor(public addr: string, public inet: string, public freq: number, public theme: number, public memory: number, public dbsize: number) { }
+    constructor(public addr: string, public freq: number, public theme: number, public memory: number, public dbsize: number) { }
 }
 
 export class TradeSafety {

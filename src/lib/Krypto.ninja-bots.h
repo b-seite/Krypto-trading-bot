@@ -6,22 +6,6 @@
 namespace ₿ {
   string epilogue, epitaph;
 
-  enum class mPortal: unsigned char {
-    Hello = '=',
-    Kiss  = '-'
-  };
-  enum class mMatter: unsigned char {
-    FairValue            = 'a', Quote                = 'b', ActiveSubscription = 'c', Connectivity       = 'd',
-    MarketData           = 'e', QuotingParameters    = 'f', SafetySettings     = 'g', Product            = 'h',
-    OrderStatusReports   = 'i', ProductAdvertisement = 'j', ApplicationState   = 'k', EWMAStats          = 'l',
-    STDEVStats           = 'm', Position             = 'n', Profit             = 'o', SubmitNewOrder     = 'p',
-    CancelOrder          = 'q', MarketTrade          = 'r', Trades             = 's', ExternalValuation  = 't',
-    QuoteStatus          = 'u', TargetBasePosition   = 'v', TradeSafetyValue   = 'w', CancelAllOrders    = 'x',
-    CleanAllClosedTrades = 'y', CleanAllTrades       = 'z', CleanTrade         = 'A',
-    WalletChart          = 'C', MarketChart          = 'D', Notepad            = 'E',
-                                MarketDataLongTerm   = 'H'
-  };
-
   //! \brief     Call all endingFn once and print a last log msg.
   //! \param[in] reason Allows any (colorful?) string.
   //! \param[in] reboot Allows a reboot only because https://tldp.org/LDP/Bash-Beginners-Guide/html/sect_09_03.html.
@@ -37,24 +21,42 @@ namespace ₿ {
     public:
       static int colorful;
       static const string reset() {
-          return colorful ? "\033[0m" : "";
+          return paint(0, -1);
       };
       static const string r(const int &color) {
-          return colorful ? "\033[0;3" + to_string(color) + 'm' : "";
+          return paint(0, color);
       };
       static const string b(const int &color) {
-          return colorful ? "\033[1;3" + to_string(color) + 'm' : "";
+          return paint(1, color);
       };
       static void default_colors() {
         if (colorful) start_color();
         use_default_colors();
-        init_pair(COLOR_WHITE,   COLOR_WHITE,   COLOR_BLACK);
-        init_pair(COLOR_GREEN,   COLOR_GREEN,   COLOR_BLACK);
-        init_pair(COLOR_RED,     COLOR_RED,     COLOR_BLACK);
-        init_pair(COLOR_YELLOW,  COLOR_YELLOW,  COLOR_BLACK);
-        init_pair(COLOR_BLUE,    COLOR_BLUE,    COLOR_BLACK);
-        init_pair(COLOR_MAGENTA, COLOR_MAGENTA, COLOR_BLACK);
-        init_pair(COLOR_CYAN,    COLOR_CYAN,    COLOR_BLACK);
+        for (const auto &color : {
+          COLOR_BLACK,
+          COLOR_RED,
+          COLOR_GREEN,
+          COLOR_YELLOW,
+          COLOR_BLUE,
+          COLOR_MAGENTA,
+          COLOR_CYAN,
+          COLOR_WHITE
+        }) init_pair(color, color,
+          color
+            ? COLOR_BLACK
+            : COLOR_WHITE
+        );
+      };
+    private:
+      static const string paint(const int &style, const int &color) {
+        return colorful
+          ? "\033["
+            + to_string(style)
+            + (color == -1
+              ? ""
+              : ";3" + to_string(color)
+            ) + 'm'
+          : "";
       };
   };
 
@@ -67,51 +69,6 @@ namespace ₿ {
   void error(const string &prefix, const string &reason, const bool &reboot = false) {
     if (reboot) this_thread::sleep_for(chrono::seconds(3));
     exit(prefix + Ansi::r(COLOR_RED) + " Errrror: " + Ansi::b(COLOR_RED) + reason, reboot);
-  };
-
-  class Hotkey {
-    private:
-      future<char> keylogger;
-      unordered_map<char, function<void()>> hotFn;
-    public:
-      void hotkey(const char &ch, function<void()> fn) {
-        if (!keylogger.valid()) return;
-        if (hotFn.find(ch) != hotFn.end())
-          error("SH", string("Too many handlers for \"") + ch + "\" hotkey event");
-        hotFn[ch] = fn;
-      };
-    protected:
-      function<const bool()> legit_keylogger() {
-        if (keylogger.valid())
-          error("SH", string("Unable to launch another \"keylogger\" thread"));
-        noecho();
-        halfdelay(5);
-        keypad(stdscr, true);
-        launch_keylogger();
-        return [&]() {
-          return wait_for_keylog();
-        };
-      };
-    private:
-      const bool wait_for_keylog() {
-        if (keylogger.valid()
-          and keylogger.wait_for(chrono::nanoseconds(0)) == future_status::ready
-        ) {
-          const char ch = keylogger.get();
-          if (hotFn.find(ch) != hotFn.end())
-            hotFn.at(ch)();
-          launch_keylogger();
-        }
-        return false;
-      };
-      void launch_keylogger() {
-        keylogger = ::async(launch::async, [&]() {
-          int ch = ERR;
-          while (ch == ERR and !hotFn.empty())
-            ch = getch();
-          return ch == ERR ? '\r' : (char)ch;
-        });
-      };
   };
 
   struct Margin {
@@ -404,64 +361,34 @@ namespace ₿ {
 
   class Option {
     protected:
-      bool autobot   = false;
-      bool databases = false;
+      bool autobot = false;
       pair<vector<Argument>, function<void(
-        unordered_map<string, string> &,
-        unordered_map<string, int>    &,
-        unordered_map<string, double> &
+        unordered_map<string, variant<string, int, double>>&
       )>> arguments;
     private:
-      unordered_map<string, string> optstr;
-      unordered_map<string, int>    optint;
-      unordered_map<string, double> optdec;
+      unordered_map<string, variant<string, int, double>> args;
     public:
-      const string str(const string &name) const {
-        return optstr.find(name) != optstr.end()
-          ? optstr.at(name)
-          : (optint.find(name) != optint.end()
-              ? to_string(num(name))
-              : to_string(dec(name))
-            );
-      };
-      const int num(const string &name) const {
+      template <typename T> const T arg(const string &name) const {
 #ifndef NDEBUG
-        if (optint.find(name) == optint.end()) return 0;
+        if (args.find(name) == args.end()) return T();
 #endif
-        return optint.at(name);
-      };
-      const double dec(const string &name) const {
-#ifndef NDEBUG
-        if (optdec.find(name) == optdec.end()) return 0;
-#endif
-        return optdec.at(name);
-      };
-      const unsigned int memSize() const {
-#ifdef _WIN32
-        return 0;
-#else
-        struct rusage ru;
-        return getrusage(RUSAGE_SELF, &ru) ? 0 : ru.ru_maxrss * 1e+3;
-#endif
-      };
-      const unsigned int dbSize() const {
-        if (!databases or str("database") == ":memory:") return 0;
-        struct stat st;
-        return stat(str("database").data(), &st) ? 0 : st.st_size;
+        return get<T>(args.at(name));
       };
     protected:
-      void main(int argc, char** argv) {
-        optint["autobot"] = autobot;
-        optint["naked"]   = !Print::display;
+      void main(int argc, char** argv, const bool &databases, const bool &headless) {
+        args["autobot"]  = autobot;
+        args["headless"] = headless;
+        args["naked"]    = !Print::display;
         vector<Argument> long_options = {
           {"help",         "h",      nullptr,  "show this help and quit"},
           {"version",      "v",      nullptr,  "show current build version and quit"},
-          {"latency",      "1",      nullptr,  "check current HTTP latency (not from WS) and quit"}
+          {"latency",      "1",      nullptr,  "check current HTTP latency (not from WS) and quit"},
+          {"nocache",      "1",      nullptr,  "do not cache handshakes 7 hours at /var/lib/K/cache"}
         };
-        if (!autobot) long_options.push_back(
+        if (!arg<int>("autobot")) long_options.push_back(
           {"autobot",      "1",      nullptr,  "automatically start trading on boot"}
         );;
-        if (Print::display) long_options.push_back(
+        if (!arg<int>("naked")) long_options.push_back(
           {"naked",        "1",      nullptr,  "do not display CLI, print output to stdout instead"}
         );
         if (databases) long_options.push_back(
@@ -469,6 +396,23 @@ namespace ₿ {
                                                "\n" "default PATH is '/var/lib/K/db/K-*.db',"
                                                "\n" "or use ':memory:' (see sqlite.org/inmemorydb.html)"}
         );
+        if (!arg<int>("headless")) for (const Argument &it : (vector<Argument>){
+          {"headless",     "1",      nullptr,  "do not listen for UI connections,"
+                                               "\n" "all other UI related arguments will be ignored"},
+          {"without-ssl",  "1",      nullptr,  "do not use HTTPS for UI connections (use HTTP only)"},
+          {"whitelist",    "IP",     "",       "set IP or csv of IPs to allow UI connections,"
+                                               "\n" "alien IPs will get a zip-bomb instead"},
+          {"client-limit", "NUMBER", "7",      "set NUMBER of maximum concurrent UI connections"},
+          {"port",         "NUMBER", "3000",   "set NUMBER of an open port to listen for UI connections"},
+          {"user",         "WORD",   "NULL",   "set allowed WORD as username for UI connections,"
+                                               "\n" "mandatory but may be 'NULL'"},
+          {"pass",         "WORD",   "NULL",   "set allowed WORD as password for UI connections,"
+                                               "\n" "mandatory but may be 'NULL'"},
+          {"ssl-crt",      "FILE",   "",       "set FILE to custom SSL .crt file for HTTPS UI connections"
+                                               "\n" "(see www.akadia.com/services/ssh_test_certificate.html)"},
+          {"ssl-key",      "FILE",   "",       "set FILE to custom SSL .key file for HTTPS UI connections"
+                                               "\n" "(the passphrase MUST be removed from the .key file!)"}
+        }) long_options.push_back(it);
         for (const Argument &it : (vector<Argument>){
           {"interface",    "IP",     "",       "set IP to bind as outgoing network interface,"
                                                "\n" "default IP is the system default network interface"},
@@ -480,8 +424,6 @@ namespace ₿ {
           {"apikey",       "WORD",   "NULL",   "set (never share!) WORD as api key for trading, mandatory"},
           {"secret",       "WORD",   "NULL",   "set (never share!) WORD as api secret for trading, mandatory"},
           {"passphrase",   "WORD",   "NULL",   "set (never share!) WORD as api passphrase for trading,"
-                                               "\n" "mandatory but may be 'NULL'"},
-          {"username",     "WORD",   "NULL",   "set (never share!) WORD as api username for trading,"
                                                "\n" "mandatory but may be 'NULL'"},
           {"http",         "URL",    "",       "set URL of alernative HTTPS api endpoint for trading"},
           {"wss",          "URL",    "",       "set URL of alernative WSS api endpoint for trading"},
@@ -504,10 +446,10 @@ namespace ₿ {
         int index = ANY_NUM;
         vector<option> opt_long = { {nullptr, 0, nullptr, 0} };
         for (const Argument &it : long_options) {
-          if     (!it.default_value)             optint[it.name] = 0;
-          else if (it.defined_value == "NUMBER") optint[it.name] = stoi(it.default_value);
-          else if (it.defined_value == "AMOUNT") optdec[it.name] = stod(it.default_value);
-          else                                   optstr[it.name] =      it.default_value;
+          if     (!it.default_value)             args[it.name] = 0;
+          else if (it.defined_value == "NUMBER") args[it.name] = stoi(it.default_value);
+          else if (it.defined_value == "AMOUNT") args[it.name] = stod(it.default_value);
+          else                                   args[it.name] =      it.default_value;
           opt_long.insert(opt_long.end()-1, {
             it.name.data(),
             it.default_value
@@ -515,7 +457,7 @@ namespace ₿ {
               : no_argument,
             it.default_value or it.defined_value.at(0) > '>'
               ? nullptr
-              : &optint[it.name],
+              : get_if<int>(&args.at(it.name)),
             it.default_value
               ? index++
               : (it.defined_value.at(0) > '>'
@@ -534,9 +476,9 @@ namespace ₿ {
             case 'v': EXIT(EXIT_SUCCESS);
             default : {
               const string name(opt_long.at(index).name);
-              if      (optint.find(name) != optint.end()) optint[name] =   stoi(optarg);
-              else if (optdec.find(name) != optdec.end()) optdec[name] =   stod(optarg);
-              else                                        optstr[name] = string(optarg);
+              if      (holds_alternative<int>(args[name]))    args[name] =   stoi(optarg);
+              else if (holds_alternative<double>(args[name])) args[name] =   stod(optarg);
+              else if (holds_alternative<string>(args[name])) args[name] = string(optarg);
             }
           }
         if (optind < argc) {
@@ -545,47 +487,55 @@ namespace ₿ {
           error("CF", argerr);
         }
         tidy();
-        if (!str("interface").empty())
-          Curl::inet = strdup(str("interface").data());
-        if (num("naked")) Print::display = nullptr;
-        Ansi::colorful = num("colors");
+        if (!arg<string>("interface").empty())
+          Curl::inet = strdup(arg<string>("interface").data());
+        Ansi::colorful = arg<int>("colors");
         if (arguments.second) {
-          arguments.second(
-            optstr,
-            optint,
-            optdec
-          );
+          arguments.second(args);
           arguments.second = nullptr;
         }
+        if (arg<int>("naked"))
+          Print::display = nullptr;
       };
     private:
       void tidy() {
-        if (optstr["currency"].find("/") == string::npos or optstr["currency"].length() < 3)
+        if (arg<string>("currency").find("/") == string::npos or arg<string>("currency").length() < 3)
           error("CF", "Invalid --currency value; must be in the format of BASE/QUOTE, like BTC/EUR");
-        if (optstr["exchange"].empty())
+        if (arg<string>("exchange").empty())
           error("CF", "Invalid --exchange value; the config file may have errors (there are extra spaces or double defined variables?)");
-        optstr["exchange"] = Text::strU(optstr["exchange"]);
-        optstr["currency"] = Text::strU(optstr["currency"]);
-        optstr["base"]  = optstr["currency"].substr(0, optstr["currency"].find("/"));
-        optstr["quote"] = optstr["currency"].substr(1+ optstr["currency"].find("/"));
-        optint["market-limit"] = max(15, optint["market-limit"]);
-        if (optint["debug"])
-          optint["debug-secret"] = 1;
+        args["exchange"] = Text::strU(arg<string>("exchange"));
+        args["currency"] = Text::strU(arg<string>("currency"));
+        args["base"]  = Text::strU(arg<string>("currency").substr(0, arg<string>("currency").find("/")));
+        args["quote"] = Text::strU(arg<string>("currency").substr(1+ arg<string>("currency").find("/")));
+        args["market-limit"] = max(15, arg<int>("market-limit"));
+        if (arg<int>("debug"))
+          args["debug-secret"] = 1;
+        if (arg<int>("latency"))
+          args["nocache"] = 1;
 #ifndef _WIN32
-        if (optint["latency"] or optint["debug-secret"])
+        if (arg<int>("latency") or arg<int>("debug-secret"))
 #endif
-          optint["naked"] = 1;
-        if (databases) {
-          optstr["diskdata"] = "";
-          if (optstr["database"].empty() or optstr["database"] == ":memory:")
-            (optstr["database"] == ":memory:"
-              ? optstr["diskdata"]
-              : optstr["database"]
+          args["naked"] = 1;
+        if (args.find("database") != args.end()) {
+          args["diskdata"] = "";
+          if (arg<string>("database").empty() or arg<string>("database") == ":memory:")
+            (arg<string>("database") == ":memory:"
+              ? args["diskdata"]
+              : args["database"]
             ) = ("/var/lib/K/db/" K_SOURCE)
-              + ('.' + optstr["exchange"])
-              +  '.' + optstr["base"]
-              +  '.' + optstr["quote"]
+              + ('.' + arg<string>("exchange"))
+              +  '.' + arg<string>("base")
+              +  '.' + arg<string>("quote")
               +  '.' + "db";
+        }
+        if (!arg<int>("headless")) {
+          if (arg<int>("latency") or !arg<int>("port") or !arg<int>("client-limit"))
+            args["headless"] = 1;
+          args["B64auth"] = (!arg<int>("headless")
+            and arg<string>("user") != "NULL" and !arg<string>("user").empty()
+            and arg<string>("pass") != "NULL" and !arg<string>("pass").empty()
+          ) ? "Basic " + Text::B64(arg<string>("user") + ':' + arg<string>("pass"))
+            : "";
         }
       };
       void help(const vector<Argument> &long_options) {
@@ -633,70 +583,24 @@ namespace ₿ {
 
   class Socket {
     public:
+      using HTTPServer = function<const string(string, const string&, const string&)>;
+      using WSServer   = function<const bool(const bool&, const string&)>;
+      using WSMessage  = function<const string(string, const string&)>;
       string wtfismyip = "localhost";
     protected:
       uWS::Hub *socket = nullptr;
       vector<uWS::Group<uWS::CLIENT>*> gw_clients;
       vector<uWS::Group<uWS::SERVER>*> ui_servers;
-    private:
-      const unordered_map<unsigned int, string> headers = {
-        {200, "HTTP/1.1 200 OK"
-              "\r\n" "Connection: keep-alive"
-              "\r\n" "Accept-Ranges: bytes"
-              "\r\n" "Vary: Accept-Encoding"
-              "\r\n" "Cache-Control: public, max-age=0"},
-        {401, "HTTP/1.1 401 Unauthorized"
-              "\r\n" "WWW-Authenticate: Basic realm=\"Basic Authorization\""
-              "\r\n" "Connection: keep-alive"
-              "\r\n" "Accept-Ranges: bytes"
-              "\r\n" "Vary: Accept-Encoding"
-              "\r\n" "Content-Type: text/plain; charset=UTF-8"},
-        {403, "HTTP/1.1 403 Forbidden"
-              "\r\n" "Connection: keep-alive"
-              "\r\n" "Accept-Ranges: bytes"
-              "\r\n" "Vary: Accept-Encoding"
-              "\r\n" "Content-Type: text/plain; charset=UTF-8"},
-        {404, "HTTP/1.1 404 Not Found"},
-        {418, "HTTP/1.1 418 I'm a teapot"},
-      };
     public:
-      const string document(
-        const       string &content,
-        const unsigned int &code,
-        const       string &type = "",
-        const         bool &gzip = false
-      ) const {
-        if (content.empty() and code == 200) // Humans!
-          return (Random::int64() % 21)      // go to any random url to check your luck
-            ? document("Today, is a beautiful day.", 404)
-            : document("Today, is your lucky day!", 418);
-        return headers.at(code)
-         + (type.empty() ? "" : "\r\n" "Content-Type: " + type)
-         + (gzip ? "\r\n" "Content-Encoding: gzip" : "")
-         + "\r\n" "Content-Length: " + to_string(content.length())
-         + "\r\n"
-           "\r\n"
-         + content;
-      };
       uWS::Group<uWS::SERVER> *listen(
-               string &protocol,
-        const     int &port,
-        const    bool &ssl,
-        const  string &crt,
-        const  string &key,
-        const function<const string(
-          const string&,
-          const string&,
-          const string&
-        )>            &httpServer = nullptr,
-        const function<const bool(
-          const   bool&,
-          const string&
-        )>            &wsServer   = nullptr,
-        const function<const string(
-                string,
-          const string&
-        )>            &wsMessage  = nullptr
+                  string &protocol,
+        const        int &port,
+        const       bool &ssl,
+        const     string &crt,
+        const     string &key,
+        const HTTPServer &httpServer = nullptr,
+        const   WSServer &wsServer   = nullptr,
+        const  WSMessage &wsMessage  = nullptr
       ) {
         auto ui_server = socket->createGroup<uWS::SERVER>(uWS::PERMESSAGE_DEFLATE);
         if (ui_server) {
@@ -806,7 +710,7 @@ namespace ₿ {
               or !SSL_CTX_use_RSAPrivateKey_file(ctx, key.data(), SSL_FILETYPE_PEM)
             ) {
               ctx = nullptr;
-              Print::logWar("UI", "Unable to encrypt web clients, will fallback to plain HTTP");
+              Print::logWar("UI", "Unable to encrypt web clients, will fallback to plain text");
             }
           }
         }
@@ -821,24 +725,24 @@ namespace ₿ {
 
   class Events {
     private:
-      uS::Timer *timer  = nullptr;
-      uS::Async *loop   = nullptr;
-      unsigned int tick  = 0,
-                   ticks = 300;
+      uS::Timer *timer = nullptr;
+      uS::Async *loop  = nullptr;
+              unsigned int tick  = 0;
+      mutable unsigned int ticks = 300;
       vector<function<const bool(const unsigned int&)>> timeFn;
-      vector<function<const bool()>> waitFn;
-      vector<function<void()>> slowFn;
+      mutable vector<function<const bool()>> waitFn;
+      mutable vector<function<void()>> slowFn;
     public:
-      void timer_ticks_factor(const unsigned int &factor) {
+      void timer_ticks_factor(const unsigned int &factor) const {
         ticks = 300 * (factor ?: 1);
       };
       void timer_1s(const function<const bool(const unsigned int&)> &fn) {
         timeFn.push_back(fn);
       };
-      void wait_for(const function<const bool()> &fn) {
+      void wait_for(const function<const bool()> &fn) const {
         waitFn.push_back(fn);
       };
-      void deferred(const function<void()> &fn) {
+      void deferred(const function<void()> &fn) const {
         slowFn.push_back(fn);
         loop->send();
       };
@@ -855,11 +759,9 @@ namespace ₿ {
           ((Events*)loop->getData())->deferred();
         });
       };
-      function<void()> stop() {
-        return [&]() {
-          timer->stop();
-          deferred();
-        };
+      void stop() {
+        timer->stop();
+        deferred();
       };
     private:
       void deferred() {
@@ -877,57 +779,204 @@ namespace ₿ {
       };
   };
 
-  class mAbout {
+  class Hotkey {
+    public_friend:
+      class Catch {
+        public:
+          Catch(const Hotkey &hotkey, const vector<pair<const char, const function<void()>>> &hotkeys)
+          {
+            for (const auto &it : hotkeys)
+              hotkey.keymap(it.first, it.second);
+          };
+      };
+    private_ref:
+      const Events &events;
+    public:
+      Hotkey(const Events &e)
+        : events(e)
+      {};
+    private:
+      future<char> keylogger;
+      mutable unordered_map<char, function<void()>> hotFn;
+    protected:
+      void legit_keylogger() {
+        if (hotFn.empty()) return;
+        if (keylogger.valid())
+          error("SH", string("Unable to launch another \"keylogger\" thread"));
+        noecho();
+        halfdelay(5);
+        keypad(stdscr, true);
+        launch_keylogger();
+        events.wait_for([&]() {
+          return wait_for_keylog();
+        });
+      };
+    private:
+      void keymap(const char &ch, function<void()> fn) const {
+        if (hotFn.find(ch) != hotFn.end())
+          error("SH", string("Too many handlers for \"") + ch + "\" hotkey event");
+        hotFn[ch] = fn;
+      };
+      const bool wait_for_keylog() {
+        if (keylogger.valid()
+          and keylogger.wait_for(chrono::nanoseconds(0)) == future_status::ready
+        ) {
+          const char ch = keylogger.get();
+          if (hotFn.find(ch) != hotFn.end())
+            hotFn.at(ch)();
+          launch_keylogger();
+        }
+        return false;
+      };
+      void launch_keylogger() {
+        keylogger = ::async(launch::async, [&]() {
+          int ch = ERR;
+          while (ch == ERR and !hotFn.empty())
+            ch = getch();
+          return ch == ERR ? '\r' : (char)ch;
+        });
+      };
+  };
+
+  class About {
+    public:
+      enum class mMatter: char {
+        FairValue            = 'a',                                                       Connectivity       = 'd',
+        MarketData           = 'e', QuotingParameters    = 'f',
+        OrderStatusReports   = 'i', ProductAdvertisement = 'j', ApplicationState   = 'k', EWMAStats          = 'l',
+        STDEVStats           = 'm', Position             = 'n', Profit             = 'o', SubmitNewOrder     = 'p',
+        CancelOrder          = 'q', MarketTrade          = 'r', Trades             = 's',
+        QuoteStatus          = 'u', TargetBasePosition   = 'v', TradeSafetyValue   = 'w', CancelAllOrders    = 'x',
+        CleanAllClosedTrades = 'y', CleanAllTrades       = 'z', CleanTrade         = 'A',
+                                    MarketChart          = 'D', Notepad            = 'E',
+                                    MarketDataLongTerm   = 'H'
+      };
     public:
       virtual const mMatter about() const = 0;
+      const bool persist() const {
+        return about() == mMatter::QuotingParameters;
+      };
   };
-  class mBlob: virtual public mAbout {
+
+  class Blob: virtual public About {
     public:
       virtual const json blob() const = 0;
   };
 
-  class mFromDb: public mBlob {
-    public:
-      void backup() const {
-        if (push) push();
-      };
-      function<void()> push
-#ifndef NDEBUG
-        = []() { WARN("Y U NO catch sqlite push?"); }
-#endif
-      ;
-      virtual       void   pull(const json &j) = 0;
-      virtual const string increment() const { return "NULL"; };
-      virtual const double limit()     const { return 0; };
-      virtual const Clock  lifetime()  const { return 0; };
-    protected:
-      virtual const string explain()   const = 0;
-      virtual       string explainOK() const = 0;
-      virtual       string explainKO() const { return ""; };
-      void explanation(const bool &empty) const {
-        string msg = empty
-          ? explainKO()
-          : explainOK();
-        if (msg.empty()) return;
-        size_t token = msg.find("%");
-        if (token != string::npos)
-          msg.replace(token, 1, explain());
-        if (empty)
-          Print::logWar("DB", msg);
-        else Print::log("DB", msg);
-      };
-  };
-
   class Sqlite {
-    public:
-      mutable vector<mFromDb*> tables;
+    public_friend:
+      class Backup: public Blob {
+        public:
+          using Report = pair<bool, string>;
+          function<void()> push
+#ifndef NDEBUG
+            = []() { WARN("Y U NO catch sqlite push?"); }
+#endif
+          ;
+        public:
+          Backup(const Sqlite &sqlite)
+          {
+            sqlite.tables.push_back(this);
+          };
+          void backup() const {
+            if (push) push();
+          };
+          virtual const Report pull(const json &j) = 0;
+          virtual const string increment() const { return "NULL"; };
+          virtual const double limit()     const { return 0; };
+          virtual const Clock  lifetime()  const { return 0; };
+        protected:
+          const Report report(const bool &empty) const {
+            string msg = empty
+              ? explainKO()
+              : explainOK();
+            const size_t token = msg.find("%");
+            if (token != string::npos)
+              msg.replace(token, 1, explain());
+            return {empty, msg};
+          };
+        private:
+          virtual const string explain()   const = 0;
+          virtual       string explainOK() const = 0;
+          virtual       string explainKO() const { return ""; };
+      };
+      template <typename T> class StructBackup: public Backup {
+        public:
+          StructBackup(const Sqlite &sqlite)
+            : Backup(sqlite)
+          {};
+          const json blob() const override {
+            return *(T*)this;
+          };
+          const Report pull(const json &j) override {
+            from_json(j.empty() ? blob() : j.at(0), *(T*)this);
+            return report(j.empty());
+          };
+        private:
+          string explainOK() const override {
+            return "loaded last % OK";
+          };
+      };
+      template <typename T> class VectorBackup: public Backup {
+        public:
+          VectorBackup(const Sqlite &sqlite)
+            : Backup(sqlite)
+          {};
+          vector<T> rows;
+          using reference              = typename vector<T>::reference;
+          using const_reference        = typename vector<T>::const_reference;
+          using iterator               = typename vector<T>::iterator;
+          using const_iterator         = typename vector<T>::const_iterator;
+          using reverse_iterator       = typename vector<T>::reverse_iterator;
+          using const_reverse_iterator = typename vector<T>::const_reverse_iterator;
+          iterator                 begin()       noexcept { return rows.begin();   };
+          const_iterator           begin() const noexcept { return rows.begin();   };
+          const_iterator          cbegin() const noexcept { return rows.cbegin();  };
+          iterator                   end()       noexcept { return rows.end();     };
+          const_iterator             end() const noexcept { return rows.end();     };
+          reverse_iterator        rbegin()       noexcept { return rows.rbegin();  };
+          const_reverse_iterator crbegin() const noexcept { return rows.crbegin(); };
+          reverse_iterator          rend()       noexcept { return rows.rend();    };
+          bool                     empty() const noexcept { return rows.empty();   };
+          size_t                    size() const noexcept { return rows.size();    };
+          reference                front()                { return rows.front();   };
+          const_reference          front() const          { return rows.front();   };
+          reference                 back()                { return rows.back();    };
+          const_reference           back() const          { return rows.back();    };
+          reference                   at(size_t n)        { return rows.at(n);     };
+          const_reference             at(size_t n) const  { return rows.at(n);     };
+          virtual void erase() {
+            if (size() > limit())
+              rows.erase(begin(), end() - limit());
+          };
+          virtual void push_back(const T &row) {
+            rows.push_back(row);
+            backup();
+            erase();
+          };
+          const Report pull(const json &j) override {
+            for (const json &it : j)
+              rows.push_back(it);
+            return report(empty());
+          };
+          const json blob() const override {
+            return back();
+          };
+        private:
+          const string explain() const override {
+            return to_string(size());
+          };
+      };
+    protected:
+      bool databases = false;
     private:
       sqlite3 *db = nullptr;
-      string qpdb = "main";
+      string disk = "main";
+      mutable vector<Backup*> tables;
     private_ref:
-      Events &events;
+      const Events &events;
     public:
-      Sqlite(Events &e)
+      Sqlite(const Events &e)
         : events(e)
       {};
     protected:
@@ -936,11 +985,13 @@ namespace ₿ {
           error("DB", sqlite3_errmsg(db));
         Print::log("DB", "loaded OK from", database);
         if (!diskdata.empty()) {
-          exec("ATTACH '" + diskdata + "' AS " + (qpdb = "qpdb") + ";");
+          exec("ATTACH '" + diskdata + "' AS " + (disk = "disk") + ";");
           Print::log("DB", "loaded OK from", diskdata);
         }
+        exec("PRAGMA " + disk + ".journal_mode = WAL;"
+             "PRAGMA " + disk + ".synchronous = NORMAL;");
         for (auto &it : tables) {
-          it->pull(select(it));
+          report(it->pull(select(it)));
           it->push = [this, it]() {
             insert(it);
           };
@@ -953,8 +1004,14 @@ namespace ₿ {
         tables.clear();
       };
     private:
-      const json select(mFromDb *const data) {
-        const string table = schema(data->about());
+      void report(const Backup::Report note) const {
+        if (note.second.empty()) return;
+        if (note.first)
+          Print::logWar("DB", note.second);
+        else Print::log("DB", note.second);
+      };
+      const json select(Backup *const data) {
+        const string table = schema(data);
         json result = json::array();
         exec(
           create(table)
@@ -964,8 +1021,8 @@ namespace ₿ {
         );
         return result;
       };
-      void insert(mFromDb *const data) {
-        const string table    = schema(data->about());
+      void insert(Backup *const data) {
+        const string table    = schema(data);
         const json   blob     = data->blob();
         const double limit    = data->limit();
         const Clock  lifetime = data->lifetime();
@@ -987,12 +1044,12 @@ namespace ₿ {
           exec(sql);
         });
       };
-      const string schema(const mMatter &type) const {
+      const string schema(Backup *const data) const {
         return (
-          type == mMatter::QuotingParameters
-            ? qpdb
+          data->persist()
+            ? disk
             : "main"
-        ) + "." + (char)type;
+        ) + "." + (char)data->about();
       };
       const string create(const string &table) const {
         return "CREATE TABLE IF NOT EXISTS " + table + "("
@@ -1005,7 +1062,7 @@ namespace ₿ {
           ? "DELETE FROM " + table + " WHERE time < " + to_string(Tstamp - lifetime) + ";"
           : "";
       };
-      void exec(const string &sql, json *const result = nullptr) {                // Print::log("DB DEBUG", sql);
+      void exec(const string &sql, json *const result = nullptr) {              // Print::log("DB DEBUG", sql);
         char* zErrMsg = nullptr;
         sqlite3_exec(db, sql.data(), result ? write : nullptr, (void*)result, &zErrMsg);
         if (zErrMsg) Print::logWar("DB", "SQLite error: " + (zErrMsg + (" at " + sql)));
@@ -1018,11 +1075,282 @@ namespace ₿ {
       };
   };
 
-  class mBackupFromDb: public mFromDb {
+  class Client {
+    public_friend:
+      class Readable: public Blob {
+        public:
+          function<void()> read
+#ifndef NDEBUG
+          = []() { WARN("Y U NO catch read?"); }
+#endif
+          ;
+        public:
+          Readable(const Client &client)
+          {
+            client.readable.push_back(this);
+          };
+          virtual const json hello() {
+            return { blob() };
+          };
+          virtual const bool realtime() const {
+            return true;
+          };
+      };
+      template <typename T> class Broadcast: public Readable {
+        public:
+          Broadcast(const Client &client)
+            : Readable(client)
+          {};
+          const bool broadcast() {
+            if ((read_asap() or read_soon())
+              and (read_same_blob() or diff_blob())
+            ) {
+              if (read) read();
+              return true;
+            }
+            return false;
+          };
+          const json blob() const override {
+            return *(T*)this;
+          };
+        protected:
+          Clock last_Tstamp = 0;
+          string last_blob;
+          virtual const bool read_same_blob() const {
+            return true;
+          };
+          const bool diff_blob() {
+            const string last = last_blob;
+            return (last_blob = blob().dump()) != last;
+          };
+          virtual const bool read_asap() const {
+            return true;
+          };
+          const bool read_soon(const int &delay = 0) {
+            const Clock now = Tstamp;
+            if (last_Tstamp + max(369, delay) > now)
+              return false;
+            last_Tstamp = now;
+            return true;
+          };
+      };
+      class Clickable: virtual public About {
+        public:
+          Clickable(const Client &client)
+          {
+            client.clickable.push_back(this);
+          };
+          virtual void click(const json&) = 0;
+      };
+      class Clicked {
+        public_friend:
+          class Catch {
+            public:
+              Catch(const Client &client, const vector<pair<const Clickable*, variant<
+                const function<void()>,
+                const function<void(const json&)>
+              >>> &clicked)
+              {
+                for (const auto &it : clicked)
+                  client.clicked(
+                    it.first,
+                    holds_alternative<const function<void()>>(it.second)
+                      ? [it](const json &j) { get<const function<void()>>(it.second)(); }
+                      : get<const function<void(const json&)>>(it.second)
+                  );
+              };
+          };
+      };
     public:
-      mBackupFromDb(const Sqlite &sqlite)
-      {
-        sqlite.tables.push_back(this);
+      string protocol = "HTTP";
+    protected:
+      uWS::Group<uWS::SERVER> *webui = nullptr;
+      unordered_map<string, pair<const char*, const int>> documents;
+    private:
+      int connections = 0;
+      mutable unsigned int delay = 0;
+      mutable vector<Readable*> readable;
+      mutable vector<Clickable*> clickable;
+      mutable unordered_map<const Clickable*, vector<function<void(const json&)>>> clickFn;
+      const pair<char, char> portal = {'=', '-'};
+      unordered_map<char, function<const json()>> hello;
+      unordered_map<char, function<void(const json&)>> kisses;
+      unordered_map<char, string> queue;
+      const unordered_map<unsigned int, const char*> headers = {
+        {200, "HTTP/1.1 200 OK"
+              "\r\n" "Connection: keep-alive"
+              "\r\n" "Accept-Ranges: bytes"
+              "\r\n" "Vary: Accept-Encoding"
+              "\r\n" "Cache-Control: public, max-age=0"},
+        {401, "HTTP/1.1 401 Unauthorized"
+              "\r\n" "Connection: keep-alive"
+              "\r\n" "Accept-Ranges: bytes"
+              "\r\n" "Vary: Accept-Encoding"
+              "\r\n" "WWW-Authenticate: Basic realm=\"Basic Authorization\""},
+        {403, "HTTP/1.1 403 Forbidden"
+              "\r\n" "Connection: keep-alive"
+              "\r\n" "Accept-Ranges: bytes"
+              "\r\n" "Vary: Accept-Encoding"},
+        {404, "HTTP/1.1 404 Not Found"},
+        {418, "HTTP/1.1 418 I'm a teapot"},
+      };
+    private_ref:
+      const Option &option;
+      const Events &events;
+    public:
+      Client(const Option &o, const Events &e)
+        : option(o)
+        , events(e)
+      {};
+      void clicked(const Clickable *data, const json &j = nullptr) const {
+        if (clickFn.find(data) != clickFn.end())
+          for (const auto &it : clickFn.at(data)) it(j);
+      };
+      void client_queue_delay(const unsigned int &d) const {
+        delay = d;
+      };
+      void broadcast(const unsigned int &tick) {
+        if (delay and !(tick % delay)) broadcast();
+      };
+      void welcome() {
+        for (auto &it : readable) {
+          it->read = [&]() {
+            if (connections) {
+              queue[(char)it->about()] = it->blob().dump();
+              if (it->realtime() or !delay) broadcast();
+            }
+          };
+          hello[(char)it->about()] = [&]() {
+            return it->hello();
+          };
+        }
+        readable.clear();
+        for (auto &it : clickable) {
+          kisses[(char)it->about()] = [&](const json &butterfly) {
+            it->click(butterfly);
+          };
+        }
+        clickable.clear();
+      };
+      void headless() {
+        for (auto &it : readable)
+          it->read = nullptr;
+        readable.clear();
+        clickable.clear();
+        documents.clear();
+      };
+      Socket::WSServer wsServer = [&](const bool &connection, const string &addr) {
+        connections += connection ?: -1;
+        Print::log("UI", to_string(connections) + " client" + string(connections == 1 ? 0 : 1, 's')
+          + " connected, last connection was from", addr);
+        if (connections > option.arg<int>("client-limit")) {
+          Print::log("UI", "--client-limit=" + to_string(option.arg<int>("client-limit")) + " reached by", addr);
+          return false;
+        }
+        return true;
+      };
+      Socket::WSMessage wsMessage = [&](string message, const string &addr) {
+        if (alien(addr))
+          return string(documents.at("").first, documents.at("").second);
+        const char matter = message.at(1);
+        if (portal.first == message.at(0)) {
+          if (hello.find(matter) != hello.end()) {
+            const json reply = hello.at(matter)();
+            if (!reply.is_null())
+              return portal.first + (matter + reply.dump());
+          }
+        } else if (portal.second == message.at(0) and kisses.find(matter) != kisses.end()) {
+          message = message.substr(2);
+          json butterfly = json::accept(message)
+            ? json::parse(message)
+            : json::object();
+          for (auto it = butterfly.begin(); it != butterfly.end();)
+            if (it.value().is_null()) it = butterfly.erase(it); else ++it;
+          kisses.at(matter)(butterfly);
+        }
+        return string();
+      };
+      Socket::HTTPServer httpServer = [&](string path, const string &auth, const string &addr) {
+        if (alien(addr))
+          path.clear();
+        const bool papersplease = !(
+          path.empty() or option.arg<string>("B64auth").empty()
+        );
+        string content,
+               type = "text/html; charset=UTF-8";
+        unsigned int code = 200;
+        if (papersplease and auth.empty()) {
+          Print::log("UI", "authorization attempt from", addr);
+          code = 401;
+        } else if (papersplease and auth != option.arg<string>("B64auth")) {
+          Print::log("UI", "authorization failed from", addr);
+          code = 403;
+        } else if (connections < option.arg<int>("client-limit")) {
+          if (documents.find(path) == documents.end())
+            path = path.substr(path.find_last_of("/", path.find_last_of("/") - 1));
+          if (documents.find(path) == documents.end())
+            path = path.substr(path.find_last_of("/"));
+          if (documents.find(path) != documents.end()) {
+            content = string(documents.at(path).first,
+                             documents.at(path).second);
+            const string leaf = path.substr(path.find_last_of('.') + 1);
+            if (leaf == "/") Print::log("UI", "authorization success from", addr);
+            else if (leaf == "js")  type = "application/javascript; charset=UTF-8";
+            else if (leaf == "css") type = "text/css; charset=UTF-8";
+            else if (leaf == "ico") type = "image/x-icon";
+            else if (leaf == "mp3") type = "audio/mpeg";
+          } else {
+            if (Random::int64() % 21)
+              code = 404, content = "Today, is a beautiful day.";
+            else // Humans! go to any random path to check your luck
+              code = 418, content = "Today, is your lucky day!";
+          }
+        } else {
+          Print::log("UI", "--client-limit=" + to_string(option.arg<int>("client-limit")) + " reached by", addr);
+          content = "Thank you! but our princess is already in this castle!"
+                    "<br/>" "Refresh the page anytime to retry.";
+        }
+        return document(content, code, type);
+      };
+    private:
+      void clicked(const Clickable *data, const function<void(const json&)> &fn) const {
+        clickFn[data].push_back(fn);
+      };
+      void broadcast() {
+        if (queue.empty()) return;
+        vector<string> msgs;
+        for (const auto &it : queue)
+          msgs.push_back(portal.second + (it.first + it.second));
+        queue.clear();
+        events.deferred([this, msgs]() {
+          for (const auto &it : msgs)
+            webui->broadcast(it.data(), it.length(), uWS::OpCode::TEXT);
+        });
+      };
+      const bool alien(const string &addr) {
+        if (addr != "unknown"
+          and !option.arg<string>("whitelist").empty()
+          and option.arg<string>("whitelist").find(addr) == string::npos
+        ) {
+          Print::log("UI", "dropping gzip bomb on", addr);
+          return true;
+        }
+        return false;
+      };
+      const string document(
+        const       string &content,
+        const unsigned int &code,
+        const       string &type
+      ) const {
+        return headers.at(code)
+         + string((content.length() > 2 and (content.substr(0, 2) == "PK" or (
+             content.at(0) == '\x1F' and content.at(1) == '\x8B'
+           ))) ? "\r\n" "Content-Encoding: gzip" : "")
+         + "\r\n" "Content-Type: "   + type
+         + "\r\n" "Content-Length: " + to_string(content.length())
+         + "\r\n"
+           "\r\n"
+         + content;
       };
   };
 
@@ -1044,32 +1372,34 @@ namespace ₿ {
   class KryptoNinja: public Klass,
                      public Print,
                      public Ending,
-                     public Hotkey,
                      public Option,
                      public Socket,
                      public Events,
-                     public Sqlite {
+                     public Hotkey,
+                     public Sqlite,
+                     public Client {
     public:
       Gw *gateway = nullptr;
     public:
       KryptoNinja()
-        : Sqlite((Events&)*this)
+        : Hotkey((Events&)*this)
+        , Sqlite((Events&)*this)
+        , Client((Option&)*this, (Events&)*this)
       {};
       KryptoNinja *const main(int argc, char** argv) {
         {
-          Option::main(argc, argv);
+          Option::main(argc, argv, databases, documents.empty());
           setup();
           curl_global_init(CURL_GLOBAL_ALL);
         } {
-          if (windowed())
-            wait_for(legit_keylogger());
+          if (windowed()) legit_keylogger();
         } {
           log("CF", "Outbound IP address is",
             wtfismyip = Curl::xfer("https://wtfismyip.com/json", 4L)
                           .value("YourFuckingIPAddress", wtfismyip)
           );
         } {
-          if (num("latency")) {
+          if (arg<int>("latency")) {
             gateway->latency("HTTP read/write handshake", [&]() {
               handshake({
                 {"gateway", gateway->http}
@@ -1082,9 +1412,7 @@ namespace ₿ {
           gateway->api = bind();
           start(socket->getLoop());
           ending([&]() {
-            gateway->close();
-            gateway->api->close();
-            gateway->end(num("dustybot"));
+            gateway->end(arg<int>("dustybot"));
             stop();
           });
           wait_for([&]() {
@@ -1095,18 +1423,38 @@ namespace ₿ {
               socket->connect(gateway->ws, nullptr, {}, 5e+3, gateway->api);
             return gateway->countdown ? false : gateway->askForData(tick);
           });
-        } {
           handshake({
-            {"gateway", gateway->http },
-            {"gateway", gateway->ws   },
-            {"gateway", gateway->fix  },
-            {"autoBot", num("autobot")
+            {"gateway", gateway->http      },
+            {"gateway", gateway->ws        },
+            {"gateway", gateway->fix       },
+            {"autoBot", arg<int>("autobot")
                           ? "yes"
-                          : "no"      }
+                          : "no"           }
           });
         } {
-          if (databases) backups(str("database"), str("diskdata"));
+          if (databases)
+            backups(
+              arg<string>("database"),
+              arg<string>("diskdata")
+            );
           else blackhole();
+        } {
+          if (arg<int>("headless")) headless();
+          else {
+            webui = listen(
+              protocol, arg<int>("port"),
+              !arg<int>("without-ssl"), arg<string>("ssl-crt"), arg<string>("ssl-key"),
+              httpServer, wsServer, wsMessage
+            );
+            timer_1s([&](const unsigned int &tick) {
+              broadcast(tick);
+              return false;
+            });
+            ending([&]() {
+              webui->close();
+            });
+            welcome();
+          }
         }
         return this;
       };
@@ -1116,36 +1464,49 @@ namespace ₿ {
         if (gateway->ready(socket->getLoop()))
           socket->run();
       };
-      void handshake(const vector<pair<string, string>> &notes = {}) {
-        const json reply = gateway->handshake();
-        if (!gateway->randId or gateway->symbol.empty())
-          error("GW", "Incomplete handshake aborted");
+      void handshake(const GwExchange::Report &notes = {}) {
+        const json reply = gateway->handshake(arg<int>("nocache"));
         if (!gateway->minTick or !gateway->minSize)
           error("GW", "Unable to fetch data from " + gateway->exchange
-            + " for symbol \"" + gateway->symbol + "\", possible error message: "
-            + reply.dump());
-        gateway->info(notes);
+            + " for symbols " + gateway->base + "/" + gateway->quote
+            + ", possible error message: " + reply.dump());
+        gateway->report(notes, arg<int>("nocache"));
+      };
+      const unsigned int memSize() const {
+#ifdef _WIN32
+        return 0;
+#else
+        struct rusage ru;
+        return getrusage(RUSAGE_SELF, &ru) ? 0 : ru.ru_maxrss * 1e+3;
+#endif
+      };
+      const unsigned int dbSize() const {
+        if (!databases or arg<string>("database") == ":memory:") return 0;
+        struct stat st;
+        return stat(arg<string>("database").data(), &st) ? 0 : st.st_size;
       };
     private:
       void setup() {
-        if (!(gateway = Gw::new_Gw(str("exchange"))))
+        if (!(gateway = Gw::new_Gw(arg<string>("exchange"))))
           error("CF",
             "Unable to configure a valid gateway using --exchange="
-              + str("exchange") + " argument"
+              + arg<string>("exchange") + " argument"
           );
-        if (!str("http").empty()) gateway->http = str("http");
-        if (!str("wss").empty())  gateway->ws   = str("wss");
-        if (!str("fix").empty())  gateway->fix  = str("fix");
-        epitaph = "- exchange: " + (gateway->exchange = str("exchange")) + '\n'
-                + "- currency: " + (gateway->base     = str("base"))     + " .. "
-                                 + (gateway->quote    = str("quote"))    + '\n';
-        gateway->apikey   = str("apikey");
-        gateway->secret   = str("secret");
-        gateway->user     = str("username");
-        gateway->pass     = str("passphrase");
-        gateway->maxLevel = num("market-limit");
-        gateway->debug    = num("debug-secret");
-        gateway->version  = num("free-version");
+        epitaph = "- exchange: " + (gateway->exchange = arg<string>("exchange")) + '\n'
+                + "- currency: " + (gateway->base     = arg<string>("base"))     + " .. "
+                                 + (gateway->quote    = arg<string>("quote"))    + '\n';
+        if (!gateway->http.empty() and !arg<string>("http").empty())
+          gateway->http   = arg<string>("http");
+        if (!gateway->ws.empty() and !arg<string>("wss").empty())
+          gateway->ws     = arg<string>("wss");
+        if (!gateway->fix.empty() and !arg<string>("fix").empty())
+          gateway->fix    = arg<string>("fix");
+        gateway->apikey   = arg<string>("apikey");
+        gateway->secret   = arg<string>("secret");
+        gateway->pass     = arg<string>("passphrase");
+        gateway->maxLevel = arg<int>("market-limit");
+        gateway->debug    = arg<int>("debug-secret");
+        gateway->version  = arg<int>("free-version");
         gateway->printer  = [&](const string &prefix, const string &reason, const string &highlight) {
           if (reason.find("Error") != string::npos)
             Print::logWar(prefix, reason);

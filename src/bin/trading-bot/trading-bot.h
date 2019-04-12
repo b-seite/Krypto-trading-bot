@@ -17,24 +17,20 @@ class TradingBot: public KryptoNinja {
       display   = terminal;
       margin    = {3, 6, 1, 2};
       databases = true;
+      documents = {
+        {"",                                  {&_www_gzip_bomb,   _www_gzip_bomb_len  }},
+        {"/",                                 {&_www_html_index,  _www_html_index_len }},
+        {"/js/client.min.js",                 {&_www_js_client,   _www_js_client_len  }},
+        {"/css/bootstrap.min.css",            {&_www_css_base,    _www_css_base_len   }},
+        {"/css/bootstrap-theme-dark.min.css", {&_www_css_dark,    _www_css_dark_len   }},
+        {"/css/bootstrap-theme.min.css",      {&_www_css_light,   _www_css_light_len  }},
+        {"/favicon.ico",                      {&_www_ico_favicon, _www_ico_favicon_len}},
+        {"/audio/0.mp3",                      {&_www_mp3_audio_0, _www_mp3_audio_0_len}},
+        {"/audio/1.mp3",                      {&_www_mp3_audio_1, _www_mp3_audio_1_len}}
+      };
       arguments = { {
         {"wallet-limit", "AMOUNT", "0",                    "set AMOUNT in base currency to limit the balance,"
                                                            "\n" "otherwise the full available balance can be used"},
-        {"client-limit", "NUMBER", "7",                    "set NUMBER of maximum concurrent UI connections"},
-        {"headless",     "1",      nullptr,                "do not listen for UI connections,"
-                                                           "\n" "all other UI related arguments will be ignored"},
-        {"without-ssl",  "1",      nullptr,                "do not use HTTPS for UI connections (use HTTP only)"},
-        {"ssl-crt",      "FILE",   "",                     "set FILE to custom SSL .crt file for HTTPS UI connections"
-                                                           "\n" "(see www.akadia.com/services/ssh_test_certificate.html)"},
-        {"ssl-key",      "FILE",   "",                     "set FILE to custom SSL .key file for HTTPS UI connections"
-                                                           "\n" "(the passphrase MUST be removed from the .key file!)"},
-        {"whitelist",    "IP",     "",                     "set IP or csv of IPs to allow UI connections,"
-                                                           "\n" "alien IPs will get a zip-bomb instead"},
-        {"port",         "NUMBER", "3000",                 "set NUMBER of an open port to listen for UI connections"},
-        {"user",         "WORD",   "NULL",                 "set allowed WORD as username for UI connections,"
-                                                           "\n" "mandatory but may be 'NULL'"},
-        {"pass",         "WORD",   "NULL",                 "set allowed WORD as password for UI connections,"
-                                                           "\n" "mandatory but may be 'NULL'"},
         {"lifetime",     "NUMBER", "0",                    "set NUMBER of minimum milliseconds to keep orders open,"
                                                            "\n" "otherwise open orders can be replaced anytime required"},
         {"matryoshka",   "URL",    "https://example.com/", "set Matryoshka link URL of the next UI"},
@@ -43,222 +39,37 @@ class TradingBot: public KryptoNinja {
         {"debug-orders", "1",      nullptr,                "print detailed output about exchange messages"},
         {"debug-quotes", "1",      nullptr,                "print detailed output about quoting engine"},
         {"debug-wallet", "1",      nullptr,                "print detailed output about target base position"}
-      }, [](
-        unordered_map<string, string> &str,
-        unordered_map<string, int>    &num,
-        unordered_map<string, double> &dec
-      ) {
-        if (num["debug"])
-          num["debug-orders"] =
-          num["debug-quotes"] =
-          num["debug-wallet"] = 1;
-        if (num["ignore-moon"] and num["ignore-sun"])
-          num["ignore-moon"] = 0;
-        if (num["debug-orders"] or num["debug-quotes"])
-          num["naked"] = 1;
-        if (num["latency"] or !num["port"] or !num["client-limit"])
-          num["headless"] = 1;
-        str["B64auth"] = (!num["headless"]
-          and str["user"] != "NULL" and !str["user"].empty()
-          and str["pass"] != "NULL" and !str["pass"].empty()
-        ) ? "Basic " + Text::B64(str["user"] + ':' + str["pass"])
-          : "";
+      }, [&](unordered_map<string, variant<string, int, double>> &args) {
+        if (arg<int>("debug"))
+          args["debug-orders"] =
+          args["debug-quotes"] =
+          args["debug-wallet"] = 1;
+        if (arg<int>("ignore-moon") and arg<int>("ignore-sun"))
+          args["ignore-moon"] = 0;
+        if (arg<int>("debug-orders") or arg<int>("debug-quotes"))
+          args["naked"] = 1;
       } };
     };
 } K;
 
-class WorldWideWeb {
-  public:
-    string protocol = "HTTP";
-  private:
-    uWS::Group<uWS::SERVER> *webui = nullptr;
-    int connections = 0;
-    unordered_map<mMatter, function<const json()>> hello;
-    unordered_map<mMatter, function<void(json&)>> kisses;
-    unordered_map<mMatter, string> queue;
-  private_ref:
-    const unsigned int &delay;
-  public:
-    WorldWideWeb(const unsigned int &d)
-      : delay(d)
-    {};
-    void listen() {
-      webui = K.listen(
-        protocol, K.num("port"),
-        !K.num("without-ssl"), K.str("ssl-crt"), K.str("ssl-key"),
-        httpServer, wsServer, wsMessage
-      );
-      K.timer_1s([&](const unsigned int &tick) {
-        if (delay and !(tick % delay) and !queue.empty()) {
-          vector<string> msgs;
-          for (const auto &it : queue)
-            msgs.push_back((char)mPortal::Kiss + ((char)it.first + it.second));
-          queue.clear();
-          K.deferred([this, msgs]() {
-            for (const auto &it : msgs)
-              webui->broadcast(it.data(), it.length(), uWS::OpCode::TEXT);
-          });
-        }
-        return false;
-      });
-      K.ending([&]() {
-        webui->close();
-      });
-    };
-    void welcome(mToClient &data) {
-      data.send = [&]() {
-        if (connections) send(data);
-      };
-      if (!webui) return;
-      const mMatter matter = data.about();
-      if (hello.find(matter) != hello.end())
-        error("UI", string("Too many handlers for \"") + (char)matter + "\" welcome event");
-      hello[matter] = [&]() {
-        return data.hello();
-      };
-    };
-    void clickme(mFromClient &data, function<void(const json&)> fn) {
-      if (!webui) return;
-      const mMatter matter = data.about();
-      if (kisses.find(matter) != kisses.end())
-        error("UI", string("Too many handlers for \"") + (char)matter + "\" clickme event");
-      kisses[matter] = [&data, fn](json &butterfly) {
-        data.kiss(&butterfly);
-        if (!butterfly.is_null())
-          fn(butterfly);
-      };
-    };
-  private:
-    void send(const mToClient &data) {
-      if (data.realtime() or !delay) {
-        const string msg = (char)mPortal::Kiss + ((char)data.about() + data.blob().dump());
-        K.deferred([this, msg]() {
-          webui->broadcast(msg.data(), msg.length(), uWS::OpCode::TEXT);
-        });
-      } else queue[data.about()] = data.blob().dump();
-    };
-    function<const bool(const bool&, const string&)> wsServer = [&](
-      const   bool &connection,
-      const string &addr
-    ) {
-      connections += connection ?: -1;
-      Print::log("UI", to_string(connections) + " client" + string(connections == 1 ? 0 : 1, 's')
-        + " connected, last connection was from", addr);
-      if (connections > K.num("client-limit")) {
-        Print::log("UI", "--client-limit=" + K.str("client-limit") + " reached by", addr);
-        return false;
-      }
-      return true;
-    };
-    function<const string(string, const string&)> wsMessage = [&](
-            string message,
-      const string &addr
-    ) {
-      if (addr != "unknown"
-        and !K.str("whitelist").empty()
-        and K.str("whitelist").find(addr) == string::npos
-      ) return string(&_www_gzip_bomb, _www_gzip_bomb_len);
-      const mPortal portal = (mPortal)message.at(0);
-      const mMatter matter = (mMatter)message.at(1);
-      if (mPortal::Hello == portal and hello.find(matter) != hello.end()) {
-        const json reply = hello.at(matter)();
-        if (!reply.is_null())
-          return (char)portal + ((char)matter + reply.dump());
-      } else if (mPortal::Kiss == portal and kisses.find(matter) != kisses.end()) {
-        message = message.substr(2);
-        json butterfly = json::accept(message)
-          ? json::parse(message)
-          : json::object();
-        for (auto it = butterfly.begin(); it != butterfly.end();)
-          if (it.value().is_null()) it = butterfly.erase(it); else ++it;
-        kisses.at(matter)(butterfly);
-      }
-      return string();
-    };
-    function<const string(const string&, const string&, const string&)> httpServer = [&](
-      const string &path,
-      const string &auth,
-      const string &addr
-    ) {
-      string content,
-             type;
-      unsigned int code = 404;
-      bool gzip = false;
-      if (addr != "unknown"
-        and !K.str("whitelist").empty()
-        and K.str("whitelist").find(addr) == string::npos
-      ) {
-        Print::log("UI", "dropping gzip bomb on", addr);
-        code = 200;
-        gzip = true;
-        content = string(&_www_gzip_bomb, _www_gzip_bomb_len);
-      } else if (!K.str("B64auth").empty() and auth.empty()) {
-        Print::log("UI", "authorization attempt from", addr);
-        code = 401;
-      } else if (!K.str("B64auth").empty() and auth != K.str("B64auth")) {
-        Print::log("UI", "authorization failed from", addr);
-        code = 403;
-      } else {
-        code = 200;
-        const string leaf = path.substr(path.find_last_of('.') + 1);
-        if (leaf == "/") {
-          type = "text/html; charset=UTF-8";
-          if (connections < K.num("client-limit")) {
-            Print::log("UI", "authorization success from", addr);
-            content = string(&_www_html_index, _www_html_index_len);
-          } else {
-            Print::log("UI", "--client-limit=" + K.str("client-limit") + " reached by", addr);
-            content = "Thank you! but our princess is already in this castle!"
-                      "<br/>" "Refresh the page anytime to retry.";
-          }
-        } else if (leaf == "js") {
-          gzip = true;
-          type = "application/javascript; charset=UTF-8";
-          content = string(&_www_js_client, _www_js_client_len);
-        } else if (leaf == "css") {
-          type = "text/css; charset=UTF-8";
-          if (path.find("css/bootstrap.min.css") != string::npos)
-            content = string(&_www_css_base, _www_css_base_len);
-          else if (path.find("css/bootstrap-theme-dark.min.css") != string::npos)
-            content = string(&_www_css_dark, _www_css_dark_len);
-          else if (path.find("css/bootstrap-theme.min.css") != string::npos)
-            content = string(&_www_css_light, _www_css_light_len);
-        } else if (leaf == "ico") {
-          type = "image/x-icon";
-          content = string(&_www_ico_favicon, _www_ico_favicon_len);
-        } else if (leaf == "mp3") {
-          type = "audio/mpeg";
-          if (path.find("audio/0.mp3") != string::npos)
-            content = string(&_www_mp3_audio_0, _www_mp3_audio_0_len);
-          else if (path.find("audio/1.mp3") != string::npos)
-            content = string(&_www_mp3_audio_1, _www_mp3_audio_1_len);
-        }
-      }
-      return K.document(content, code, type, gzip);
-    };
-};
-
 class Engine: public Klass {
   public:
-           mButtons btn;
      mQuotingParams qp;
-       WorldWideWeb client;
-           mMonitor monitor;
-           mProduct product;
             mOrders orders;
+           mButtons button;
       mMarketLevels levels;
     mWalletPosition wallet;
             mBroker broker;
+            mMemory memory;
   public:
     Engine()
       : qp(K)
-      , client(qp.delayUI)
-      , monitor(K)
-      , product(K)
       , orders(K)
-      , levels(K, orders, qp)
-      , wallet(K, orders, qp, levels.stats.ewma.targetPositionAutoPercentage, levels.fairValue)
-      , broker(K, orders, qp, levels, wallet)
+      , button(K)
+      , levels(K, qp, orders)
+      , wallet(K, qp, orders, button, levels)
+      , broker(K, qp, orders, button, levels, wallet)
+      , memory(K)
     {};
   protected:
     void waitData() override {
@@ -283,101 +94,30 @@ class Engine: public Klass {
         levels.stats.takerTrades.read_from_gw(rawdata);
       };
     };
-#define HOTKEYS      \
-        HOTKEYS_LIST \
-      ( HOTKEYS_CODE )
-#define HOTKEYS_CODE(key, fn)          K.hotkey(key, [&]() { fn(); });
-#define HOTKEYS_LIST(code)             \
-code( 'Q'  , exit                    ) \
-code( 'q'  , exit                    ) \
-code( '\e' , broker.semaphore.toggle )
-
-#define CLIENT_WELCOME      \
-        CLIENT_WELCOME_LIST \
-      ( CLIENT_WELCOME_CODE )
-#define CLIENT_WELCOME_CODE(data) client.welcome(data);
-#define CLIENT_WELCOME_LIST(code) \
-code( btn.notepad              )  \
-code( qp                       )  \
-code( monitor                  )  \
-code( product                  )  \
-code( orders                   )  \
-code( levels.diff              )  \
-code( levels.stats.takerTrades )  \
-code( levels.stats.fairPrice   )  \
-code( levels.stats             )  \
-code( wallet.target            )  \
-code( wallet.safety            )  \
-code( wallet.safety.trades     )  \
-code( wallet                   )  \
-code( broker.semaphore         )  \
-code( broker.calculon          )
-
-#define CLIENT_CLICKME      \
-        CLIENT_CLICKME_LIST \
-      ( CLIENT_CLICKME_CODE )
-#define CLIENT_CLICKME_CODE(btn, fn, val) \
-                 client.clickme(btn, [&](const json &butterfly) { fn(val); });
-#define CLIENT_CLICKME_LIST(code)                                            \
-code( btn.notepad           , void                             ,           ) \
-code( btn.submit            , manualSendOrder                  , butterfly ) \
-code( btn.cancel            , manualCancelOrder                , butterfly ) \
-code( btn.cancelAll         , cancelOrders                     ,           ) \
-code( btn.cleanTrade        , wallet.safety.trades.clearOne    , butterfly ) \
-code( btn.cleanTrades       , wallet.safety.trades.clearAll    ,           ) \
-code( btn.cleanTradesClosed , wallet.safety.trades.clearClosed ,           ) \
-code( qp                    , savedQuotingParameters           ,           ) \
-code( broker.semaphore      , void                             ,           )
     void waitAdmin() override {
-      HOTKEYS
-      if (!K.num("headless")) client.listen();
-      CLIENT_WELCOME
-      CLIENT_CLICKME
+      broker.semaphore.agree(K.arg<int>("autobot"));
     };
     void run() override {
-      {
-        K.timer_ticks_factor(qp.delayUI);
-        broker.calculon.dummyMM.mode("loaded");
-      } {
-        broker.semaphore.agree(K.num("autobot"));
-        K.timer_1s([&](const unsigned int &tick) {
-          if (!K.gateway->countdown and !levels.warn_empty()) {
-            levels.timer_1s();
-            if (!(tick % 60)) {
-              levels.timer_60s();
-              monitor.timer_60s();
-            }
-            wallet.safety.timer_1s();
-            calcQuotes();
+      K.timer_1s([&](const unsigned int &tick) {
+        if (!K.gateway->countdown and !levels.warn_empty()) {
+          levels.timer_1s();
+          if (!(tick % 60)) {
+            levels.timer_60s();
+            memory.timer_60s();
           }
-          return false;
-        });
-        K.gateway->askForCancelAll = &qp.cancelOrdersAuto;
-      }
+          wallet.safety.timer_1s();
+          calcQuotes();
+        }
+        return false;
+      });
     };
   private:
-    void savedQuotingParameters() {
-      K.timer_ticks_factor(qp.delayUI);
-      broker.calculon.dummyMM.mode("saved");
-      levels.stats.ewma.calcFromHistory(qp._diffEwma);
-    };
-    void cancelOrders() {
-      for (mOrder *const it : orders.working())
-        cancelOrder(it);
-    };
-    void manualSendOrder(mOrder raw) {
-      raw.orderId = K.gateway->randId();
-      placeOrder(raw);
-    };
-    void manualCancelOrder(const RandId &orderId) {
-      cancelOrder(orders.find(orderId));
-    };
     void calcQuotes() {
       if (broker.ready() and levels.ready() and wallet.ready()) {
         if (broker.calcQuotes()) {
           quote2orders(broker.calculon.quotes.ask);
           quote2orders(broker.calculon.quotes.bid);
-        } else cancelOrders();
+        } else broker.cancelOrders();
       }
       broker.clear();
     };
@@ -389,13 +129,13 @@ code( broker.semaphore      , void                             ,           )
       for_each(
         abandoned.begin(), abandoned.end() - replace,
         [&](mOrder *const it) {
-          cancelOrder(it);
+          broker.cancelOrder(it);
         }
       );
       if (quote.empty()) return;
       if (replace)
-        replaceOrder(quote.price, quote.isPong, abandoned.back());
-      else placeOrder({
+        broker.replaceOrder(quote.price, quote.isPong, abandoned.back());
+      else broker.placeOrder({
         quote.side,
         quote.price,
         quote.size,
@@ -403,18 +143,7 @@ code( broker.semaphore      , void                             ,           )
         quote.isPong,
         K.gateway->randId()
       });
-      monitor.orders_60s++;
-    };
-    void placeOrder(const mOrder &raw) {
-      K.gateway->place(orders.upsert(raw));
-    };
-    void replaceOrder(const Price &price, const bool &isPong, mOrder *const order) {
-      if (orders.replace(price, isPong, order))
-        K.gateway->replace(order);
-    };
-    void cancelOrder(mOrder *const order) {
-      if (orders.cancel(order))
-        K.gateway->cancel(order);
+      memory.orders_60s++;
     };
 } engine;
 
@@ -442,9 +171,9 @@ void TradingBot::terminal() {
     mvwhline(stdscr, ++yOrders, 1, ' ', x-1);
     wattron(stdscr, COLOR_PAIR(it.side == Side::Bid ? COLOR_CYAN : COLOR_MAGENTA));
     mvwaddstr(stdscr, yOrders, 1, (((it.side == Side::Bid ? "BID" : "ASK") + (" > "
-      + K.gateway->str(it.quantity))) + ' ' + K.gateway->base + " at price "
-      + K.gateway->str(it.price) + ' ' + K.gateway->quote + " (value "
-      + K.gateway->str(abs(it.price * it.quantity)) + ' ' + K.gateway->quote + ")"
+      + K.gateway->decimal.amount.str(it.quantity))) + ' ' + K.gateway->base + " at price "
+      + K.gateway->decimal.price.str(it.price) + ' ' + K.gateway->quote + " (value "
+      + K.gateway->decimal.price.str(abs(it.price * it.quantity)) + ' ' + K.gateway->quote + ")"
     ).data());
     wattroff(stdscr, COLOR_PAIR(it.side == Side::Bid ? COLOR_CYAN : COLOR_MAGENTA));
   }
@@ -457,10 +186,10 @@ void TradingBot::terminal() {
   mvwaddch(stdscr, y, 0, ACS_BTEE);
   mvwaddch(stdscr, 0, 12, ACS_RTEE);
   wattron(stdscr, COLOR_PAIR(COLOR_GREEN));
-  const string title1 = "   " + K.str("exchange");
-  const string title2 = " " + (K.num("headless")
+  const string title1 = "   " + K.arg<string>("exchange");
+  const string title2 = " " + (K.arg<int>("headless")
     ? "headless"
-    : "UI at " + Text::strL(engine.client.protocol) + "://" + K.wtfismyip + ":" + K.str("port")
+    : "UI at " + Text::strL(K.protocol) + "://" + K.wtfismyip + ":" + to_string(K.arg<int>("port"))
   )  + ' ';
   wattron(stdscr, A_BOLD);
   mvwaddstr(stdscr, 0, 13, title1.data());
@@ -480,8 +209,8 @@ void TradingBot::terminal() {
   mvwhline(stdscr, 1, 8, ACS_HLINE, 4);
   mvwaddch(stdscr, 1, 12, ACS_RTEE);
   wattron(stdscr, COLOR_PAIR(COLOR_MAGENTA));
-  const string baseValue  = K.gateway->str(engine.wallet.base.value),
-               quoteValue = K.gateway->str(engine.wallet.quote.value);
+  const string baseValue  = K.gateway->decimal.amount.str(engine.wallet.base.value),
+               quoteValue = K.gateway->decimal.price.str(engine.wallet.quote.value);
   wattron(stdscr, A_BOLD);
   waddstr(stdscr, (" " + baseValue + ' ').data());
   wattroff(stdscr, A_BOLD);
@@ -556,14 +285,14 @@ void TradingBot::terminal() {
     wattron(stdscr, COLOR_PAIR(COLOR_GREEN));
     waddstr(stdscr, (" 1 " + K.gateway->base + " = ").data());
     wattron(stdscr, A_BOLD);
-    waddstr(stdscr, K.gateway->str(engine.levels.fairValue).data());
+    waddstr(stdscr, K.gateway->decimal.price.str(engine.levels.fairValue).data());
     wattroff(stdscr, A_BOLD);
     waddstr(stdscr, (" " + K.gateway->quote).data());
     wattroff(stdscr, COLOR_PAIR(COLOR_GREEN));
     waddch(stdscr, engine.broker.semaphore.paused() ? ' ' : ':');
   }
   mvwaddch(stdscr, y-1, 0, ACS_LLCORNER);
-  mvwaddstr(stdscr, 1, 2, string("|/-\\").substr(engine.monitor.orders_60s % 4, 1).data());
+  mvwaddstr(stdscr, 1, 2, string("|/-\\").substr(engine.memory.orders_60s % 4, 1).data());
 };
 
 #endif

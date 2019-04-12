@@ -17,6 +17,8 @@ export class TradesComponent implements OnInit {
 
   public audio: boolean;
 
+  public hasPongs: boolean;
+
   public headerNameMod: string = "";
 
   private sortTimeout: number;
@@ -26,14 +28,15 @@ export class TradesComponent implements OnInit {
   @Input() set setQuotingParameters(o: Models.QuotingParameters) {
     this.audio = o.audio;
     if (!this.gridOptions.api) return;
-    var isK = (o.safety === Models.QuotingSafety.Boomerang || o.safety === Models.QuotingSafety.AK47);
-    this.headerNameMod = isK ? "Ping" : "";
+    this.hasPongs = (o.safety === Models.QuotingSafety.Boomerang || o.safety === Models.QuotingSafety.AK47);
+    this.headerNameMod = this.hasPongs ? "Ping" : "";
     this.gridOptions.columnDefs.map((r: ColDef) => {
       if (['Kqty','Kprice','Kvalue','Kdiff','Ktime'].indexOf(r.field) > -1)
-        this.gridOptions.columnApi.setColumnVisible(r.field, isK);
+        this.gridOptions.columnApi.setColumnVisible(r.field, this.hasPongs);
       return r;
     });
     this.gridOptions.api.refreshHeader();
+    this.emitLengths();
   }
 
   @Input() set setTrade(o: Models.Trade) {
@@ -45,6 +48,8 @@ export class TradesComponent implements OnInit {
   }
 
   @Output() onTradesLength = new EventEmitter<number>();
+
+  @Output() onTradesMatchedLength = new EventEmitter<number>();
 
   @Output() onTradesChartData = new EventEmitter<Models.TradeChart>();
 
@@ -85,22 +90,22 @@ export class TradesComponent implements OnInit {
         else return "unknown";
       }},
       {width: 80, field:'price', headerValueGetter:(params) => { return 'px' + this.headerNameMod; }, cellClass: (params) => {
-        if (params.data.side === 'K') return (params.data.price > params.data.Kprice) ? "sell" : "buy"; else return params.data.side === 'Sell' ? "sell" : "buy";
+        return params.data.pingSide;
       }, cellRendererFramework: QuoteCurrencyCellComponent},
-      {width: 65, suppressSizeToFit: true, field:'quantity', headerValueGetter:(params) => { return 'qty' + this.headerNameMod; }, cellClass: (params) => {
-        if (params.data.side === 'K') return (params.data.price > params.data.Kprice) ? "sell" : "buy"; else return params.data.side === 'Sell' ? "sell" : "buy";
+      {width: 85, suppressSizeToFit: true, field:'quantity', headerValueGetter:(params) => { return 'qty' + this.headerNameMod; }, cellClass: (params) => {
+        return params.data.pingSide;
       }, cellRendererFramework: BaseCurrencyCellComponent},
       {width: 69, field:'value', headerValueGetter:(params) => { return 'val' + this.headerNameMod; }, cellClass: (params) => {
-        if (params.data.side === 'K') return (params.data.price > params.data.Kprice) ? "sell" : "buy"; else return params.data.side === 'Sell' ? "sell" : "buy";
+        return params.data.pingSide;
       }, cellRendererFramework: QuoteCurrencyCellComponent},
       {width: 75, field:'Kvalue', headerName:'valPong', hide:true, cellClass: (params) => {
-        if (params.data.side === 'K') return (params.data.price < params.data.Kprice) ? "sell" : "buy"; else return params.data.Kqty ? ((params.data.price < params.data.Kprice) ? "sell" : "buy") : "";
+        return params.data.pongSide;
       }, cellRendererFramework: QuoteCurrencyCellComponent},
-      {width: 65, suppressSizeToFit: true, field:'Kqty', headerName:'qtyPong', hide:true, cellClass: (params) => {
-        if (params.data.side === 'K') return (params.data.price < params.data.Kprice) ? "sell" : "buy"; else return params.data.Kqty ? ((params.data.price < params.data.Kprice) ? "sell" : "buy") : "";
+      {width: 85, suppressSizeToFit: true, field:'Kqty', headerName:'qtyPong', hide:true, cellClass: (params) => {
+        return params.data.pongSide;
       }, cellRendererFramework: BaseCurrencyCellComponent},
       {width: 80, field:'Kprice', headerName:'pxPong', hide:true, cellClass: (params) => {
-        if (params.data.side === 'K') return (params.data.price < params.data.Kprice) ? "sell" : "buy"; else return params.data.Kqty ? ((params.data.price < params.data.Kprice) ? "sell" : "buy") : "";
+        return params.data.pongSide;
       }, cellRendererFramework: QuoteCurrencyCellComponent},
       {width: 65, field:'Kdiff', headerName:'Kdiff', hide:true, cellClass: (params) => {
         if (params.data.side === 'K') return "kira"; else return "";
@@ -139,7 +144,9 @@ export class TradesComponent implements OnInit {
             Kprice: t.Kprice ? t.Kprice : null,
             Kvalue: t.Kvalue ? t.Kvalue : null,
             Kdiff: t.Kdiff?t.Kdiff:null,
-            side: t.Kqty >= t.quantity ? 'K' : (t.side === Models.Side.Ask ? "Sell" : "Buy")
+            side: t.Kqty >= t.quantity ? 'K' : (t.side === Models.Side.Ask ? "Sell" : "Buy"),
+            pingSide: t.side == Models.Side.Ask ? "sell" : "buy",
+            pongSide: t.side == Models.Side.Ask ? "buy" : "sell"
           }));
           if (t.loadedFromDB === false) {
             if (this.sortTimeout) window.clearTimeout(this.sortTimeout);
@@ -158,6 +165,8 @@ export class TradesComponent implements OnInit {
           price: t.price,
           quantity: t.quantity,
           side: t.Kqty >= t.quantity ? 'K' : (t.side === Models.Side.Ask ? "Sell" : "Buy"),
+          pingSide: t.side == Models.Side.Ask ? "sell" : "buy",
+          pongSide: t.side == Models.Side.Ask ? "buy" : "sell",
           value: t.value,
           Ktime: t.Ktime || 0,
           Kqty: t.Kqty ? t.Kqty : null,
@@ -165,7 +174,8 @@ export class TradesComponent implements OnInit {
           Kvalue: t.Kvalue ? t.Kvalue : null,
           Kdiff: t.Kdiff && t.Kdiff!=0 ? t.Kdiff : null,
           quoteSymbol: this.product.advert.quote.replace('EUR','€').replace('USD','$'),
-          productFixed: this.product.fixed
+          productFixedPrice: this.product.fixedPrice,
+          productFixedSize: this.product.fixedSize
         }]});
       }
       if (t.loadedFromDB === false) {
@@ -185,6 +195,17 @@ export class TradesComponent implements OnInit {
     }
 
     this.gridOptions.api.sizeColumnsToFit();
+    this.emitLengths();
+  }
+
+  private emitLengths = () => {
     this.onTradesLength.emit(this.gridOptions.api.getModel().getRowCount());
+    var tradesMatched: number = 0;
+    if (this.hasPongs) {
+      this.gridOptions.api.forEachNode((node: RowNode) => {
+        if (node.data.Kqty) tradesMatched++;
+      });
+    } else tradesMatched = -1;
+    this.onTradesMatchedLength.emit(tradesMatched);
   }
 }
